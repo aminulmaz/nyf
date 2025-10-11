@@ -54,8 +54,8 @@
         <div class="container mx-auto px-4 flex justify-between items-center h-16">
             <h1 class="text-2xl font-orbitron font-bold neon-text-pink">HSL Auctioneer Portal</h1>
             <div class="flex items-center gap-4">
-                 <button id="seed-data-btn" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-md btn-glow">Seed Sample Data</button>
-                 <button id="reset-auction-btn" class="bg-red-600 text-white font-semibold py-2 px-4 rounded-md btn-glow">Reset Auction</button>
+                 <button id="seed-data-btn" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-md btn-glow">Seed Firebase Data</button>
+                 <button id="reset-auction-btn" class="bg-red-600 text-white font-semibold py-2 px-4 rounded-md btn-glow">Reset Firebase Auction</button>
             </div>
         </div>
     </header>
@@ -72,7 +72,6 @@
         <!-- Right Column: Auction Stage & Sold Log -->
         <div class="glass-effect rounded-lg p-4 flex flex-col gap-4 lg:col-span-2">
             <div id="auction-stage" class="flex-grow flex items-center justify-center">
-                <p class="text-gray-400 text-lg text-center">Select a player from the pool to begin auction</p>
                 <!-- Current player auction card will be injected here -->
             </div>
             <div class="flex-shrink-0">
@@ -92,24 +91,47 @@
         // --- IMPORTANT: REPLACE WITH YOUR FIREBASE CONFIG ---
         const firebaseConfig = {
            // Your Firebase config object goes here
+           // NOTE: The portal will still display with sample data if this is not configured.
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-        
-        await signInAnonymously(auth);
+        try {
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+            const auth = getAuth(app);
+            await signInAnonymously(auth);
+            
+            // Set up Firebase listeners only if config is valid
+            setupFirebaseListeners(db);
+            setupAdminButtons(db);
 
-        const playersCol = collection(db, 'players');
-        const teamsCol = collection(db, 'teams');
+        } catch (error) {
+            console.warn("Firebase config is missing or invalid. Displaying sample data only. Real-time features are disabled.");
+        }
 
         const playerPoolEl = document.getElementById('player-pool');
         const auctionStageEl = document.getElementById('auction-stage');
         const soldPlayersLogEl = document.getElementById('sold-players-log');
 
-        let allPlayersData = [];
-        let allTeamsData = [];
-        let currentPlayerId = null;
+        // --- INITIAL SAMPLE DATA FOR INSTANT PREVIEW ---
+        let allPlayersData = [
+            { id: 'p1_sample', name: 'Arjun Sharma', skill: 'Batsman', basePrice: 200000, status: 'available', imageUrl: 'https://placehold.co/400x300/1a1a1a/ffffff?text=Arjun' },
+            { id: 'p2_sample', name: 'Rohan Singh', skill: 'Bowler', basePrice: 150000, status: 'available', imageUrl: 'https://placehold.co/400x300/2a2a2a/ffffff?text=Rohan' },
+            { id: 'p3_sample', name: 'Vikram Das', skill: 'All-Rounder', basePrice: 180000, status: 'available', imageUrl: 'https://placehold.co/400x300/3a3a3a/ffffff?text=Vikram' },
+            { id: 'p4_sample', name: 'Sameer Khan', skill: 'Batsman', basePrice: 220000, status: 'available', imageUrl: 'https://placehold.co/400x300/4a4a4a/ffffff?text=Sameer' },
+            { id: 'p_sold_sample', name: 'Prakash Roy', skill: 'Wicketkeeper', basePrice: 120000, status: 'sold', sellingPrice: 250000, soldToTeam: 't2_sample', soldAt: new Date().getTime(), imageUrl: 'https://placehold.co/400x300/5a5a5a/ffffff?text=Prakash' }
+        ];
+        let allTeamsData = [
+            { id: 't1_sample', name: 'Assasin Kalain' },
+            { id: 't2_sample', name: 'Narainpur Knight Riders' },
+            { id: 't3_sample', name: 'Deccan Hyderabad' },
+            { id: 't4_sample', name: 'Bowerghat Bulls' },
+        ];
+        let currentPlayerId = 'p1_sample'; // Start with a player on the block
+
+        // --- INITIAL RENDER ---
+        renderPlayerPool(allPlayersData);
+        renderSoldPlayers(allPlayersData, allTeamsData);
+        renderAuctionStage(currentPlayerId);
 
         // --- RENDER FUNCTIONS ---
         function renderPlayerPool(players) {
@@ -142,13 +164,11 @@
                 auctionStageEl.innerHTML = '<p class="text-gray-400 text-lg text-center">Select a player from the pool to begin auction</p>';
                 return;
             }
-
             const player = allPlayersData.find(p => p.id === playerId);
             if (!player) return;
 
             auctionStageEl.innerHTML = `
                 <div class="w-full h-full flex flex-col justify-center items-center gap-6">
-                    <!-- Player Card -->
                     <div class="w-full max-w-md glass-effect rounded-lg p-6 auction-card-main">
                         <img src="${player.imageUrl || 'https://placehold.co/400x300/0a0a1a/ff00de?text=Player+Image'}" alt="${player.name}" class="w-full h-48 object-cover rounded-md border-2 border-pink-500/50 mb-4">
                         <h2 class="text-4xl font-orbitron font-bold text-center">${player.name}</h2>
@@ -158,8 +178,6 @@
                             <p class="text-3xl font-orbitron font-bold text-green-400">₹${player.basePrice.toLocaleString()}</p>
                         </div>
                     </div>
-
-                    <!-- Auctioneer Controls -->
                     <div class="w-full max-w-md glass-effect rounded-lg p-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <input type="number" id="selling-price-input" placeholder="Final Selling Price" class="form-input rounded-md p-3 text-white col-span-1 md:col-span-2" required>
@@ -176,26 +194,35 @@
         }
         
         // --- FIREBASE LISTENERS ---
-        onSnapshot(playersCol, (snapshot) => {
-            allPlayersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderPlayerPool(allPlayersData);
-            renderSoldPlayers(allPlayersData, allTeamsData);
-            // If the current player is updated (e.g., sold), clear the stage
-            const currentPlayerStillAvailable = allPlayersData.find(p => p.id === currentPlayerId)?.status === 'available';
-            if (!currentPlayerStillAvailable && currentPlayerId) {
-                currentPlayerId = null;
-                renderAuctionStage(null);
-            }
-        });
+        function setupFirebaseListeners(db) {
+            const playersCol = collection(db, 'players');
+            const teamsCol = collection(db, 'teams');
 
-        onSnapshot(teamsCol, (snapshot) => {
-            allTeamsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a,b) => a.name.localeCompare(b.name));
-            renderSoldPlayers(allPlayersData, allTeamsData);
-             // Re-render stage if a player is selected to update the team dropdown
-            if (currentPlayerId) {
-                renderAuctionStage(currentPlayerId);
-            }
-        });
+            onSnapshot(playersCol, (snapshot) => {
+                const firebasePlayers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                if (firebasePlayers.length > 0) {
+                    allPlayersData = firebasePlayers;
+                }
+                renderPlayerPool(allPlayersData);
+                renderSoldPlayers(allPlayersData, allTeamsData);
+                const currentPlayerStillAvailable = allPlayersData.find(p => p.id === currentPlayerId)?.status === 'available';
+                if (!currentPlayerStillAvailable && currentPlayerId) {
+                    currentPlayerId = null;
+                    renderAuctionStage(null);
+                }
+            });
+
+            onSnapshot(teamsCol, (snapshot) => {
+                const firebaseTeams = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a,b) => a.name.localeCompare(b.name));
+                 if (firebaseTeams.length > 0) {
+                    allTeamsData = firebaseTeams;
+                }
+                renderSoldPlayers(allPlayersData, allTeamsData);
+                if (currentPlayerId) {
+                    renderAuctionStage(currentPlayerId);
+                }
+            });
+        }
 
         // --- EVENT HANDLERS ---
         playerPoolEl.addEventListener('click', (e) => {
@@ -207,6 +234,8 @@
         });
 
         auctionStageEl.addEventListener('click', async (e) => {
+             const db = getFirestore(initializeApp(firebaseConfig));
+
             if (e.target.id === 'sell-player-btn') {
                 if (!currentPlayerId) return;
                 const sellingPrice = document.getElementById('selling-price-input').value;
@@ -216,13 +245,23 @@
                     return;
                 }
                 
-                const playerRef = doc(db, 'players', currentPlayerId);
-                await updateDoc(playerRef, {
-                    status: 'sold',
-                    sellingPrice: parseInt(sellingPrice),
-                    soldToTeam: teamId,
-                    soldAt: new Date().getTime() // For sorting recent sales
-                });
+                try {
+                    const playerRef = doc(db, 'players', currentPlayerId);
+                    await updateDoc(playerRef, {
+                        status: 'sold',
+                        sellingPrice: parseInt(sellingPrice),
+                        soldToTeam: teamId,
+                        soldAt: new Date().getTime()
+                    });
+                } catch(error) {
+                    // Fallback for sample data mode
+                     const playerIndex = allPlayersData.findIndex(p => p.id === currentPlayerId);
+                     if (playerIndex !== -1) {
+                        allPlayersData[playerIndex] = { ...allPlayersData[playerIndex], status: 'sold', sellingPrice: parseInt(sellingPrice), soldToTeam: teamId, soldAt: new Date().getTime() };
+                        renderPlayerPool(allPlayersData);
+                        renderSoldPlayers(allPlayersData, allTeamsData);
+                     }
+                }
                 
                 currentPlayerId = null;
                 renderAuctionStage(null);
@@ -230,47 +269,49 @@
 
             if (e.target.id === 'unsold-player-btn') {
                 if (!currentPlayerId) return;
-                const playerRef = doc(db, 'players', currentPlayerId);
-                await updateDoc(playerRef, {
-                    status: 'unsold'
-                });
+                 try {
+                    const playerRef = doc(db, 'players', currentPlayerId);
+                    await updateDoc(playerRef, { status: 'unsold' });
+                } catch(error) {
+                    const playerIndex = allPlayersData.findIndex(p => p.id === currentPlayerId);
+                    if (playerIndex !== -1) {
+                         allPlayersData[playerIndex].status = 'unsold';
+                         renderPlayerPool(allPlayersData);
+                    }
+                }
                 currentPlayerId = null;
                 renderAuctionStage(null);
             }
         });
         
         // --- ADMIN BUTTONS ---
-        document.getElementById('seed-data-btn').addEventListener('click', async () => {
-             if (!confirm('This will add sample players and teams. Proceed?')) return;
-             const samplePlayers = [ 
-                 { name: 'Arjun Sharma', skill: 'Batsman', basePrice: 200000, status: 'available', imageUrl: 'https://placehold.co/400x300/1a1a1a/ffffff?text=Arjun' },
-                 { name: 'Rohan Singh', skill: 'Bowler', basePrice: 150000, status: 'available', imageUrl: 'https://placehold.co/400x300/2a2a2a/ffffff?text=Rohan' },
-                 { name: 'Vikram Das', skill: 'All-Rounder', basePrice: 180000, status: 'available', imageUrl: 'https://placehold.co/400x300/3a3a3a/ffffff?text=Vikram' },
-                 { name: 'Sameer Khan', skill: 'Batsman', basePrice: 220000, status: 'available', imageUrl: 'https://placehold.co/400x300/4a4a4a/ffffff?text=Sameer' },
-                 { name: 'Manish Patel', skill: 'Wicketkeeper', basePrice: 120000, status: 'available', imageUrl: 'https://placehold.co/400x300/5a5a5a/ffffff?text=Manish' }
-            ];
-             const sampleTeams = allTeams.slice(0, 4).map(t => ({ name: t.name }));
-             const batch = writeBatch(db);
-             samplePlayers.forEach(p => batch.set(doc(collection(db, 'players')), p));
-             sampleTeams.forEach(t => batch.set(doc(collection(db, 'teams')), t));
-             await batch.commit();
-             alert('Sample data added!');
-        });
+        function setupAdminButtons(db) {
+            document.getElementById('seed-data-btn').addEventListener('click', async () => {
+                 if (!confirm('This will add sample players and teams to your Firebase database. Proceed?')) return;
+                 const samplePlayersForFirebase = [ 
+                     { name: 'Arjun Sharma', skill: 'Batsman', basePrice: 200000, status: 'available', imageUrl: 'https://placehold.co/400x300/1a1a1a/ffffff?text=Arjun' },
+                     { name: 'Rohan Singh', skill: 'Bowler', basePrice: 150000, status: 'available', imageUrl: 'https://placehold.co/400x300/2a2a2a/ffffff?text=Rohan' },
+                     { name: 'Vikram Das', skill: 'All-Rounder', basePrice: 180000, status: 'available', imageUrl: 'https://placehold.co/400x300/3a3a3a/ffffff?text=Vikram' },
+                 ];
+                 const sampleTeamsForFirebase = [ { name: 'Assasin Kalain' }, { name: 'Narainpur Knight Riders' }, { name: 'Deccan Hyderabad' } ];
+                 const batch = writeBatch(db);
+                 samplePlayersForFirebase.forEach(p => batch.set(doc(collection(db, 'players')), p));
+                 sampleTeamsForFirebase.forEach(t => batch.set(doc(collection(db, 'teams')), t));
+                 await batch.commit();
+                 alert('Sample data added to Firebase!');
+            });
 
-        document.getElementById('reset-auction-btn').addEventListener('click', async () => {
-            if (!confirm('ARE YOU SURE? This will reset all players to "available".')) return;
-            const batch = writeBatch(db);
-            const playersSnapshot = await getDocs(playersCol);
-            playersSnapshot.forEach(d => batch.update(d.ref, { 
-                status: 'available',
-                soldToTeam: null,
-                sellingPrice: 0,
-                soldAt: null
-            }));
-            await batch.commit();
-            alert('Auction players have been reset!');
-        });
+            document.getElementById('reset-auction-btn').addEventListener('click', async () => {
+                if (!confirm('ARE YOU SURE? This will reset all players in Firebase to "available".')) return;
+                const batch = writeBatch(db);
+                const playersSnapshot = await getDocs(collection(db, 'players'));
+                playersSnapshot.forEach(d => batch.update(d.ref, { status: 'available', soldToTeam: null, sellingPrice: 0, soldAt: null }));
+                await batch.commit();
+                alert('Firebase auction players have been reset!');
+            });
+        }
     </script>
 </body>
 </html>
+
 
