@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <style>
+        :root {
+            --angle: 0deg;
+        }
         body {
             font-family: 'Roboto', sans-serif;
             background-color: #0a0a1a;
@@ -24,10 +27,6 @@
         }
         .neon-text-pink {
             text-shadow: 0 0 5px #ff00de, 0 0 10px #ff00de, 0 0 20px #ff00de;
-        }
-        .neon-border {
-            border-color: #ff00de;
-            box-shadow: 0 0 5px #ff00de, 0 0 10px #ff00de inset;
         }
         .glass-effect {
             background: rgba(16, 16, 32, 0.6);
@@ -64,13 +63,6 @@
         .page.active {
             display: block;
         }
-        .team-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .team-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 0 15px #00f, 0 0 30px #00f;
-        }
         .btn-glow {
              transition: all 0.3s ease;
         }
@@ -98,53 +90,91 @@
             border-radius: 0.5rem;
             border: 2px solid #ff00de80;
         }
-        .swiper-pagination-bullet-active {
-            background-color: #ff00de !important;
+        /* Animated Border for Announcement Box */
+        @property --angle {
+          syntax: '<angle>';
+          initial-value: 0deg;
+          inherits: false;
         }
-        .swiper-button-next, .swiper-button-prev {
-            color: #ff00de !important;
-            text-shadow: 0 0 10px #ff00de;
+        @keyframes rotate {
+          to {
+            --angle: 360deg;
+          }
         }
-        .sponsor-card {
+        .animated-border {
+            position: relative;
+            background-clip: padding-box;
+            border: 2px solid transparent;
+            border-radius: 0.75rem; /* 12px */
+        }
+        .animated-border::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0; bottom: 0; left: 0;
+            z-index: -1;
+            margin: -2px; /* Same as border width */
+            border-radius: inherit; /* Inherit border-radius */
+            background: conic-gradient(from var(--angle), #0a0a1a, #0a0a1a, #ff00de, #00f, #ff00de, #0a0a1a, #0a0a1a);
+            animation: rotate 4s linear infinite;
+        }
+        /* Schedule Card Styles */
+        .match-card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        .sponsor-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 15px #00f, 0 0 25px #ff00de;
+        .match-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), 0 0 30px rgba(255, 0, 222, 0.2);
         }
-        .sponsor-card img {
-            filter: grayscale(0.5) contrast(1.2);
-            transition: filter 0.3s ease;
+        .team-logo-initials {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 1.25rem;
         }
-        .sponsor-card:hover img {
-            filter: grayscale(0) contrast(1);
+        .logo-blue {
+             background: rgba(0, 100, 255, 0.2);
+             border: 2px solid #00f;
+             color: #00f;
+             text-shadow: 0 0 5px #00f;
         }
+        .logo-pink {
+            background: rgba(255, 0, 222, 0.2);
+             border: 2px solid #ff00de;
+             color: #ff00de;
+             text-shadow: 0 0 5px #ff00de;
+        }
+
     </style>
 </head>
 <body class="overflow-x-hidden">
 
-    <!-- Header -->
     <header id="header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 glass-effect">
         <div class="container mx-auto px-4">
             <nav class="flex justify-between items-center py-4">
-                <a href="#" class="text-2xl md:text-3xl font-orbitron font-bold neon-text-pink">HSL Night Cricket</a>
+                <a href="#home" class="text-xl sm:text-2xl md:text-3xl font-orbitron font-bold neon-text-pink">HSL Cricket</a>
                 <div class="hidden md:flex items-center space-x-8">
                     <a href="#home" class="nav-link text-lg font-semibold active">Home</a>
                     <a href="#teams" class="nav-link text-lg font-semibold">Teams</a>
                     <a href="#schedule" class="nav-link text-lg font-semibold">Schedule</a>
                     <a href="#sponsors" class="nav-link text-lg font-semibold">Sponsors</a>
+                    <a href="#register" class="nav-link text-lg font-semibold">Register</a>
                 </div>
                 <button id="mobile-menu-button" class="md:hidden text-white">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                 </button>
             </nav>
         </div>
-        <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden md:hidden px-4 pb-4">
             <a href="#home" class="block py-2 text-lg font-semibold nav-link active">Home</a>
             <a href="#teams" class="block py-2 text-lg font-semibold nav-link">Teams</a>
             <a href="#schedule" class="block py-2 text-lg font-semibold nav-link">Schedule</a>
             <a href="#sponsors" class="block py-2 text-lg font-semibold nav-link">Sponsors</a>
+            <a href="#register" class="block py-2 text-lg font-semibold nav-link">Register</a>
         </div>
     </header>
 
@@ -153,284 +183,54 @@
         <section id="home" class="page active">
             <div class="hero-bg min-h-screen flex items-center justify-center pt-24">
                 <div class="text-center text-white px-4">
-                    <h1 class="text-5xl md:text-6xl lg:text-7xl font-orbitron font-black uppercase neon-text">Haji Sujamuddin Laskar<br>Night Cricket</h1>
-                    <p class="text-xl md:text-2xl mt-6 mb-2 font-light text-gray-300">The ultimate showdown under the stars.</p>
-                    <p class="text-lg md:text-xl font-semibold text-blue-300 mb-8">Organised by Narainpur Youth Federation</p>
-                    <div id="countdown" class="flex justify-center space-x-2 md:space-x-8 my-10 scale-90 md:scale-100">
-                        <!-- Countdown timer will be injected here -->
-                    </div>
+                    <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-orbitron font-black uppercase neon-text">Haji Sujamuddin Laskar<br>Night Cricket</h1>
+                    <p class="text-lg sm:text-xl md:text-2xl mt-6 mb-2 font-light text-gray-300">The ultimate showdown under the stars.</p>
+                    <p class="text-base sm:text-lg md:text-xl font-semibold text-blue-300 mb-8">Organised by Narainpur Youth Federation</p>
+                    <div id="countdown" class="flex justify-center space-x-2 sm:space-x-4 md:space-x-8 my-10"></div>
                     <a href="#schedule" class="bg-pink-600 text-white font-bold py-3 px-8 rounded-full text-lg uppercase hover:bg-pink-700 btn-glow border-2 border-pink-500">View Schedule</a>
                 </div>
             </div>
-
-            <!-- Image Carousel Section -->
-            <div class="py-12 bg-gray-900/50">
+            <div class="py-16 bg-black/30">
                 <div class="container mx-auto px-4">
-                    <h2 class="text-4xl font-orbitron font-bold text-center mb-4 neon-text-pink">Moments From The Past</h2>
-                    <div class="swiper-container mySwiper">
-                        <div class="swiper-wrapper">
-                            <div class="swiper-slide"><img src="https://placehold.co/400x400/0a0a1a/ff00de?text=Season+1+Champions" alt="Previous Season Image 1"></div>
-                            <div class="swiper-slide"><img src="https://placehold.co/400x400/0a0a1a/00f?text=Epic+Six" alt="Previous Season Image 2"></div>
-                            <div class="swiper-slide"><img src="https://placehold.co/400x400/0a0a1a/ff00de?text=Night+Finals+Crowd" alt="Previous Season Image 3"></div>
-                            <div class="swiper-slide"><img src="https://placehold.co/400x400/0a0a1a/00f?text=Winning+Shot" alt="Previous Season Image 4"></div>
-                            <div class="swiper-slide"><img src="https://placehold.co/400x400/0a0a1a/ff00de?text=Team+Celebration" alt="Previous Season Image 5"></div>
-                             <div class="swiper-slide"><img src="https://placehold.co/400x400/0a0a1a/00f?text=Under+The+Lights" alt="Previous Season Image 6"></div>
+                    <h2 class="text-4xl font-orbitron font-bold text-center mb-10 neon-text-pink">Latest Updates</h2>
+                    <div class="max-w-3xl mx-auto animated-border">
+                        <div class="glass-effect rounded-lg p-4 sm:p-6">
+                            <div class="space-y-4">
+                                <!-- Announcements -->
+                            </div>
                         </div>
-                        <div class="swiper-pagination"></div>
-                        <div class="swiper-button-next"></div>
-                        <div class="swiper-button-prev"></div>
                     </div>
                 </div>
             </div>
-
-            <!-- Tournament Highlights Section -->
+            <div class="py-12 bg-gray-900/50">
+                <div class="container mx-auto px-4 overflow-hidden">
+                    <h2 class="text-4xl font-orbitron font-bold text-center mb-4 neon-text-pink">Moments From The Past</h2>
+                    <div class="swiper-container mySwiper">
+                        <div class="swiper-wrapper">
+                            <!-- Carousel slides -->
+                        </div>
+                        <div class="swiper-button-next text-pink-500"></div>
+                        <div class="swiper-button-prev text-pink-500"></div>
+                    </div>
+                </div>
+            </div>
             <div class="py-20 bg-gray-900/50">
                 <div class="container mx-auto px-4">
                      <h2 class="text-4xl font-orbitron font-bold text-center mb-12 neon-text-pink">Tournament Highlights</h2>
                      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <div class="glass-effect p-6 rounded-lg text-center">
-                            <i class="ph-trophy text-6xl text-yellow-400 mx-auto mb-4"></i>
-                            <h3 class="text-2xl font-bold font-orbitron mb-2">Champions Prize</h3>
-                            <p>The winners ride away with a brand new <span class="font-bold text-white">Royal Enfield Hunter</span> bike.</p>
-                        </div>
-                        <div class="glass-effect p-6 rounded-lg text-center">
-                            <i class="ph-motorcycle text-6xl text-gray-300 mx-auto mb-4"></i>
-                            <h3 class="text-2xl font-bold font-orbitron mb-2">Runners Up Prize</h3>
-                            <p>The runners-up will be awarded a stylish new <span class="font-bold text-white">Scooty</span>.</p>
-                        </div>
-                         <div class="glass-effect p-6 rounded-lg text-center">
-                            <i class="ph-stadium text-6xl text-blue-400 mx-auto mb-4"></i>
-                            <h3 class="text-2xl font-bold font-orbitron mb-2">Floodlit Action</h3>
-                            <p>Experience cricket like never before under dazzling stadium lights.</p>
-                        </div>
-                         <div class="glass-effect p-6 rounded-lg text-center">
-                            <i class="ph-users-three text-6xl text-pink-400 mx-auto mb-4"></i>
-                            <h3 class="text-2xl font-bold font-orbitron mb-2">For The Fans</h3>
-                            <p>Live DJ, food stalls, and an electrifying atmosphere for everyone.</p>
-                        </div>
+                        <!-- Highlights -->
                      </div>
                 </div>
             </div>
         </section>
 
-        <!-- Teams Page -->
-        <section id="teams" class="page min-h-screen pt-24 bg-gray-900/50">
-            <div class="container mx-auto px-4 py-16">
-                <h2 class="text-5xl font-orbitron font-bold text-center mb-16 neon-text-pink">Meet The Contenders</h2>
-                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <!-- Team Card 1 -->
-                    <div class="team-card glass-effect rounded-lg overflow-hidden text-center">
-                        <img src="https://placehold.co/400x300/1a1a2e/00f?text=Neon+Ninjas" alt="Team Logo" class="w-full h-48 object-cover">
-                        <div class="p-6">
-                            <h3 class="text-2xl font-orbitron font-bold text-blue-400">Neon Ninjas</h3>
-                            <p class="mt-2 text-gray-400">Known for their lightning-fast fielding and aggressive batting.</p>
-                        </div>
-                    </div>
-                     <!-- Team Card 2 -->
-                    <div class="team-card glass-effect rounded-lg overflow-hidden text-center">
-                        <img src="https://placehold.co/400x300/1a1a2e/ff00de?text=Galaxy+Gladiators" alt="Team Logo" class="w-full h-48 object-cover">
-                        <div class="p-6">
-                            <h3 class="text-2xl font-orbitron font-bold text-pink-500">Galaxy Gladiators</h3>
-                            <p class="mt-2 text-gray-400">Masters of strategy, they outsmart their opponents with every move.</p>
-                        </div>
-                    </div>
-                     <!-- Team Card 3 -->
-                    <div class="team-card glass-effect rounded-lg overflow-hidden text-center">
-                        <img src="https://placehold.co/400x300/1a1a2e/00f?text=Cosmic+Comets" alt="Team Logo" class="w-full h-48 object-cover">
-                        <div class="p-6">
-                            <h3 class="text-2xl font-orbitron font-bold text-blue-400">Cosmic Comets</h3>
-                            <p class="mt-2 text-gray-400">Their explosive hitters can turn the game around in a single over.</p>
-                        </div>
-                    </div>
-                     <!-- Team Card 4 -->
-                    <div class="team-card glass-effect rounded-lg overflow-hidden text-center">
-                        <img src="https://placehold.co/400x300/1a1a2e/ff00de?text=Vortex+Vipers" alt="Team Logo" class="w-full h-48 object-cover">
-                        <div class="p-6">
-                            <h3 class="text-2xl font-orbitron font-bold text-pink-500">Vortex Vipers</h3>
-                            <p class="mt-2 text-gray-400">A team with venomous bowlers that strike with deadly precision.</p>
-                        </div>
-                    </div>
-                    <!-- Add 4 more teams -->
-                    <div class="team-card glass-effect rounded-lg overflow-hidden text-center">
-                        <img src="https://placehold.co/400x300/1a1a2e/ff00de?text=Stellar+Strikers" alt="Team Logo" class="w-full h-48 object-cover">
-                        <div class="p-6">
-                            <h3 class="text-2xl font-orbitron font-bold text-pink-500">Stellar Strikers</h3>
-                            <p class="mt-2 text-gray-400">Balanced and consistent, they are a threat in every department.</p>
-                        </div>
-                    </div>
-                    <div class="team-card glass-effect rounded-lg overflow-hidden text-center">
-                        <img src="https://placehold.co/400x300/1a1a2e/00f?text=Lunar+Lions" alt="Team Logo" class="w-full h-48 object-cover">
-                        <div class="p-6">
-                            <h3 class="text-2xl font-orbitron font-bold text-blue-400">Lunar Lions</h3>
-                            <p class="mt-2 text-gray-400">Fierce competitors who hunt for victory with unparalleled passion.</p>
-                        </div>
-                    </div>
-                     <div class="team-card glass-effect rounded-lg overflow-hidden text-center">
-                        <img src="https://placehold.co/400x300/1a1a2e/ff00de?text=Orion+Oracles" alt="Team Logo" class="w-full h-48 object-cover">
-                        <div class="p-6">
-                            <h3 class="text-2xl font-orbitron font-bold text-pink-500">Orion Oracles</h3>
-                            <p class="mt-2 text-gray-400">They read the game like no other, predicting every outcome.</p>
-                        </div>
-                    </div>
-                     <div class="team-card glass-effect rounded-lg overflow-hidden text-center">
-                        <img src="https://placehold.co/400x300/1a1a2e/00f?text=Phantom+Phantoms" alt="Team Logo" class="w-full h-48 object-cover">
-                        <div class="p-6">
-                            <h3 class="text-2xl font-orbitron font-bold text-blue-400">Phantom Phantoms</h3>
-                            <p class="mt-2 text-gray-400">A mysterious squad with unpredictable tactics and hidden talents.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Schedule Page -->
-        <section id="schedule" class="page min-h-screen pt-24 bg-gray-900/50">
-            <div class="container mx-auto px-4 py-16">
-                <h2 class="text-5xl font-orbitron font-bold text-center mb-16 neon-text-pink">Match Fixtures</h2>
-                <div class="max-w-4xl mx-auto">
-                    <div class="space-y-6">
-                        <!-- Match 1 -->
-                        <div class="glass-effect rounded-lg p-6 flex flex-col md:flex-row items-center justify-between">
-                             <div class="font-bold text-lg mb-4 md:mb-0 text-gray-400">Match 1 - Group A</div>
-                             <div class="flex items-center space-x-4 md:space-x-8 text-xl font-bold">
-                                 <span class="text-blue-400">Neon Ninjas</span>
-                                 <span class="text-2xl font-orbitron neon-text-pink">VS</span>
-                                 <span class="text-pink-500">Galaxy Gladiators</span>
-                             </div>
-                             <div class="mt-4 md:mt-0 text-center md:text-right">
-                                 <p class="font-semibold">Nov 15, 2025</p>
-                                 <p class="text-gray-300">7:00 PM IST</p>
-                             </div>
-                        </div>
-                        <!-- Match 2 -->
-                         <div class="glass-effect rounded-lg p-6 flex flex-col md:flex-row items-center justify-between">
-                             <div class="font-bold text-lg mb-4 md:mb-0 text-gray-400">Match 2 - Group A</div>
-                             <div class="flex items-center space-x-4 md:space-x-8 text-xl font-bold">
-                                 <span class="text-blue-400">Cosmic Comets</span>
-                                 <span class="text-2xl font-orbitron neon-text-pink">VS</span>
-                                 <span class="text-pink-500">Vortex Vipers</span>
-                             </div>
-                             <div class="mt-4 md:mt-0 text-center md:text-right">
-                                 <p class="font-semibold">Nov 15, 2025</p>
-                                 <p class="text-gray-300">9:30 PM IST</p>
-                             </div>
-                        </div>
-                        <!-- Match 3 -->
-                         <div class="glass-effect rounded-lg p-6 flex flex-col md:flex-row items-center justify-between">
-                             <div class="font-bold text-lg mb-4 md:mb-0 text-gray-400">Match 3 - Group B</div>
-                             <div class="flex items-center space-x-4 md:space-x-8 text-xl font-bold">
-                                 <span class="text-pink-500">Stellar Strikers</span>
-                                 <span class="text-2xl font-orbitron neon-text-pink">VS</span>
-                                 <span class="text-blue-400">Lunar Lions</span>
-                             </div>
-                             <div class="mt-4 md:mt-0 text-center md:text-right">
-                                 <p class="font-semibold">Nov 16, 2025</p>
-                                 <p class="text-gray-300">7:00 PM IST</p>
-                             </div>
-                        </div>
-                        <!-- Match 4 -->
-                         <div class="glass-effect rounded-lg p-6 flex flex-col md:flex-row items-center justify-between">
-                             <div class="font-bold text-lg mb-4 md:mb-0 text-gray-400">Match 4 - Group B</div>
-                             <div class="flex items-center space-x-4 md:space-x-8 text-xl font-bold">
-                                 <span class="text-pink-500">Orion Oracles</span>
-                                 <span class="text-2xl font-orbitron neon-text-pink">VS</span>
-                                 <span class="text-blue-400">Phantom Phantoms</span>
-                             </div>
-                             <div class="mt-4 md:mt-0 text-center md:text-right">
-                                 <p class="font-semibold">Nov 16, 2025</p>
-                                 <p class="text-gray-300">9:30 PM IST</p>
-                             </div>
-                        </div>
-                        <!-- Semi Final -->
-                         <div class="glass-effect rounded-lg p-6 flex flex-col md:flex-row items-center justify-between border-2 border-blue-500 shadow-lg shadow-blue-500/30">
-                             <div class="font-bold text-lg mb-4 md:mb-0 text-gray-400">SEMI FINAL 1</div>
-                             <div class="flex items-center space-x-4 md:space-x-8 text-xl font-bold">
-                                 <span class="text-gray-300">Winner M1</span>
-                                 <span class="text-2xl font-orbitron neon-text-pink">VS</span>
-                                 <span class="text-gray-300">Winner M2</span>
-                             </div>
-                             <div class="mt-4 md:mt-0 text-center md:text-right">
-                                 <p class="font-semibold">Nov 20, 2025</p>
-                                 <p class="text-gray-300">8:00 PM IST</p>
-                             </div>
-                        </div>
-                         <!-- Final -->
-                         <div class="glass-effect rounded-lg p-6 flex flex-col md:flex-row items-center justify-between border-2 border-pink-500 shadow-lg shadow-pink-500/30">
-                             <div class="font-bold text-lg mb-4 md:mb-0 text-gray-400">GRAND FINAL</div>
-                             <div class="flex items-center space-x-4 md:space-x-8 text-xl font-bold">
-                                 <span class="text-gray-300">TBD</span>
-                                 <span class="text-2xl font-orbitron neon-text-pink">VS</span>
-                                 <span class="text-gray-300">TBD</span>
-                             </div>
-                             <div class="mt-4 md:mt-0 text-center md:text-right">
-                                 <p class="font-semibold">Nov 25, 2025</p>
-                                 <p class="text-gray-300">8:00 PM IST</p>
-                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- Sponsors Page -->
-        <section id="sponsors" class="page min-h-screen pt-24 bg-gray-900/50">
-            <div class="container mx-auto px-4 py-16">
-                <h2 class="text-5xl font-orbitron font-bold text-center mb-16 neon-text-pink">Our Esteemed Sponsors</h2>
-
-                <!-- Title Sponsor -->
-                <div class="text-center mb-16">
-                    <h3 class="text-2xl font-orbitron text-blue-300 mb-4 uppercase tracking-widest">Title Sponsor</h3>
-                    <div class="inline-block p-1 bg-gradient-to-br from-blue-400 to-pink-500 rounded-lg">
-                        <div class="sponsor-card glass-effect rounded-lg p-6">
-                            <img src="https://placehold.co/300x150/0a0a1a/ffffff?text=Main+Sponsor" alt="Title Sponsor Logo" class="mx-auto">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Gold Sponsors -->
-                <div class="text-center mb-16">
-                    <h3 class="text-2xl font-orbitron text-yellow-400 mb-6 uppercase tracking-widest">Gold Sponsors</h3>
-                    <div class="flex flex-wrap justify-center items-center gap-8">
-                        <div class="sponsor-card glass-effect rounded-lg p-4">
-                            <img src="https://placehold.co/200x100/0a0a1a/ffffff?text=Gold+Sponsor+A" alt="Gold Sponsor A">
-                        </div>
-                        <div class="sponsor-card glass-effect rounded-lg p-4">
-                            <img src="https://placehold.co/200x100/0a0a1a/ffffff?text=Gold+Sponsor+B" alt="Gold Sponsor B">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Silver Sponsors -->
-                <div class="text-center mb-12">
-                    <h3 class="text-2xl font-orbitron text-gray-400 mb-6 uppercase tracking-widest">Silver Sponsors</h3>
-                    <div class="flex flex-wrap justify-center items-center gap-6">
-                        <div class="sponsor-card glass-effect rounded-lg p-3">
-                            <img src="https://placehold.co/150x75/0a0a1a/ffffff?text=Silver+1" alt="Silver Sponsor 1">
-                        </div>
-                        <div class="sponsor-card glass-effect rounded-lg p-3">
-                            <img src="https://placehold.co/150x75/0a0a1a/ffffff?text=Silver+2" alt="Silver Sponsor 2">
-                        </div>
-                        <div class="sponsor-card glass-effect rounded-lg p-3">
-                            <img src="https://placehold.co/150x75/0a0a1a/ffffff?text=Silver+3" alt="Silver Sponsor 3">
-                        </div>
-                        <div class="sponsor-card glass-effect rounded-lg p-3">
-                            <img src="https://placehold.co/150x75/0a0a1a/ffffff?text=Silver+4" alt="Silver Sponsor 4">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Call to Action -->
-                <div class="text-center mt-24">
-                    <h3 class="text-3xl font-orbitron font-bold mb-4">Become a Part of the Action!</h3>
-                    <p class="text-lg text-gray-300 mb-6 max-w-2xl mx-auto">Support local cricket and promote your brand to a passionate audience. Contact us to learn about sponsorship opportunities.</p>
-                    <a href="mailto:sponsorship.nyf@example.com" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-full text-lg uppercase hover:bg-blue-700 btn-glow border-2 border-blue-500">Sponsor Us</a>
-                </div>
-            </div>
-        </section>
-
+        <!-- Other Pages -->
+        <section id="teams" class="page min-h-screen pt-32 bg-gray-900/50"></section>
+        <section id="schedule" class="page min-h-screen pt-32 bg-gray-900/50"></section>
+        <section id="sponsors" class="page min-h-screen pt-32 bg-gray-900/50"></section>
+        <section id="register" class="page min-h-screen pt-24 sm:pt-32 bg-gray-900/50"></section>
     </main>
 
-    <!-- Footer -->
     <footer class="bg-black py-8">
         <div class="container mx-auto px-4 text-center text-gray-400">
             <p>&copy; 2025 Haji Sujamuddin Laskar Night Cricket. All Rights Reserved.</p>
@@ -445,138 +245,202 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // --- DATA ---
+            const allTeams = [
+                { name: 'Assasin Kalain', slogan: 'Silent executioners of the game.' },
+                { name: 'Narainpur Knight Riders', slogan: 'Riding into battle, claiming victory.' },
+                { name: 'Deccan Hyderabad', slogan: 'Royal contenders from the south.' },
+                { name: 'Bowerghat Bulls', slogan: 'Charging down the pitch with raw power.' },
+                { name: 'Raising Punjab', slogan: 'Rising to the occasion, every time.' },
+                { name: 'Hailakandi Hurricanes', slogan: 'A storm of talent, unstoppable force.' },
+                { name: 'Silchar Super Strikers', slogan: 'Striking fear into the hearts of bowlers.' },
+                { name: 'Barak Valley Blasters', slogan: 'Explosive batting, fiery bowling.' },
+                { name: 'Katlicherra Kings', slogan: 'Royalty on the field, kings of the sport.' },
+                { name: 'Algapur Avengers', slogan: 'Assembling for victory, one match at a time.' },
+                { name: 'Lala Lions', slogan: 'Hunting for wickets with the heart of a lion.' },
+                { name: 'Rongpur Royals', slogan: 'A royal flush of cricketing skill.' },
+                { name: 'Karimganj Chargers', slogan: 'Electrifying the crowd with every play.' },
+                { name: 'Dholai Dragons', slogan: 'Breathing fire on the field.' },
+                { name: 'Panchgram Panthers', slogan: 'Stealthy, agile, and deadly in the chase.' },
+                { name: 'Badarpur Badshahs', slogan: 'The undisputed emperors of cricket.' },
+            ];
+            
+            // --- PAGE NAVIGATION ---
             const pages = document.querySelectorAll('.page');
             const navLinks = document.querySelectorAll('.nav-link');
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
 
-            // Function to show a page and hide others
             function showPage(pageId) {
-                pages.forEach(page => {
-                    if (page.id === pageId) {
-                        page.classList.add('active');
-                    } else {
-                        page.classList.remove('active');
-                    }
-                });
-
+                pages.forEach(page => page.classList.toggle('active', page.id === pageId));
                 navLinks.forEach(link => {
-                    if (link.getAttribute('href') === '#' + pageId) {
-                        link.classList.add('active');
-                    } else {
-                        link.classList.remove('active');
-                    }
+                    const linkTarget = link.getAttribute('href').substring(1);
+                    document.querySelector(`a[href="#${linkTarget}"]`).classList.toggle('active', linkTarget === pageId);
+                    document.querySelector(`#mobile-menu a[href="#${linkTarget}"]`).classList.toggle('active', linkTarget === pageId);
                 });
-                window.scrollTo(0,0);
+                window.scrollTo(0, 0);
             }
             
-            // Navigation handling
             navLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
                     const pageId = this.getAttribute('href').substring(1);
                     showPage(pageId);
-                    // Close mobile menu on click
-                    if(mobileMenu.classList.contains('hidden') === false){
+                    if (!mobileMenu.classList.contains('hidden')) {
                        mobileMenu.classList.add('hidden');
                     }
                 });
             });
 
-            // Initial page setup based on hash
             const initialPage = window.location.hash.substring(1) || 'home';
             showPage(initialPage);
             
-             window.addEventListener('hashchange', () => {
-                const pageId = window.location.hash.substring(1);
-                if (pageId) {
-                    showPage(pageId);
-                }
+            window.addEventListener('hashchange', () => {
+                const pageId = window.location.hash.substring(1) || 'home';
+                showPage(pageId);
             });
 
-            // Mobile menu toggle
-            mobileMenuButton.addEventListener('click', function() {
-                mobileMenu.classList.toggle('hidden');
-            });
+            mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
             
-            // Sticky header
             const header = document.getElementById('header');
-            window.addEventListener('scroll', function() {
-                if (window.scrollY > 50) {
-                    header.classList.add('py-2');
-                    header.classList.remove('py-4');
-                } else {
-                    header.classList.add('py-4');
-                    header.classList.remove('py-2');
-                }
+            window.addEventListener('scroll', () => {
+                header.classList.toggle('py-2', window.scrollY > 50);
+                header.classList.toggle('py-4', window.scrollY <= 50);
             });
 
-            // Countdown Timer
-            const countdownDate = new Date("Nov 15, 2025 19:00:00").getTime();
-            const countdownElement = document.getElementById('countdown');
-
-            const updateCountdown = setInterval(function() {
-                const now = new Date().getTime();
-                const distance = countdownDate - now;
-
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                countdownElement.innerHTML = `
-                    <div class="glass-effect p-4 rounded-lg w-24 text-center">
-                        <div class="text-4xl font-orbitron font-bold">${days}</div>
-                        <div class="text-sm uppercase">Days</div>
-                    </div>
-                    <div class="glass-effect p-4 rounded-lg w-24 text-center">
-                        <div class="text-4xl font-orbitron font-bold">${hours}</div>
-                        <div class="text-sm uppercase">Hours</div>
-                    </div>
-                    <div class="glass-effect p-4 rounded-lg w-24 text-center">
-                        <div class="text-4xl font-orbitron font-bold">${minutes}</div>
-                        <div class="text-sm uppercase">Minutes</div>
-                    </div>
-                    <div class="glass-effect p-4 rounded-lg w-24 text-center">
-                        <div class="text-4xl font-orbitron font-bold">${seconds}</div>
-                        <div class="text-sm uppercase">Seconds</div>
-                    </div>
-                `;
-
-                if (distance < 0) {
-                    clearInterval(updateCountdown);
-                    countdownElement.innerHTML = `<div class="text-3xl font-orbitron font-bold text-center w-full neon-text-pink">The Tournament has begun!</div>`;
+            // --- DYNAMIC CONTENT INJECTION ---
+            function populateHomePage() {
+                // Countdown
+                const countdownElement = document.getElementById('countdown');
+                if (countdownElement) {
+                    const countdownDate = new Date("Nov 15, 2025 18:00:00").getTime();
+                    const updateCountdown = setInterval(() => {
+                        const now = new Date().getTime();
+                        const distance = countdownDate - now;
+                        if (distance < 0) {
+                            clearInterval(updateCountdown);
+                            countdownElement.innerHTML = `<div class="text-3xl font-orbitron font-bold text-center w-full neon-text-pink">The Tournament has begun!</div>`;
+                            return;
+                        }
+                        const d = Math.floor(distance / (1000 * 60 * 60 * 24));
+                        const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                        const s = Math.floor((distance % (1000 * 60)) / 1000);
+                        countdownElement.innerHTML = `
+                            <div class="glass-effect p-2 rounded-lg w-16 sm:w-20 md:w-24 text-center"><div class="text-2xl sm:text-3xl md:text-4xl font-orbitron font-bold">${d}</div><div class="text-xs uppercase">Days</div></div>
+                            <div class="glass-effect p-2 rounded-lg w-16 sm:w-20 md:w-24 text-center"><div class="text-2xl sm:text-3xl md:text-4xl font-orbitron font-bold">${h}</div><div class="text-xs uppercase">Hours</div></div>
+                            <div class="glass-effect p-2 rounded-lg w-16 sm:w-20 md:w-24 text-center"><div class="text-2xl sm:text-3xl md:text-4xl font-orbitron font-bold">${m}</div><div class="text-xs uppercase">Minutes</div></div>
+                            <div class="glass-effect p-2 rounded-lg w-16 sm:w-20 md:w-24 text-center"><div class="text-2xl sm:text-3xl md:text-4xl font-orbitron font-bold">${s}</div><div class="text-xs uppercase">Seconds</div></div>`;
+                    }, 1000);
                 }
-            }, 1000);
+                // Announcements
+                document.querySelector('#home .animated-border .space-y-4').innerHTML = `
+                    <div class="flex items-start space-x-4 p-3 rounded-lg hover:bg-white/5 transition-colors duration-200"><i class="ph-trophy text-3xl text-pink-400 mt-1"></i><div><h3 class="font-bold text-lg text-blue-300">First Round Fixtures Released!</h3><p class="text-gray-300">The randomly generated schedule for the first round is now live. Check the Schedule page!</p></div></div>
+                    <div class="flex items-start space-x-4 p-3 rounded-lg hover:bg-white/5 transition-colors duration-200"><i class="ph-calendar-check text-3xl text-pink-400 mt-1"></i><div><h3 class="font-bold text-lg text-blue-300">Tournament Kicks Off Nov 15th</h3><p class="text-gray-300">Get ready for two days of intense knockout cricket action under the lights.</p></div></div>`;
+                // Carousel
+                document.querySelector('#home .swiper-wrapper').innerHTML = `
+                    <div class="swiper-slide"><img src="https://placehold.co/400x400/0a0a1a/ff00de?text=Season+1+Champions" alt="Previous Season Image 1"></div>
+                    <div class="swiper-slide"><img src="https://placehold.co/400x400/0a0a1a/00f?text=Epic+Six" alt="Previous Season Image 2"></div>
+                    <div class="swiper-slide"><img src="https://placehold.co/400x400/0a0a1a/ff00de?text=Night+Finals+Crowd" alt="Previous Season Image 3"></div>
+                    <div class="swiper-slide"><img src="https://placehold.co/400x400/0a0a1a/00f?text=Winning+Shot" alt="Previous Season Image 4"></div>`;
+                // Highlights
+                document.querySelector('#home .grid').innerHTML = `
+                    <div class="glass-effect p-6 rounded-lg text-center"><i class="ph-trophy text-6xl text-yellow-400 mx-auto mb-4"></i><h3 class="text-2xl font-bold font-orbitron mb-2">Champions Prize</h3><p>Brand new <span class="font-bold text-white">Royal Enfield Hunter</span> bike.</p></div>
+                    <div class="glass-effect p-6 rounded-lg text-center"><i class="ph-motorcycle text-6xl text-gray-300 mx-auto mb-4"></i><h3 class="text-2xl font-bold font-orbitron mb-2">Runners Up Prize</h3><p>A stylish new <span class="font-bold text-white">Scooty</span>.</p></div>
+                    <div class="glass-effect p-6 rounded-lg text-center"><i class="ph-stadium text-6xl text-blue-400 mx-auto mb-4"></i><h3 class="text-2xl font-bold font-orbitron mb-2">Floodlit Action</h3><p>Cricket like never before under dazzling stadium lights.</p></div>
+                    <div class="glass-effect p-6 rounded-lg text-center"><i class="ph-users-three text-6xl text-pink-400 mx-auto mb-4"></i><h3 class="text-2xl font-bold font-orbitron mb-2">For The Fans</h3><p>Live DJ, food stalls, and an electrifying atmosphere.</p></div>`;
+            }
+
+            function populateTeamsPage() {
+                const content = `<div class="container mx-auto px-4 py-16"><h2 class="text-4xl sm:text-5xl font-orbitron font-bold text-center mb-16 neon-text-pink">All 16 Teams</h2><div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">${allTeams.map(team => `<div class="glass-effect rounded-lg overflow-hidden text-center transition-transform duration-300 hover:-translate-y-2"><div class="p-6"><h3 class="text-2xl font-orbitron font-bold text-blue-300">${team.name}</h3><p class="mt-2 text-gray-400 h-12">${team.slogan}</p></div></div>`).join('')}</div></div>`;
+                document.getElementById('teams').innerHTML = content;
+            }
+
+            function populateSchedulePage() {
+                // Function to get initials from team name
+                const getInitials = (name) => {
+                    const words = name.split(' ');
+                    if (words.length > 1) {
+                        return words.map(word => word[0]).join('').substring(0, 3).toUpperCase();
+                    }
+                    return name.substring(0, 3).toUpperCase();
+                };
+
+                const shuffledTeams = [...allTeams].sort(() => 0.5 - Math.random());
+                let fixturesHtml = '';
+                const matchesPerDay = 4;
+                const totalMatches = shuffledTeams.length / 2;
+                const matchTimes = ["06:00 PM", "07:30 PM", "09:00 PM", "10:30 PM"];
+                let matchCount = 0;
+
+                for (let day = 0; day < totalMatches / matchesPerDay; day++) {
+                    const matchDate = new Date('2025-11-15T00:00:00');
+                    matchDate.setDate(matchDate.getDate() + day);
+                    const formattedDate = matchDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+                    fixturesHtml += `<div class="mb-12"><h3 class="text-3xl font-orbitron font-bold text-center text-blue-300 mb-8">${formattedDate}</h3><div class="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">`;
+
+                    for (let i = 0; i < matchesPerDay; i++) {
+                        if (matchCount < totalMatches) {
+                            const team1 = shuffledTeams[matchCount * 2];
+                            const team2 = shuffledTeams[matchCount * 2 + 1];
+                            fixturesHtml += `
+                                <div class="glass-effect rounded-lg p-6 match-card">
+                                    <div class="flex items-center justify-between">
+                                        <div class="w-2/5 text-center">
+                                            <div class="team-logo-initials logo-blue mx-auto">${getInitials(team1.name)}</div>
+                                            <h4 class="font-bold font-orbitron text-base mt-2">${team1.name}</h4>
+                                        </div>
+                                        <div class="text-center">
+                                            <p class="text-3xl font-bold text-pink-400 font-orbitron">VS</p>
+                                        </div>
+                                        <div class="w-2/5 text-center">
+                                            <div class="team-logo-initials logo-pink mx-auto">${getInitials(team2.name)}</div>
+                                            <h4 class="font-bold font-orbitron text-base mt-2">${team2.name}</h4>
+                                        </div>
+                                    </div>
+                                    <div class="text-center mt-4 pt-4 border-t border-gray-700">
+                                        <p class="text-lg font-semibold text-gray-300">Match Time: <span class="text-white font-bold">${matchTimes[i]}</span></p>
+                                    </div>
+                                </div>`;
+                            matchCount++;
+                        }
+                    }
+                    fixturesHtml += `</div></div>`;
+                }
+
+                const content = `<div class="container mx-auto px-4 py-16"><h2 class="text-4xl sm:text-5xl font-orbitron font-bold text-center mb-16 neon-text-pink">First Round Fixtures</h2>${fixturesHtml}</div>`;
+                document.getElementById('schedule').innerHTML = content;
+            }
             
-            // Initialize Swiper Carousel
-            var swiper = new Swiper(".mySwiper", {
-                effect: "coverflow",
-                grabCursor: true,
-                centeredSlides: true,
-                slidesPerView: "auto",
-                loop: true,
-                autoplay: {
-                    delay: 2500,
-                    disableOnInteraction: false,
-                },
-                coverflowEffect: {
-                    rotate: 50,
-                    stretch: 0,
-                    depth: 100,
-                    modifier: 1,
-                    slideShadows: true,
-                },
-                pagination: {
-                    el: ".swiper-pagination",
-                    clickable: true,
-                },
-                navigation: {
-                    nextEl: ".swiper-button-next",
-                    prevEl: ".swiper-button-prev",
-                },
-            });
+            function populateSponsorsPage() {
+                document.getElementById('sponsors').innerHTML = `<div class="container mx-auto px-4 py-16"><h2 class="text-4xl sm:text-5xl font-orbitron font-bold text-center mb-16 neon-text-pink">Our Esteemed Sponsors</h2><div class="text-center mt-24"><h3 class="text-3xl font-orbitron font-bold mb-4">Become a Part of the Action!</h3><p class="text-lg text-gray-300 mb-6 max-w-2xl mx-auto">Support local cricket and promote your brand. Contact us to learn about sponsorship opportunities.</p><a href="mailto:sponsorship.nyf@example.com" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-full text-lg uppercase hover:bg-blue-700 btn-glow border-2 border-blue-500">Sponsor Us</a></div></div>`;
+            }
 
+            function populateRegisterPage() {
+                document.getElementById('register').innerHTML = `<div class="container mx-auto px-4 py-16"><div class="max-w-2xl mx-auto"><div class="glass-effect rounded-lg overflow-hidden"><div class="form-header"><h2 class="text-xl sm:text-2xl font-orbitron font-bold">PLAYER REGISTRATION</h2></div><form class="p-6 sm:p-8 space-y-6"><p class="text-center text-blue-300">Online registrations are now closed. Please contact event organizers for details.</p></form></div></div></div>`;
+            }
+
+            // --- INITIALIZE ---
+            populateHomePage();
+            populateTeamsPage();
+            populateSchedulePage();
+            populateSponsorsPage();
+            populateRegisterPage();
+
+            if (document.querySelector('.mySwiper')) {
+                new Swiper(".mySwiper", {
+                    effect: "coverflow",
+                    grabCursor: true,
+                    centeredSlides: true,
+                    slidesPerView: "auto",
+                    loop: true,
+                    autoplay: { delay: 2500, disableOnInteraction: false },
+                    coverflowEffect: { rotate: 50, stretch: 0, depth: 100, modifier: 1, slideShadows: true },
+                    navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
+                    breakpoints: { 320: { slidesPerView: 1, spaceBetween: 20 }, 768: { slidesPerView: "auto", spaceBetween: 30 } }
+                });
+            }
         });
     </script>
 </body>
