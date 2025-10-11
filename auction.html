@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HSL Auctioneer Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/phosphor-icons"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0a0a1a;
+            color: #e0e0e0;
+        }
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+        .neon-text-pink { text-shadow: 0 0 5px #ff00de, 0 0 10px #ff00de, 0 0 20px #ff00de; }
+        .glass-effect {
+            background: rgba(16, 16, 32, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .btn-glow { transition: all 0.3s ease; }
+        .btn-glow:hover:not(:disabled) {
+            box-shadow: 0 0 15px #ff00de, 0 0 25px #ff00de;
+            transform: scale(1.05);
+        }
+        .player-card.available:hover {
+            border-color: #ff00de;
+            cursor: pointer;
+            transform: translateY(-4px);
+        }
+        .auction-card-main {
+            border: 2px solid #ff00de;
+            box-shadow: 0 0 25px rgba(255, 0, 222, 0.4);
+        }
+        .h-screen-minus-header { height: calc(100vh - 64px); }
+        .form-input {
+            background-color: rgba(10, 10, 26, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #00f;
+            box-shadow: 0 0 15px rgba(0, 0, 255, 0.7);
+        }
+    </style>
+</head>
+<body class="overflow-hidden">
+
+    <header class="bg-black/50 backdrop-blur-sm z-10">
+        <div class="container mx-auto px-4 flex justify-between items-center h-16">
+            <h1 class="text-2xl font-orbitron font-bold neon-text-pink">HSL Auctioneer Portal</h1>
+            <div class="flex items-center gap-4">
+                 <button id="seed-data-btn" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-md btn-glow">Seed Sample Data</button>
+                 <button id="reset-auction-btn" class="bg-red-600 text-white font-semibold py-2 px-4 rounded-md btn-glow">Reset Auction</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="grid grid-cols-1 lg:grid-cols-3 gap-4 p-4 h-screen-minus-header">
+        <!-- Left Column: Player Pool -->
+        <div class="glass-effect rounded-lg p-4 flex flex-col lg:col-span-1">
+            <h2 class="font-orbitron text-xl font-bold mb-4 text-center">Available Players</h2>
+            <div id="player-pool" class="overflow-y-auto space-y-2 pr-2">
+                <!-- Players will be dynamically injected here -->
+            </div>
+        </div>
+
+        <!-- Right Column: Auction Stage & Sold Log -->
+        <div class="glass-effect rounded-lg p-4 flex flex-col gap-4 lg:col-span-2">
+            <div id="auction-stage" class="flex-grow flex items-center justify-center">
+                <p class="text-gray-400 text-lg text-center">Select a player from the pool to begin auction</p>
+                <!-- Current player auction card will be injected here -->
+            </div>
+            <div class="flex-shrink-0">
+                <h2 class="font-orbitron text-xl font-bold mb-4 text-center">Recently Sold</h2>
+                <div id="sold-players-log" class="overflow-y-auto h-32 border-t border-pink-500/20 pt-2 space-y-1">
+                    <!-- Sold players log will be injected here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, doc, onSnapshot, getDocs, writeBatch, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        
+        // --- IMPORTANT: REPLACE WITH YOUR FIREBASE CONFIG ---
+        const firebaseConfig = {
+           // Your Firebase config object goes here
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        
+        await signInAnonymously(auth);
+
+        const playersCol = collection(db, 'players');
+        const teamsCol = collection(db, 'teams');
+
+        const playerPoolEl = document.getElementById('player-pool');
+        const auctionStageEl = document.getElementById('auction-stage');
+        const soldPlayersLogEl = document.getElementById('sold-players-log');
+
+        let allPlayersData = [];
+        let allTeamsData = [];
+        let currentPlayerId = null;
+
+        // --- RENDER FUNCTIONS ---
+        function renderPlayerPool(players) {
+            const availablePlayers = players.filter(p => p.status === 'available').sort((a,b) => a.name.localeCompare(b.name));
+            playerPoolEl.innerHTML = availablePlayers.length > 0 ? availablePlayers.map(p => `
+                <div class="player-card available glass-effect rounded-md p-3 border border-transparent transition-all duration-300" data-id="${p.id}">
+                    <div class="flex justify-between items-center">
+                        <p class="font-bold text-lg">${p.name}</p>
+                        <p class="text-xs font-semibold text-pink-400">${p.skill}</p>
+                    </div>
+                    <p class="text-sm text-gray-300">Base: ₹${p.basePrice.toLocaleString()}</p>
+                </div>
+            `).join('') : '<p class="text-center text-gray-400 mt-4">All players have been auctioned.</p>';
+        }
+
+        function renderSoldPlayers(players, teams) {
+            const soldPlayers = players.filter(p => p.status === 'sold').sort((a,b) => (b.soldAt || 0) - (a.soldAt || 0)).slice(0, 5);
+             soldPlayersLogEl.innerHTML = soldPlayers.length > 0 ? soldPlayers.map(p => {
+                 const team = teams.find(t => t.id === p.soldToTeam);
+                 return `
+                    <div class="text-sm flex justify-between items-center glass-effect rounded p-2">
+                        <p>${p.name}</p>
+                        <p class="text-right"><span class="font-bold text-blue-300">${team?.name || 'N/A'}</span> @ <span class="text-green-400 font-semibold">₹${p.sellingPrice.toLocaleString()}</span></p>
+                    </div>`
+             }).join('') : '<p class="text-center text-gray-400">No players sold yet.</p>';
+        }
+
+        function renderAuctionStage(playerId) {
+            if (!playerId) {
+                auctionStageEl.innerHTML = '<p class="text-gray-400 text-lg text-center">Select a player from the pool to begin auction</p>';
+                return;
+            }
+
+            const player = allPlayersData.find(p => p.id === playerId);
+            if (!player) return;
+
+            auctionStageEl.innerHTML = `
+                <div class="w-full h-full flex flex-col justify-center items-center gap-6">
+                    <!-- Player Card -->
+                    <div class="w-full max-w-md glass-effect rounded-lg p-6 auction-card-main">
+                        <img src="${player.imageUrl || 'https://placehold.co/400x300/0a0a1a/ff00de?text=Player+Image'}" alt="${player.name}" class="w-full h-48 object-cover rounded-md border-2 border-pink-500/50 mb-4">
+                        <h2 class="text-4xl font-orbitron font-bold text-center">${player.name}</h2>
+                        <p class="text-center text-lg text-blue-300 font-semibold">${player.skill}</p>
+                        <div class="mt-4 pt-4 border-t border-pink-500/20 text-center">
+                            <p class="text-sm uppercase text-gray-400">Asking Price</p>
+                            <p class="text-3xl font-orbitron font-bold text-green-400">₹${player.basePrice.toLocaleString()}</p>
+                        </div>
+                    </div>
+
+                    <!-- Auctioneer Controls -->
+                    <div class="w-full max-w-md glass-effect rounded-lg p-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="number" id="selling-price-input" placeholder="Final Selling Price" class="form-input rounded-md p-3 text-white col-span-1 md:col-span-2" required>
+                            <select id="team-select" class="form-input rounded-md p-3 text-white">
+                                <option value="">Assign to Team...</option>
+                                ${allTeamsData.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
+                            </select>
+                            <button id="sell-player-btn" class="bg-green-600 text-white font-bold p-3 rounded-md btn-glow text-lg uppercase">Sell Player</button>
+                        </div>
+                         <button id="unsold-player-btn" class="bg-yellow-600 text-white font-bold p-3 rounded-md btn-glow w-full mt-2 uppercase">Mark Unsold</button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // --- FIREBASE LISTENERS ---
+        onSnapshot(playersCol, (snapshot) => {
+            allPlayersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderPlayerPool(allPlayersData);
+            renderSoldPlayers(allPlayersData, allTeamsData);
+            // If the current player is updated (e.g., sold), clear the stage
+            const currentPlayerStillAvailable = allPlayersData.find(p => p.id === currentPlayerId)?.status === 'available';
+            if (!currentPlayerStillAvailable && currentPlayerId) {
+                currentPlayerId = null;
+                renderAuctionStage(null);
+            }
+        });
+
+        onSnapshot(teamsCol, (snapshot) => {
+            allTeamsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a,b) => a.name.localeCompare(b.name));
+            renderSoldPlayers(allPlayersData, allTeamsData);
+             // Re-render stage if a player is selected to update the team dropdown
+            if (currentPlayerId) {
+                renderAuctionStage(currentPlayerId);
+            }
+        });
+
+        // --- EVENT HANDLERS ---
+        playerPoolEl.addEventListener('click', (e) => {
+            const card = e.target.closest('.player-card');
+            if (card) {
+                currentPlayerId = card.dataset.id;
+                renderAuctionStage(currentPlayerId);
+            }
+        });
+
+        auctionStageEl.addEventListener('click', async (e) => {
+            if (e.target.id === 'sell-player-btn') {
+                if (!currentPlayerId) return;
+                const sellingPrice = document.getElementById('selling-price-input').value;
+                const teamId = document.getElementById('team-select').value;
+                if (!sellingPrice || !teamId) {
+                    alert('Please enter a selling price and select a team.');
+                    return;
+                }
+                
+                const playerRef = doc(db, 'players', currentPlayerId);
+                await updateDoc(playerRef, {
+                    status: 'sold',
+                    sellingPrice: parseInt(sellingPrice),
+                    soldToTeam: teamId,
+                    soldAt: new Date().getTime() // For sorting recent sales
+                });
+                
+                currentPlayerId = null;
+                renderAuctionStage(null);
+            }
+
+            if (e.target.id === 'unsold-player-btn') {
+                if (!currentPlayerId) return;
+                const playerRef = doc(db, 'players', currentPlayerId);
+                await updateDoc(playerRef, {
+                    status: 'unsold'
+                });
+                currentPlayerId = null;
+                renderAuctionStage(null);
+            }
+        });
+        
+        // --- ADMIN BUTTONS ---
+        document.getElementById('seed-data-btn').addEventListener('click', async () => {
+             if (!confirm('This will add sample players and teams. Proceed?')) return;
+             const samplePlayers = [ 
+                 { name: 'Arjun Sharma', skill: 'Batsman', basePrice: 200000, status: 'available', imageUrl: 'https://placehold.co/400x300/1a1a1a/ffffff?text=Arjun' },
+                 { name: 'Rohan Singh', skill: 'Bowler', basePrice: 150000, status: 'available', imageUrl: 'https://placehold.co/400x300/2a2a2a/ffffff?text=Rohan' },
+                 { name: 'Vikram Das', skill: 'All-Rounder', basePrice: 180000, status: 'available', imageUrl: 'https://placehold.co/400x300/3a3a3a/ffffff?text=Vikram' },
+                 { name: 'Sameer Khan', skill: 'Batsman', basePrice: 220000, status: 'available', imageUrl: 'https://placehold.co/400x300/4a4a4a/ffffff?text=Sameer' },
+                 { name: 'Manish Patel', skill: 'Wicketkeeper', basePrice: 120000, status: 'available', imageUrl: 'https://placehold.co/400x300/5a5a5a/ffffff?text=Manish' }
+            ];
+             const sampleTeams = allTeams.slice(0, 4).map(t => ({ name: t.name }));
+             const batch = writeBatch(db);
+             samplePlayers.forEach(p => batch.set(doc(collection(db, 'players')), p));
+             sampleTeams.forEach(t => batch.set(doc(collection(db, 'teams')), t));
+             await batch.commit();
+             alert('Sample data added!');
+        });
+
+        document.getElementById('reset-auction-btn').addEventListener('click', async () => {
+            if (!confirm('ARE YOU SURE? This will reset all players to "available".')) return;
+            const batch = writeBatch(db);
+            const playersSnapshot = await getDocs(playersCol);
+            playersSnapshot.forEach(d => batch.update(d.ref, { 
+                status: 'available',
+                soldToTeam: null,
+                sellingPrice: 0,
+                soldAt: null
+            }));
+            await batch.commit();
+            alert('Auction players have been reset!');
+        });
+    </script>
+</body>
+</html>
+
