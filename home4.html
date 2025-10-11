@@ -61,6 +61,21 @@
         .swiper-container { width: 100%; padding-top: 50px; padding-bottom: 50px; }
         .swiper-slide img { border: 2px solid rgba(0, 191, 255, 0.5); }
 
+        /* Animated Border for Announcement Box */
+        @property --angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+        @keyframes rotate { to { --angle: 360deg; } }
+        .animated-border { 
+            position: relative; 
+            border: 2px solid transparent; 
+            border-radius: 0.5rem;
+        }
+        .animated-border::before {
+            content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+            z-index: -1; margin: -2px; border-radius: inherit;
+            background: conic-gradient(from var(--angle), #0c0c1e, #0c0c1e, #00BFFF, #FF00FF, #00BFFF, #0c0c1e, #0c0c1e);
+            animation: rotate 4s linear infinite;
+        }
+        
         .card-animated-border {
             position: relative; overflow: hidden;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -82,78 +97,25 @@
             transform: translateY(0);
         }
 
-        /* New Table Styles */
-        .schedule-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: rgba(12, 12, 30, 0.8);
-        }
-        .schedule-table thead th {
-            font-family: 'Orbitron', sans-serif;
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 2px solid #00BFFF;
-            color: #00BFFF;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 0.9rem;
-        }
-        .schedule-table tbody tr {
-            border-bottom: 1px solid rgba(0, 191, 255, 0.2);
-            transition: background-color 0.3s ease;
-        }
-        .schedule-table tbody tr:last-child {
-            border-bottom: none;
-        }
-        .schedule-table tbody tr:hover {
-            background-color: rgba(0, 191, 255, 0.1);
-        }
-        .schedule-table tbody td {
-            padding: 1rem;
-            vertical-align: middle;
-        }
-        .team-name {
-            font-weight: 600;
-            color: #fff;
-        }
-        .vs-cell {
-            text-align: center;
-            font-family: 'Orbitron', sans-serif;
-            color: #FF00FF;
-            font-weight: 900;
-        }
+        /* Table Styles */
+        .schedule-table { width: 100%; border-collapse: collapse; background: rgba(12, 12, 30, 0.8); }
+        .schedule-table thead th { font-family: 'Orbitron', sans-serif; padding: 1rem; text-align: left; border-bottom: 2px solid #00BFFF; color: #00BFFF; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; }
+        .schedule-table tbody tr { border-bottom: 1px solid rgba(0, 191, 255, 0.2); transition: background-color 0.3s ease; }
+        .schedule-table tbody tr:last-child { border-bottom: none; }
+        .schedule-table tbody tr:hover { background-color: rgba(0, 191, 255, 0.1); }
+        .schedule-table tbody td { padding: 1rem; vertical-align: middle; }
+        .team-name { font-weight: 600; color: #fff; }
+        .vs-cell { text-align: center; font-family: 'Orbitron', sans-serif; color: #FF00FF; font-weight: 900; }
         
         /* Responsive Table */
         @media (max-width: 768px) {
             .schedule-table thead { display: none; }
-            .schedule-table, .schedule-table tbody, .schedule-table tr, .schedule-table td {
-                display: block;
-                width: 100%;
-            }
-            .schedule-table tr {
-                margin-bottom: 1rem;
-                border: 1px solid rgba(0, 191, 255, 0.2);
-                border-radius: 0.5rem;
-            }
-            .schedule-table td {
-                display: flex;
-                justify-content: space-between;
-                padding: 0.75rem 1rem;
-                text-align: right;
-                border-bottom: 1px solid rgba(0, 191, 255, 0.1);
-            }
-            .schedule-table td:last-child {
-                 border-bottom: none;
-            }
-            .schedule-table td::before {
-                content: attr(data-label);
-                font-weight: bold;
-                text-align: left;
-                margin-right: 1rem;
-                color: #00BFFF;
-            }
-             .vs-cell { text-align: right; }
-             .vs-cell::before { content: '' !important; }
+            .schedule-table, .schedule-table tbody, .schedule-table tr, .schedule-table td { display: block; width: 100%; }
+            .schedule-table tr { margin-bottom: 1rem; border: 1px solid rgba(0, 191, 255, 0.2); border-radius: 0.5rem; }
+            .schedule-table td { display: flex; justify-content: space-between; padding: 0.75rem 1rem; text-align: right; border-bottom: 1px solid rgba(0, 191, 255, 0.1); }
+            .schedule-table td:last-child { border-bottom: none; }
+            .schedule-table td::before { content: attr(data-label); font-weight: bold; text-align: left; margin-right: 1rem; color: #00BFFF; }
+            .vs-cell { text-align: right; } .vs-cell::before { content: '' !important; }
         }
 
     </style>
@@ -196,7 +158,11 @@
                 <div class="container mx-auto px-4">
                     <div class="fade-in-section">
                         <h2 class="text-4xl font-orbitron font-bold text-center mb-10 text-white title-glow">Latest Updates</h2>
-                        <div id="announcements-container"></div>
+                        <div class="max-w-3xl mx-auto animated-border">
+                             <div class="bg-[#0c0c1e] p-4 sm:p-6 rounded-[5px]">
+                                <div id="announcements-container" class="space-y-4"></div>
+                             </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -259,7 +225,7 @@
             // --- DYNAMIC CONTENT ---
             function populateHomePage() {
                 const countdownElement = document.getElementById('countdown'); if (countdownElement) { const cdDate = new Date("Nov 15, 2025 18:00:00").getTime(); const cdInt = setInterval(() => { const now = new Date().getTime(); const dist = cdDate - now; if (dist < 0) { clearInterval(cdInt); countdownElement.innerHTML = `<div class="text-3xl font-orbitron font-bold text-center w-full title-glow">The Tournament has begun!</div>`; return; } const d = Math.floor(dist / 864e5); const h = Math.floor((dist % 864e5) / 36e5); const m = Math.floor((dist % 36e5) / 6e4); const s = Math.floor((dist % 6e4) / 1e3); countdownElement.innerHTML = `<div class="panel-sharp p-2 rounded-lg w-16 sm:w-20 md:w-24 text-center"><div class="text-2xl sm:text-3xl md:text-4xl font-orbitron font-bold">${d}</div><div class="text-xs uppercase">Days</div></div><div class="panel-sharp p-2 rounded-lg w-16 sm:w-20 md:w-24 text-center"><div class="text-2xl sm:text-3xl md:text-4xl font-orbitron font-bold">${h}</div><div class="text-xs uppercase">Hours</div></div><div class="panel-sharp p-2 rounded-lg w-16 sm:w-20 md:w-24 text-center"><div class="text-2xl sm:text-3xl md:text-4xl font-orbitron font-bold">${m}</div><div class="text-xs uppercase">Minutes</div></div><div class="panel-sharp p-2 rounded-lg w-16 sm:w-20 md:w-24 text-center"><div class="text-2xl sm:text-3xl md:text-4xl font-orbitron font-bold">${s}</div><div class="text-xs uppercase">Seconds</div></div>`; }, 1000); }
-                document.getElementById('announcements-container').innerHTML = `<div class="max-w-3xl mx-auto animated-border rounded-lg"><div class="panel-sharp p-4 sm:p-6 !clip-path-none"><div class="space-y-4"><div class="flex items-start space-x-4 p-3"><i class="ph-trophy text-3xl text-blue-400 mt-1 text-glow-blue"></i><div><h3 class="font-bold text-lg text-blue-300">First Round Fixtures Released!</h3><p class="text-gray-300">The schedule is now live. Check the Schedule page!</p></div></div><div class="flex items-start space-x-4 p-3"><i class="ph-calendar-check text-3xl text-pink-400 mt-1 text-glow-magenta"></i><div><h3 class="font-bold text-lg text-pink-400">Tournament Kicks Off Nov 15th</h3><p class="text-gray-300">Intense knockout cricket action under the lights.</p></div></div></div></div></div>`;
+                document.getElementById('announcements-container').innerHTML = `<div class="flex items-start space-x-4 p-3"><i class="ph-trophy text-3xl text-blue-400 mt-1 text-glow-blue"></i><div><h3 class="font-bold text-lg text-blue-300">First Round Fixtures Released!</h3><p class="text-gray-300">The schedule is now live. Check the Schedule page!</p></div></div><div class="flex items-start space-x-4 p-3"><i class="ph-calendar-check text-3xl text-pink-400 mt-1 text-glow-magenta"></i><div><h3 class="font-bold text-lg text-pink-400">Tournament Kicks Off Nov 15th</h3><p class="text-gray-300">Intense knockout cricket action under the lights.</p></div></div>`;
                 document.getElementById('highlights-grid').innerHTML = `<div class="panel-sharp p-6 text-center card-animated-border"><i class="ph-trophy text-6xl text-yellow-400 mx-auto"></i><h3 class="text-2xl font-bold font-orbitron mt-4 mb-2">Champions Prize</h3><p>Brand new <span class="font-bold text-white">Royal Enfield Hunter</span> bike.</p></div><div class="panel-sharp p-6 text-center card-animated-border"><i class="ph-scooter text-6xl text-gray-300 mx-auto"></i><h3 class="text-2xl font-bold font-orbitron mt-4 mb-2">Runners Up Prize</h3><p>A stylish new <span class="font-bold text-white">Scooty</span>.</p></div><div class="panel-sharp p-6 text-center card-animated-border"><i class="ph-stadium text-6xl text-blue-400 mx-auto"></i><h3 class="text-2xl font-bold font-orbitron mt-4 mb-2">Floodlit Action</h3><p>Cricket like never before under dazzling stadium lights.</p></div><div class="panel-sharp p-6 text-center card-animated-border"><i class="ph-users-three text-6xl text-pink-400 mx-auto"></i><h3 class="text-2xl font-bold font-orbitron mt-4 mb-2">For The Fans</h3><p>Live DJ, food stalls, and an electrifying atmosphere.</p></div>`;
                 document.getElementById('carousel-wrapper').innerHTML = `<div class="swiper-slide"><img src="https://placehold.co/400x400/0c0c1e/00BFFF?text=Champions" alt="Image 1"></div> <div class="swiper-slide"><img src="https://placehold.co/400x400/0c0c1e/FF00FF?text=Action" alt="Image 2"></div><div class="swiper-slide"><img src="https://placehold.co/400x400/0c0c1e/00BFFF?text=Crowd" alt="Image 3"></div> <div class="swiper-slide"><img src="https://placehold.co/400x400/0c0c1e/FF00FF?text=Celebration" alt="Image 4"></div>`;
             }
@@ -300,33 +266,24 @@
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
                 
-                doc.setFont("helvetica", "bold");
-                doc.setFontSize(20);
-                doc.text("Haji Sujamuddin Laskar Night Cricket", 105, 20, null, null, "center");
-                doc.setFontSize(16);
-                doc.text("First Round Fixtures", 105, 30, null, null, "center");
+                doc.setFont("helvetica", "bold"); doc.setFontSize(20); doc.text("Haji Sujamuddin Laskar Night Cricket", 105, 20, null, null, "center");
+                doc.setFontSize(16); doc.text("First Round Fixtures", 105, 30, null, null, "center");
 
-                doc.setFont("helvetica", "bold");
-                doc.setFontSize(10);
+                doc.setFont("helvetica", "bold"); doc.setFontSize(10);
                 doc.text("Match", 15, 45); doc.text("Date", 35, 45); doc.text("Time", 55, 45); doc.text("Teams", 105, 45, null, null, "center");
-
                 doc.setLineWidth(0.5); doc.line(10, 48, 200, 48);
                 
                 doc.setFont("helvetica", "normal");
-                let yPos = 55;
-                let matchCount = 0;
+                let yPos = 55; let matchCount = 0;
                  for (let day = 0; day < 2; day++) {
                     const matchDate = new Date('2025-11-15T00:00:00'); matchDate.setDate(matchDate.getDate() + day);
                     const formattedDate = matchDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                     const times = ["06:00 PM", "07:30 PM", "09:00 PM", "10:30 PM"];
                     for (let i = 0; i < 4; i++) {
                          const t1 = shuffledTeams[matchCount * 2]; const t2 = shuffledTeams[matchCount * 2 + 1];
-                         doc.text(String(matchCount + 1).padStart(2, '0'), 15, yPos);
-                         doc.text(formattedDate, 35, yPos);
-                         doc.text(times[i], 55, yPos);
-                         doc.text(`${t1.name} vs ${t2.name}`, 105, yPos, null, null, "center");
-                         yPos += 10;
-                         matchCount++;
+                         doc.text(String(matchCount + 1).padStart(2, '0'), 15, yPos); doc.text(formattedDate, 35, yPos);
+                         doc.text(times[i], 55, yPos); doc.text(`${t1.name} vs ${t2.name}`, 105, yPos, null, null, "center");
+                         yPos += 10; matchCount++;
                     }
                 }
                 doc.save('HSL-Night-Cricket-Fixtures.pdf');
@@ -337,12 +294,10 @@
 
             // --- ANIMATIONS & INITIALIZE ---
             function setupScrollAnimations() { const observer = new IntersectionObserver((entries) => { entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-visible'); } }); }, { threshold: 0.1 }); document.querySelectorAll('.fade-in-section').forEach(s => observer.observe(s)); }
-
             populateHomePage(); populateTeamsPage(); populateSchedulePage(); populateSponsorsPage(); populateRegisterPage();
             setupScrollAnimations();
 
             if (document.querySelector('.mySwiper')) { new Swiper(".mySwiper", { effect: "coverflow", grabCursor: true, centeredSlides: true, slidesPerView: "auto", loop: true, autoplay: { delay: 3000, disableOnInteraction: false }, coverflowEffect: { rotate: 50, stretch: 0, depth: 100, modifier: 1, slideShadows: true }, navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" }, breakpoints: { 320: { slidesPerView: 1 }, 768: { slidesPerView: "auto" } } }); }
-
             const canvas = document.getElementById('hero-canvas'); if(canvas) { const ctx = canvas.getContext('2d'); let w, h, p, m; function i() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; p = []; m = { x: w / 2, y: h / 2 }; const n = Math.floor(w * h / 15e3); for (let i = 0; i < n; i++) p.push(new P()); } class P { constructor() { this.x = Math.random() * w; this.y = Math.random() * h; this.s = Math.random() * 1.5 + 1; this.sx = Math.random() * 2 - 1; this.sy = Math.random() * 2 - 1; this.c = '#00BFFF'; } u() { if (this.x > w || this.x < 0) this.sx *= -1; if (this.y > h || this.y < 0) this.sy *= -1; this.x += this.sx; this.y += this.sy; } d() { ctx.fillStyle = this.c; ctx.beginPath(); ctx.arc(this.x, this.y, this.s, 0, Math.PI * 2); ctx.fill(); } } function hP() { for (let i = 0; i < p.length; i++) { p[i].u(); p[i].d(); for (let j = i; j < p.length; j++) { const dx = p[i].x - p[j].x; const dy = p[i].y - p[j].y; const d = Math.sqrt(dx * dx + dy * dy); if (d < 100) { ctx.beginPath(); ctx.strokeStyle = `rgba(0, 191, 255, ${1 - d / 100})`; ctx.lineWidth = 0.5; ctx.moveTo(p[i].x, p[i].y); ctx.lineTo(p[j].x, p[j].y); ctx.stroke(); } } } } function a() { ctx.clearRect(0, 0, w, h); hP(); requestAnimationFrame(a); } i(); a(); window.addEventListener('resize', i); }
         });
     </script>
