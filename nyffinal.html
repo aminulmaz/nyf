@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haji Sujamuddin Laskar Night Cricket - Night Tournament</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/phosphor-icons"></script>
+    <!-- SwiperJS for Carousel -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #0a0a1a;
+            color: #e0e0e0;
+        }
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+        .neon-text {
+            text-shadow: 0 0 5px #00f, 0 0 10px #00f, 0 0 20px #00f, 0 0 40px #ff00de, 0 0 80px #ff00de, 0 0 90px #ff00de, 0 0 100px #ff00de, 0 0 150px #ff00de;
+        }
+        .neon-text-pink {
+            text-shadow: 0 0 5px #ff00de, 0 0 10px #ff00de, 0 0 20px #ff00de;
+        }
+        .neon-border-glow {
+            border: 2px solid #ff00de;
+            box-shadow: 0 0 10px #ff00de, 0 0 20px #ff00de, 0 0 30px #ff00de inset;
+        }
+        .glass-effect {
+            background: rgba(16, 16, 32, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .hero-bg {
+            background-image: linear-gradient(rgba(10, 10, 26, 0.8), rgba(10, 10, 26, 1)), url('https://placehold.co/1200x800/0a0a1a/ff00de?text=Night+Cricket+Action');
+            background-size: cover;
+            background-position: center;
+        }
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        .nav-link:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ff00de;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover:after, .nav-link.active:after {
+            width: 100%;
+        }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+        .team-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .team-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 0 15px #00f, 0 0 30px #00f;
+        }
+        .btn-glow {
+             transition: all 0.3s ease;
+        }
+        .btn-glow:hover {
+            box-shadow: 0 0 15px #ff00de, 0 0 25px #ff00de;
+            transform: scale(1.05);
+        }
+        /* Swiper Carousel Styles */
+        .swiper-container {
+            width: 100%;
+            padding-top: 50px;
+            padding-bottom: 50px;
+        }
+        .swiper-slide {
+            background-position: center;
+            background-size: cover;
+            width: 300px;
+            height: 300px;
+        }
+        .swiper-slide img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 0.5rem;
+            border: 2px solid #ff00de80;
+        }
+        /* Registration Form Styles */
+        .form-header {
+            background-color: #007BFF;
+            color: white;
+            padding: 1rem 1.5rem;
+            clip-path: polygon(0 0, 100% 0, 95% 100%, 0% 100%);
+        }
+        .form-input, .form-select {
+            background-color: rgba(30, 41, 59, 0.5);
+            border: 1px solid #475569;
+            color: white;
+            border-radius: 0.375rem;
+            padding: 0.75rem;
+            width: 100%;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+
+    <!-- Header -->
+    <header id="header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 glass-effect">
+        <div class="container mx-auto px-4">
+            <nav class="flex justify-between items-center py-4">
+                <a href="#home" class="text-xl sm:text-2xl md:text-3xl font-orbitron font-bold neon-text-pink">HSL Cricket</a>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#home" class="nav-link text-lg font-semibold active">Home</a>
+                    <a href="#teams" class="nav-link text-lg font-semibold">Teams</a>
+                    <a href="#schedule" class="nav-link text-lg font-semibold">Schedule</a>
+                    <a href="#sponsors" class="nav-link text-lg font-semibold">Sponsors</a>
+                    <a href="#register" class="nav-link text-lg font-semibold">Register</a>
+                </div>
+                <button id="mobile-menu-button" class="md:hidden text-white">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </nav>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden px-4 pb-4">
+            <a href="#home" class="block py-2 text-lg font-semibold nav-link active">Home</a>
+            <a href="#teams" class="block py-2 text-lg font-semibold nav-link">Teams</a>
+            <a href="#schedule" class="block py-2 text-lg font-semibold nav-link">Schedule</a>
+            <a href="#sponsors" class="block py-2 text-lg font-semibold nav-link">Sponsors</a>
+            <a href="#register" class="block py-2 text-lg font-semibold nav-link">Register</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- Home Page -->
+        <section id="home" class="page active">
+            <div class="hero-bg min-h-screen flex items-center justify-center pt-24">
+                <div class="text-center text-white px-4">
+                    <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-orbitron font-black uppercase neon-text">Haji Sujamuddin Laskar<br>Night Cricket</h1>
+                    <p class="text-lg sm:text-xl md:text-2xl mt-6 mb-2 font-light text-gray-300">The ultimate showdown under the stars.</p>
+                    <p class="text-base sm:text-lg md:text-xl font-semibold text-blue-300 mb-8">Organised by Narainpur Youth Federation</p>
+                    <div id="countdown" class="flex justify-center space-x-2 sm:space-x-4 md:space-x-8 my-10">
+                        <!-- Countdown timer will be injected here -->
+                    </div>
+                    <a href="#schedule" class="bg-pink-600 text-white font-bold py-3 px-8 rounded-full text-lg uppercase hover:bg-pink-700 btn-glow border-2 border-pink-500">View Schedule</a>
+                </div>
+            </div>
+
+            <!-- Announcement Section -->
+            <div class="py-16 bg-black/30">
+                <div class="container mx-auto px-4">
+                    <h2 class="text-4xl font-orbitron font-bold text-center mb-10 neon-text-pink">Latest Updates</h2>
+                    <div class="max-w-3xl mx-auto glass-effect rounded-lg p-4 sm:p-6 neon-border-glow">
+                        <div class="space-y-4">
+                            <!-- Announcement 1 -->
+                            <div class="flex items-start space-x-4 p-3 rounded-lg hover:bg-white/5 transition-colors duration-200">
+                                <i class="ph-megaphone text-3xl text-pink-400 mt-1"></i>
+                                <div>
+                                    <h3 class="font-bold text-lg text-blue-300">Registrations Closing Soon!</h3>
+                                    <p class="text-gray-300">All teams must submit their player lists by October 31st, 2025. Don't miss out on your chance to compete for the grand prize!</p>
+                                </div>
+                            </div>
+                            <!-- Announcement 2 -->
+                            <div class="flex items-start space-x-4 p-3 rounded-lg hover:bg-white/5 transition-colors duration-200">
+                                <i class="ph-calendar-check text-3xl text-pink-400 mt-1"></i>
+                                <div>
+                                    <h3 class="font-bold text-lg text-blue-300">Final Schedule Published</h3>
+                                    <p class="text-gray-300">The complete match schedule is now available on the 'Schedule' page. Check out your team's fixtures and get ready for the action.</p>
+                                </div>
+                            </div>
+                            <!-- Announcement 3 -->
+                            <div class="flex items-start space-x-4 p-3 rounded-lg hover:bg-white/5 transition-colors duration-200">
+                                <i class="ph-users-four text-3xl text-pink-400 mt-1"></i>
+                                <div>
+                                    <h3 class="font-bold text-lg text-blue-300">Captain's Meeting</h3>
+                                    <p class="text-gray-300">A mandatory meeting for all team captains will be held on November 5th, 2025 at 6:00 PM at the main ground pavilion.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Image Carousel Section -->
+            <div class="py-12 bg-gray-900/50">
+                <div class="container mx-auto px-4">
+                    <h2 class="text-4xl font-orbitron font-bold text-center mb-4 neon-text-pink">Moments From The Past</h2>
+                    <div class="swiper-container mySwiper">
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide"><img src="https://placehold.co/400x400/0a0a1a/ff00de?text=Season+1+Champions" alt="Previous Season Image 1"></div>
+                            <div class="swiper-slide"><img src="https://placehold.co/400x400/0a0a1a/00f?text=Epic+Six" alt="Previous Season Image 2"></div>
+                            <div class="swiper-slide"><img src="https://placehold.co/400x400/0a0a1a/ff00de?text=Night+Finals+Crowd" alt="Previous Season Image 3"></div>
+                            <div class="swiper-slide"><img src="https://placehold.co/400x400/0a0a1a/00f?text=Winning+Shot" alt="Previous Season Image 4"></div>
+                            <div class="swiper-slide"><img src="https://placehold.co/400x400/0a0a1a/ff00de?text=Team+Celebration" alt="Previous Season Image 5"></div>
+                            <div class="swiper-slide"><img src="https://placehold.co/400x400/0a0a1a/00f?text=Under+The+Lights" alt="Previous Season Image 6"></div>
+                        </div>
+                        <div class="swiper-pagination"></div>
+                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tournament Highlights Section -->
+            <div class="py-20 bg-gray-900/50">
+                <div class="container mx-auto px-4">
+                     <h2 class="text-4xl font-orbitron font-bold text-center mb-12 neon-text-pink">Tournament Highlights</h2>
+                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div class="glass-effect p-6 rounded-lg text-center">
+                            <i class="ph-trophy text-6xl text-yellow-400 mx-auto mb-4"></i>
+                            <h3 class="text-2xl font-bold font-orbitron mb-2">Champions Prize</h3>
+                            <p>The winners ride away with a brand new <span class="font-bold text-white">Royal Enfield Hunter</span> bike.</p>
+                        </div>
+                        <div class="glass-effect p-6 rounded-lg text-center">
+                            <i class="ph-motorcycle text-6xl text-gray-300 mx-auto mb-4"></i>
+                            <h3 class="text-2xl font-bold font-orbitron mb-2">Runners Up Prize</h3>
+                            <p>The runners-up will be awarded a stylish new <span class="font-bold text-white">Scooty</span>.</p>
+                        </div>
+                         <div class="glass-effect p-6 rounded-lg text-center">
+                            <i class="ph-stadium text-6xl text-blue-400 mx-auto mb-4"></i>
+                            <h3 class="text-2xl font-bold font-orbitron mb-2">Floodlit Action</h3>
+                            <p>Experience cricket like never before under dazzling stadium lights.</p>
+                        </div>
+                         <div class="glass-effect p-6 rounded-lg text-center">
+                            <i class="ph-users-three text-6xl text-pink-400 mx-auto mb-4"></i>
+                            <h3 class="text-2xl font-bold font-orbitron mb-2">For The Fans</h3>
+                            <p>Live DJ, food stalls, and an electrifying atmosphere for everyone.</p>
+                        </div>
+                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Other Pages (Teams, Schedule, etc.) -->
+        <section id="teams" class="page min-h-screen pt-32 bg-gray-900/50">
+            <!-- Teams content -->
+        </section>
+        <section id="schedule" class="page min-h-screen pt-32 bg-gray-900/50">
+            <!-- Schedule content -->
+        </section>
+        <section id="sponsors" class="page min-h-screen pt-32 bg-gray-900/50">
+            <!-- Sponsors content -->
+        </section>
+
+        <!-- Registration Page -->
+        <section id="register" class="page min-h-screen pt-24 sm:pt-32 bg-gray-900/50">
+             <div class="container mx-auto px-4 py-16">
+                 <div class="max-w-2xl mx-auto">
+                    <div class="glass-effect rounded-lg overflow-hidden">
+                        <div class="form-header">
+                           <h2 class="text-xl sm:text-2xl font-orbitron font-bold">PLAYER REGISTRATION</h2>
+                        </div>
+                        <form class="p-6 sm:p-8 space-y-6">
+                            <!-- Form fields here -->
+                            <div>
+                                <label for="playerName" class="block mb-2 text-sm font-medium text-gray-300">Full Name <span class="text-pink-500">*</span></label>
+                                <input type="text" id="playerName" name="playerName" class="form-input" placeholder="Enter your full name" required>
+                            </div>
+                             <div>
+                                <label for="teamName" class="block mb-2 text-sm font-medium text-gray-300">Team Name <span class="text-pink-500">*</span></label>
+                                <input type="text" id="teamName" name="teamName" class="form-input" placeholder="Your team's name" required>
+                            </div>
+                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="phone" class="block mb-2 text-sm font-medium text-gray-300">Phone Number <span class="text-pink-500">*</span></label>
+                                    <input type="tel" id="phone" name="phone" class="form-input" placeholder="10-digit mobile number" required>
+                                </div>
+                                 <div>
+                                    <label for="email" class="block mb-2 text-sm font-medium text-gray-300">Email Address</label>
+                                    <input type="email" id="email" name="email" class="form-input" placeholder="you@example.com">
+                                </div>
+                             </div>
+                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="playingRole" class="block mb-2 text-sm font-medium text-gray-300">Playing Role <span class="text-pink-500">*</span></label>
+                                    <select id="playingRole" name="playingRole" class="form-select" required>
+                                        <option value="">Select your role</option>
+                                        <option value="batsman">Batsman</option>
+                                        <option value="bowler">Bowler</option>
+                                        <option value="all-rounder">All-Rounder</option>
+                                        <option value="wicketkeeper">Wicketkeeper</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="jerseyNumber" class="block mb-2 text-sm font-medium text-gray-300">Jersey Number</label>
+                                    <input type="number" id="jerseyNumber" name="jerseyNumber" class="form-input" placeholder="e.g., 7, 18, 45" min="0" max="999">
+                                </div>
+                             </div>
+                            
+                            <div class="pt-4">
+                                <div class="flex items-center">
+                                    <input id="terms" name="terms" type="checkbox" class="h-4 w-4 rounded border-gray-500 text-blue-600 focus:ring-blue-500 bg-gray-700" required>
+                                    <label for="terms" class="ml-3 block text-sm text-gray-300">
+                                        I agree to the <a href="#" class="font-medium text-blue-400 hover:text-blue-300">Tournament Rules</a><span class="text-pink-500">*</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="pt-6">
+                                <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-8 rounded-full text-lg uppercase hover:bg-blue-700 btn-glow border-2 border-blue-500">Register Now</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+             </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black py-8">
+        <div class="container mx-auto px-4 text-center text-gray-400">
+            <p>&copy; 2025 Haji Sujamuddin Laskar Night Cricket. All Rights Reserved.</p>
+            <div class="flex justify-center space-x-6 mt-4">
+                <a href="#" class="hover:text-pink-500"><i class="ph-facebook-logo text-2xl"></i></a>
+                <a href="#" class="hover:text-pink-500"><i class="ph-twitter-logo text-2xl"></i></a>
+                <a href="#" class="hover:text-pink-500"><i class="ph-instagram-logo text-2xl"></i></a>
+            </div>
+        </div>
+    </footer>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const pages = document.querySelectorAll('.page');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            function showPage(pageId) {
+                pages.forEach(page => page.classList.toggle('active', page.id === pageId));
+                navLinks.forEach(link => link.classList.toggle('active', link.getAttribute('href') === '#' + pageId));
+                window.scrollTo(0, 0);
+            }
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const pageId = this.getAttribute('href').substring(1);
+                    showPage(pageId);
+                    if (!mobileMenu.classList.contains('hidden')) {
+                       mobileMenu.classList.add('hidden');
+                    }
+                });
+            });
+
+            const initialPage = window.location.hash.substring(1) || 'home';
+            showPage(initialPage);
+            
+            window.addEventListener('hashchange', () => {
+                const pageId = window.location.hash.substring(1) || 'home';
+                showPage(pageId);
+            });
+
+            mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+            
+            const header = document.getElementById('header');
+            window.addEventListener('scroll', () => {
+                header.classList.toggle('py-2', window.scrollY > 50);
+                header.classList.toggle('py-4', window.scrollY <= 50);
+            });
+
+            const countdownDate = new Date("Nov 15, 2025 19:00:00").getTime();
+            const countdownElement = document.getElementById('countdown');
+            if (countdownElement) {
+                const updateCountdown = setInterval(function() {
+                    const now = new Date().getTime();
+                    const distance = countdownDate - now;
+                    if (distance < 0) {
+                        clearInterval(updateCountdown);
+                        countdownElement.innerHTML = `<div class="text-3xl font-orbitron font-bold text-center w-full neon-text-pink">The Tournament has begun!</div>`;
+                        return;
+                    }
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                    countdownElement.innerHTML = `
+                        <div class="glass-effect p-2 rounded-lg w-16 sm:w-20 md:w-24 text-center"><div class="text-2xl sm:text-3xl md:text-4xl font-orbitron font-bold">${days}</div><div class="text-xs uppercase">Days</div></div>
+                        <div class="glass-effect p-2 rounded-lg w-16 sm:w-20 md:w-24 text-center"><div class="text-2xl sm:text-3xl md:text-4xl font-orbitron font-bold">${hours}</div><div class="text-xs uppercase">Hours</div></div>
+                        <div class="glass-effect p-2 rounded-lg w-16 sm:w-20 md:w-24 text-center"><div class="text-2xl sm:text-3xl md:text-4xl font-orbitron font-bold">${minutes}</div><div class="text-xs uppercase">Minutes</div></div>
+                        <div class="glass-effect p-2 rounded-lg w-16 sm:w-20 md:w-24 text-center"><div class="text-2xl sm:text-3xl md:text-4xl font-orbitron font-bold">${seconds}</div><div class="text-xs uppercase">Seconds</div></div>`;
+                }, 1000);
+            }
+            
+            if (document.querySelector('.mySwiper')) {
+                new Swiper(".mySwiper", {
+                    effect: "coverflow",
+                    grabCursor: true,
+                    centeredSlides: true,
+                    slidesPerView: "auto",
+                    loop: true,
+                    autoplay: { delay: 2500, disableOnInteraction: false },
+                    coverflowEffect: { rotate: 50, stretch: 0, depth: 100, modifier: 1, slideShadows: true },
+                    pagination: { el: ".swiper-pagination", clickable: true },
+                    navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+
+
