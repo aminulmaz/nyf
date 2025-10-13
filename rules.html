@@ -5,14 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rules & Regulations - NYF Tournament</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+
     <style>
         :root { 
             --bg-dark: #1a202c; 
             --bg-secondary: #2d3748; 
             --primary-blue: #4f46e5; 
-            --accent-violet: #a855f7; 
+            --accent-violet: #a855f7;
+            --accent-yellow: #fbbf24;
             --text-light: #ffffff; 
             --text-muted: #a0aec0; 
             --border-color: #4a5568; 
@@ -66,6 +71,26 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .pdf-btn {
+            display: inline-block;
+            background: linear-gradient(to right, var(--primary-blue), var(--accent-violet));
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            text-decoration: none;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.3s ease;
+        }
+        .pdf-btn:hover {
+            transform: scale(1.05);
+        }
+
         .rules-section {
             background-color: var(--bg-secondary);
             border: 1px solid var(--border-color);
@@ -94,9 +119,19 @@
             content: '🏏';
             margin-right: 0.75rem;
             color: var(--accent-violet);
+            font-size: 1.2em;
+        }
+        .highlight {
+            color: var(--accent-yellow);
+            font-weight: 700;
+            margin: 0 0.25rem; /* Added margin for spacing */
         }
         .footer { background-color: #111827; padding: 3rem 0; margin-top: 3rem; text-align: center; }
         .copyright { font-size: 0.875rem; border-top: 1px solid var(--border-color); padding-top: 2rem; max-width: 1280px; margin: 0 auto; }
+        .developer-name {
+            font-weight: 700;
+            color: var(--accent-yellow);
+        }
     </style>
 </head>
 <body>
@@ -115,23 +150,26 @@
         </nav>
         <div id="mobile-menu"></div>
     </header>
-    <div class="container">
-        <h1>Rules & Regulations</h1>
+    <div class="container" id="rules-content">
+        <div class="page-header">
+            <h1>Rules & Regulations</h1>
+            <button id="download-pdf" class="pdf-btn">Download Rules as PDF</button>
+        </div>
 
         <div class="rules-section">
             <h2>Tournament Format</h2>
             <ul>
-                <li>This is a Franchise-Based 9-a-Side Night Cricket League with Player Auction.</li>
-                <li>There will be a total of 16 Teams participating in the tournament.</li>
-                <li>Each team will have a purse of 30K Free Coins for the player auction.</li>
+                <li>This is a Franchise-Based<span class="highlight">9-a-Side</span> Night Cricket League with Player Auction.</li>
+                <li>There will be a total of<span class="highlight">16 Teams</span> participating in the tournament.</li>
+                <li>Each team will have a purse of<span class="highlight">30K Free Coins</span> for the player auction.</li>
             </ul>
         </div>
         
         <div class="rules-section">
             <h2>Match Rules</h2>
             <ul>
-                <li>There will be 8 Overs in an innings for every match.</li>
-                <li>A player can bowl a maximum of 2 overs in any innings.</li>
+                <li>There will be<span class="highlight">8 Overs</span> in an innings for every match.</li>
+                <li>A player can bowl a maximum of<span class="highlight">2 overs</span> in any innings.</li>
                 <li>Only genuine bowling actions are allowed. Any suspect action will be reported.</li>
             </ul>
         </div>
@@ -139,8 +177,8 @@
         <div class="rules-section">
             <h2>Important Dates & Fees</h2>
             <ul>
-                <li>Player Registration Link will be open on 15th October 2025.</li>
-                <li>The Joining Fee for each Franchise Team is 20K.</li>
+                <li>Player Registration Link will be open on<span class="highlight">15th October 2025</span>.</li>
+                <li>The Joining Fee for each Franchise Team is<span class="highlight">20K</span>.</li>
             </ul>
         </div>
         
@@ -153,7 +191,7 @@
             </ul>
         </div>
     </div>
-    <footer class="footer"><div class="copyright">Developed by Aminul Mazumder</div></footer>
+    <footer class="footer"><div class="copyright">Developed by <span class="developer-name">Aminul Mazumder</span></div></footer>
     <script>
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
@@ -161,6 +199,34 @@
         mobileMenu.innerHTML = '';
         navLinksContainer.querySelectorAll('a').forEach(link => { mobileMenu.appendChild(link.cloneNode(true)); });
         mobileMenuButton.addEventListener('click', () => { mobileMenu.style.display = mobileMenu.style.display === 'block' ? 'none' : 'block'; });
+
+        // PDF Generation
+        document.getElementById('download-pdf').addEventListener('click', () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFontSize(22);
+            doc.text("NYF Tournament - Rules & Regulations", 105, 20, null, null, "center");
+
+            let yPos = 40;
+
+            document.querySelectorAll('.rules-section').forEach(section => {
+                const title = section.querySelector('h2').textContent;
+                const rules = Array.from(section.querySelectorAll('li')).map(li => li.innerText.replace('🏏', '').trim());
+                
+                doc.autoTable({
+                    head: [[title]],
+                    body: rules.map(rule => [rule]),
+                    startY: yPos,
+                    theme: 'grid',
+                    headStyles: { fillColor: [79, 70, 229] },
+                });
+
+                yPos = doc.autoTable.previous.finalY + 15;
+            });
+
+            doc.save('NYF-Tournament-Rules.pdf');
+        });
     </script>
 </body>
 </html>
