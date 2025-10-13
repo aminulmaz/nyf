@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found - NYF Tournament</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #1a202c;
+            --primary-blue: #4f46e5;
+            --accent-violet: #a855f7;
+            --text-light: #ffffff;
+            --text-muted: #a0aec0;
+            --stump-color: #f7b733;
+            --ball-color: #e74c3c;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .container {
+            padding: 2rem;
+        }
+
+        .stumps-container {
+            position: relative;
+            width: 150px;
+            height: 200px;
+            margin: 0 auto 2rem auto;
+        }
+
+        .stump {
+            position: absolute;
+            bottom: 0;
+            width: 15px;
+            height: 150px;
+            background-color: var(--stump-color);
+            border-radius: 5px;
+        }
+
+        .stump.left { left: 30px; }
+        .stump.middle { left: 67.5px; }
+        .stump.right { left: 105px; }
+
+        .bail {
+            position: absolute;
+            top: 35px;
+            width: 52.5px;
+            height: 12px;
+            background-color: var(--stump-color);
+            border-radius: 6px;
+            transform-origin: center;
+            z-index: 10;
+        }
+
+        .bail.left { left: 30px; }
+        .bail.right { left: 67.5px; }
+
+        .ball {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-color: var(--ball-color);
+            border-radius: 50%;
+            top: 100px;
+            left: -100px; /* Start off-screen */
+            z-index: 5;
+        }
+
+        /* Animations */
+        .container:hover .ball {
+            animation: hit-stumps 0.5s ease-in forwards;
+        }
+        .container:hover .bail {
+            animation: bail-fly 0.8s ease-out 0.45s forwards;
+        }
+
+        @keyframes hit-stumps {
+            to {
+                transform: translateX(180px) rotate(360deg);
+            }
+        }
+        @keyframes bail-fly {
+            0% { transform: translateY(0) rotate(0); opacity: 1; }
+            100% { transform: translateY(-80px) rotate(720deg); opacity: 0; }
+        }
+
+        .error-code {
+            font-family: 'Teko', sans-serif;
+            font-size: 8rem;
+            line-height: 1;
+            background: linear-gradient(to right, var(--primary-blue), var(--accent-violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+
+        h1 {
+            font-family: 'Teko', sans-serif;
+            font-size: 3rem;
+            margin: 0 0 1rem 0;
+        }
+        
+        p {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .home-button {
+            display: inline-block;
+            background: linear-gradient(to right, var(--primary-blue), var(--accent-violet));
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 0.375rem;
+            text-decoration: none;
+            font-weight: 700;
+            transition: transform 0.3s ease;
+        }
+        .home-button:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="stumps-container">
+            <div class="stump left"></div>
+            <div class="stump middle"></div>
+            <div class="stump right"></div>
+            <div class="bail left"></div>
+            <div class="bail right"></div>
+            <div class="ball"></div>
+        </div>
+        <div class="error-code">404</div>
+        <h1>HOWZAT?! Page Not Found</h1>
+        <p>Looks like you've been stumped. The page you're looking for is out.</p>
+        <a href="index.html" class="home-button">Go Back to the Crease</a>
+    </div>
+</body>
+</html>
