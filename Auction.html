@@ -105,6 +105,8 @@
         .card h3 { font-size: 1.5rem; margin-top: 0; color: var(--accent-violet); }
         .card-actions { margin-top: 1rem; }
         .placeholder { color: var(--text-muted); text-align: center; padding: 2rem; }
+        .footer { background-color: var(--bg-secondary); padding: 2rem 0; margin-top: 3rem; text-align: center; border-top: 1px solid var(--border-color); }
+        .developer-name { font-weight: 700; color: var(--accent-yellow); }
     </style>
 </head>
 <body>
@@ -196,6 +198,7 @@
                 </div>
             </div>
         </main>
+        <footer class="footer">Developed by <span class="developer-name">Aminul Mazumder</span></footer>
     </div>
 
     <script src="firebaseconfig.js"></script>
@@ -412,6 +415,12 @@
                         { x: margin, y: margin * 2 + cardH }, { x: margin * 2 + cardW, y: margin * 2 + cardH },
                     ];
                     
+                    doc.setFontSize(30); doc.setTextColor('#4f46e5');
+                    doc.text('MLA Haji Suzam Uddin Laskar Night Cricket Tournament', pageW / 2, 20, { align: 'center' });
+                    doc.setFontSize(24); doc.setTextColor('#a855f7');
+                    doc.text(`Player Auction - ${role.toUpperCase()}S`, pageW / 2, 35, { align: 'center' });
+                    doc.addPage();
+                    
                     const playersInRole = groupedPlayers[role];
                     playersInRole.forEach((player, index) => {
                         if (index % 4 === 0 && index > 0) { doc.addPage(); }
@@ -424,15 +433,22 @@
                 }
 
                 function drawCard(doc, x, y, w, h, player, img) {
+                    // Card Background
                     doc.setFillColor('#2d3748');
                     doc.setDrawColor('#4a5568');
                     doc.roundedRect(x, y, w, h, 3, 3, 'FD');
                     
+                    // Card Header
+                    doc.setFillColor('#1a202c');
+                    doc.roundedRect(x, y, w, 20, 3, 3, 'F');
+                    doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor('#ffffff');
+                    doc.text('NYF Player Auction Card', x + w / 2, y + 12, { align: 'center' });
+
                     // Image Box
-                    const imgBoxH = 65;
-                    const imgBoxW = w - 10;
-                    const imgBoxX = x + 5;
-                    const imgBoxY = y + 5;
+                    const imgBoxH = 50; // Image height
+                    const imgBoxW = w - 20; // Image width
+                    const imgBoxX = x + 10;
+                    const imgBoxY = y + 25;
 
                     let imgDisplayW, imgDisplayH;
                     const ratio = img.width / img.height;
@@ -450,19 +466,16 @@
 
                     doc.addImage(img, 'JPEG', imgDisplayX, imgDisplayY, imgDisplayW, imgDisplayH);
                     
-                    doc.setFontSize(20); doc.setFont('helvetica', 'bold'); doc.setTextColor('#ffffff');
-                    doc.text(player.fullName, x + w / 2, y + 80, { align: 'center', maxWidth: w - 10 });
+                    doc.setFontSize(22); doc.setFont('Teko', 'bold'); doc.setTextColor('#ffffff');
+                    doc.text(player.fullName, x + w / 2, y + 88, { align: 'center', maxWidth: w - 10 });
                     
                     doc.setFontSize(14); doc.setFont('helvetica', 'normal'); doc.setTextColor('#a0aec0');
-                    doc.text(player.role, x + w / 2, y + 88, { align: 'center' });
+                    doc.text(player.role, x + w / 2, y + 96, { align: 'center' });
 
                     doc.setDrawColor('#4a5568');
-                    doc.line(x + 10, y + 95, x + w - 10, y + 95);
-
-                    doc.setFontSize(16); doc.setTextColor('#ffffff');
-                    doc.text('Base Price', x + w / 2, y + 103, { align: 'center' });
+                    doc.line(x + 10, y + 102, x + w - 10, y + 102);
                     
-                    doc.setFontSize(26); doc.setFont('helvetica', 'bold'); doc.setTextColor('#fbbf24');
+                    doc.setFontSize(24); doc.setFont('Teko', 'bold'); doc.setTextColor('#fbbf24');
                     doc.text(`${player.basePrice} Coins`, x + w / 2, y + 112, { align: 'center' });
                 }
 
