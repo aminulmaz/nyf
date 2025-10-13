@@ -64,14 +64,14 @@
         }
          @media (min-width: 768px) { .nav-brand { font-size: 1.875rem; } }
         .nav-links { display: none; }
-        @media (min-width: 768px) { .nav-links { display: flex; align-items: center; gap: 1.5rem; font-size: 0.875rem; } }
+        @media (min-width: 1024px) { .nav-links { display: flex; align-items: center; gap: 1.5rem; font-size: 0.875rem; } }
         .nav-links a { text-decoration: none; color: white; transition: color 0.3s ease; }
         .nav-links a.active { font-weight: 600; border-bottom: 2px solid white; padding-bottom: 0.25rem; }
         .nav-links a:not(.active):hover { color: var(--accent-yellow); }
 
         /* Mobile Menu */
         #mobile-menu-button { display: block; background: none; border: none; color: white; cursor: pointer; }
-        @media (min-width: 768px) { #mobile-menu-button { display: none; } }
+        @media (min-width: 1024px) { #mobile-menu-button { display: none; } }
         #mobile-menu { 
             display: none; 
             padding: 0 1.5rem 1rem; 
@@ -132,11 +132,29 @@
         @media (min-width: 768px) { .section-title { font-size: 2.25rem; } }
         
         /* Announcements Section */
+        @keyframes animated-border {
+            0% { box-shadow: 0 0 15px rgba(142, 45, 226, 0.3); }
+            50% { box-shadow: 0 0 25px rgba(74, 0, 224, 0.6); }
+            100% { box-shadow: 0 0 15px rgba(142, 45, 226, 0.3); }
+        }
         #announcements { max-width: 56rem; margin: 0 auto; }
-        .announcement-box { background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 0.75rem; padding: 1.5rem; }
-        .announcement-item { padding: 1rem 0; border-bottom: 1px solid var(--border-color); }
+        .announcement-box { 
+            background-color: var(--bg-secondary); 
+            border: 1px solid var(--border-color); 
+            border-radius: 0.75rem; 
+            padding: 1.5rem; 
+            animation: animated-border 5s infinite;
+        }
+        .announcement-item { 
+            padding: 1rem 0; 
+            border-bottom: 1px solid var(--border-color); 
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
         .announcement-item:last-child { border-bottom: none; padding-bottom: 0; }
         .announcement-item:first-child { padding-top: 0; }
+        .announcement-icon { color: var(--primary-purple); min-width: 24px; }
 
         /* Teams Section */
         .teams-grid { display: grid; gap: 1rem; }
@@ -192,10 +210,11 @@
             <a href="index.html" class="nav-brand">NYF</a>
             <div class="nav-links">
                 <a href="index.html" class="active">Home</a>
+                <a href="about.html">About Tournament</a>
                 <a href="fixtures.html">Fixtures</a>
-                <a href="rules.html">Rules</a>
+                <a href="rules.html">Rules & Regulations</a>
                 <a href="player-registration.html">Player Registration</a>
-                <a href="faq.html">FAQ</a>
+                <a href="contact.html">Contact</a>
             </div>
             <button id="mobile-menu-button">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
@@ -234,7 +253,7 @@
             </section>
         </div>
 
-        <section class="section">
+        <section class="section" style="background-color: var(--bg-secondary);">
             <div class="container">
                 <h2 class="section-title">Participating Teams</h2>
                 <div id="teams-grid" class="teams-grid"></div>
@@ -253,7 +272,7 @@
             </div>
         </section>
 
-        <section class="section" style="background-color: var(--bg-secondary); border-top: 1px solid var(--border-color);">
+        <section class="section" style="background-color: var(--bg-secondary);">
             <div class="container">
                 <h2 class="section-title">Our Sponsors</h2>
                 <div class="sponsors-grid">
@@ -310,9 +329,10 @@
             if (snapshot.empty) {
                 announcementsList.innerHTML = `<p style="text-align: center;">No announcements yet.</p>`; return;
             }
+            const bellIcon = `<svg class="announcement-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>`;
             announcementsList.innerHTML = snapshot.docs.map(doc => {
                 const item = doc.data();
-                return `<div class="announcement-item"><p><strong>${item.headline}:</strong> ${item.text}</p></div>`;
+                return `<div class="announcement-item">${bellIcon}<div><p><strong>${item.headline}:</strong> ${item.text}</p></div></div>`;
             }).join('');
         });
 
