@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Begins Soon | MLA Haji Suzam Uddin Laskar Night Cricket</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/phosphor-icons"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827;
+            color: #F9FAFB;
+        }
+        .font-heading { font-family: 'Inter', sans-serif; font-weight: 900; }
+        .text-gradient {
+            background-image: linear-gradient(90deg, #3b82f6, #ec4899, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .panel-modern {
+            background-color: #1F2937;
+            border: 1px solid #374151;
+            border-radius: 0.75rem;
+        }
+        .btn-primary {
+            background-image: linear-gradient(90deg, #3b82f6 0%, #ec4899 100%);
+            color: white;
+            font-weight: 700;
+            border-radius: 9999px;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(236, 72, 153, 0.5);
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(236, 72, 153, 0.5); }
+            50% { box-shadow: 0 0 35px rgba(236, 72, 153, 1); }
+        }
+        .btn-live {
+            animation: pulse-glow 2s infinite;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen py-12 px-4">
+
+    <div class="max-w-4xl mx-auto text-center">
+        <a href="index.html" class="text-3xl sm:text-4xl font-heading text-white">HSL<span class="text-gradient">Cricket</span></a>
+        
+        <div class="panel-modern p-8 sm:p-12 mt-8">
+            <div id="countdown-content">
+                <i class="ph-calendar-check text-6xl text-gradient mx-auto"></i>
+                <h1 class="font-heading text-4xl sm:text-5xl mt-4">Registration Begins Soon</h1>
+                <p class="text-gray-400 mt-4 max-w-2xl mx-auto">Player registration for the MLA Haji Suzam Uddin Laskar Night Cricket Tournament will go live on **October 15th at 2:00 PM**.</p>
+                <div id="countdown" class="flex flex-wrap justify-center gap-4 my-8">
+                    <!-- Countdown timer will be injected here -->
+                </div>
+                 <p class="text-gray-400">Follow us for updates:</p>
+                <div class="flex justify-center space-x-6 mt-4">
+                    <a href="#" class="text-gray-500 hover:text-pink-500 transition-colors"><i class="ph-facebook-logo text-3xl"></i></a>
+                    <a href="#" class="text-gray-500 hover:text-pink-500 transition-colors"><i class="ph-twitter-logo text-3xl"></i></a>
+                    <a href="#" class="text-gray-500 hover:text-pink-500 transition-colors"><i class="ph-instagram-logo text-3xl"></i></a>
+                </div>
+            </div>
+
+            <div id="live-content" class="hidden">
+                <i class="ph-rocket-launch text-6xl text-gradient mx-auto"></i>
+                <h1 class="font-heading text-4xl sm:text-5xl mt-4 text-green-400">Registration is Now Open!</h1>
+                <p class="text-gray-300 mt-4 max-w-2xl mx-auto">The wait is over. Click the button below to register your details and be a part of the tournament.</p>
+                <div class="mt-8">
+                    <a href="register_live.html" class="btn-primary btn-live py-4 px-10 text-xl inline-block">Register Now</a>
+                </div>
+            </div>
+        </div>
+         <a href="index.html" class="inline-block mt-6 text-blue-400 hover:underline">&larr; Return to Home</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const countdownElement = document.getElementById('countdown');
+            const countdownContent = document.getElementById('countdown-content');
+            const liveContent = document.getElementById('live-content');
+            
+            // Set the date we're counting down to
+            const countDownDate = new Date("October 15, 2025 14:00:00").getTime();
+
+            const countdownInterval = setInterval(function() {
+                const now = new Date().getTime();
+                const distance = countDownDate - now;
+
+                if (distance < 0) {
+                    clearInterval(countdownInterval);
+                    countdownContent.classList.add('hidden');
+                    liveContent.classList.remove('hidden');
+                    return;
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                countdownElement.innerHTML = `
+                    <div class="panel-modern bg-gray-900 p-4 text-center w-24 rounded-lg"><div class="text-4xl sm:text-5xl font-heading">${String(days).padStart(2, '0')}</div><div class="text-sm uppercase text-gray-400">Days</div></div>
+                    <div class="panel-modern bg-gray-900 p-4 text-center w-24 rounded-lg"><div class="text-4xl sm:text-5xl font-heading">${String(hours).padStart(2, '0')}</div><div class="text-sm uppercase text-gray-400">Hours</div></div>
+                    <div class="panel-modern bg-gray-900 p-4 text-center w-24 rounded-lg"><div class="text-4xl sm:text-5xl font-heading">${String(minutes).padStart(2, '0')}</div><div class="text-sm uppercase text-gray-400">Minutes</div></div>
+                    <div class="panel-modern bg-gray-900 p-4 text-center w-24 rounded-lg"><div class="text-4xl sm:text-5xl font-heading">${String(seconds).padStart(2, '0')}</div><div class="text-sm uppercase text-gray-400">Seconds</div></div>
+                `;
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
+
