@@ -192,7 +192,7 @@
             <div id="auction-cards" class="tab-content">
                 <div class="section-header"><h2>Auction Card Generator</h2></div>
                 <div class="form-container">
-                    <p>This tool will generate separate PDF files for each player category (Batsman, Bowler, etc.), containing auction cards for all approved players. This process may take a moment as it needs to download all player images.</p>
+                    <p>This tool will generate separate PDF files for each player category (Batsman, Bowler, etc.), containing professionally designed auction cards for all approved players. This process may take a moment as it needs to download all player images.</p>
                     <button class="submit-btn" id="generate-auction-pdf">Generate & Download All PDFs</button>
                     <p id="pdf-generation-status" style="text-align: center; margin-top: 1rem; color: var(--accent-violet);"></p>
                 </div>
@@ -358,6 +358,29 @@
         });
 
         // --- Auction Card PDF Generation ---
+        const loadImageAsBase64 = (url) => {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    const blob = await response.blob();
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(blob);
+                } catch (error) {
+                     console.warn(`Could not load image from ${url}. Using placeholder. Error: ${error}`);
+                     // Fetch a placeholder image as a fallback
+                     const placeholderResponse = await fetch(`https://placehold.co/250x300/2d3748/ffffff?text=Image+Error`);
+                     const placeholderBlob = await placeholderResponse.blob();
+                     const reader = new FileReader();
+                     reader.onloadend = () => resolve(reader.result);
+                     reader.onerror = reject;
+                     reader.readAsDataURL(placeholderBlob);
+                }
+            });
+        };
+
         document.getElementById('generate-auction-pdf').addEventListener('click', async () => {
             if (approvedPlayersData.length === 0) {
                 alert('No approved players to generate auction cards for.');
@@ -379,27 +402,13 @@
                     return acc;
                 }, {});
                 
-                // 2. Pre-load all images
+                // 2. Pre-load all images as Base64
                 const allPlayers = Object.values(groupedPlayers).flat();
-                const imagePromises = allPlayers.map(player => {
-                    return new Promise((resolve, reject) => {
-                        const img = new Image();
-                        img.crossOrigin = 'Anonymous';
-                        img.onload = () => resolve({ photoUrl: player.photoUrl, img });
-                        img.onerror = () => {
-                            const placeholder = new Image();
-                            placeholder.crossOrigin = 'Anonymous';
-                            placeholder.onload = () => resolve({ photoUrl: player.photoUrl, img: placeholder });
-                            placeholder.onerror = reject;
-                            placeholder.src = `https://placehold.co/250x300/2d3748/ffffff?text=${player.fullName.split(' ').map(n=>n[0]).join('')}`;
-                        };
-                        img.src = player.photoUrl;
-                    });
-                });
+                const imagePromises = allPlayers.map(player => loadImageAsBase64(player.photoUrl));
 
                 const loadedImages = await Promise.all(imagePromises);
-                const imageMap = loadedImages.reduce((map, { photoUrl, img }) => {
-                    map[photoUrl] = img;
+                const imageMap = allPlayers.reduce((map, player, index) => {
+                    map[player.photoUrl] = loadedImages[index];
                     return map;
                 }, {});
 
@@ -409,7 +418,7 @@
                 for (const role in groupedPlayers) {
                     const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
                     const pageW = 210, pageH = 297, margin = 10;
-                    const cardW = (pageW - margin * 3) / 2, cardH = 120; // Fixed card height
+                    const cardW = (pageW - margin * 3) / 2, cardH = 120;
                     const positions = [
                         { x: margin, y: margin }, { x: margin * 2 + cardW, y: margin },
                         { x: margin, y: margin * 2 + cardH }, { x: margin * 2 + cardW, y: margin * 2 + cardH },
@@ -419,52 +428,36 @@
                     doc.text('MLA Haji Suzam Uddin Laskar Night Cricket Tournament', pageW / 2, 20, { align: 'center' });
                     doc.setFontSize(24); doc.setTextColor('#a855f7');
                     doc.text(`Player Auction - ${role.toUpperCase()}S`, pageW / 2, 35, { align: 'center' });
-                    doc.addPage();
                     
                     const playersInRole = groupedPlayers[role];
                     playersInRole.forEach((player, index) => {
-                        if (index % 4 === 0 && index > 0) { doc.addPage(); }
+                        if (index % 4 === 0) { doc.addPage(); }
                         
                         const pos = positions[index % 4];
-                        const img = imageMap[player.photoUrl];
-                        drawCard(doc, pos.x, pos.y, cardW, cardH, player, img);
+                        const imgData = imageMap[player.photoUrl];
+                        drawCard(doc, pos.x, pos.y, cardW, cardH, player, imgData);
                     });
-                     doc.save(`NYF-Auction-${role.replace(/\s/g, '_')}.pdf`);
+                    
+                    doc.deletePage(1); // Remove the blank first page
+                    doc.save(`NYF-Auction-${role.replace(/\s/g, '_')}.pdf`);
                 }
 
-                function drawCard(doc, x, y, w, h, player, img) {
-                    // Card Background
+                function drawCard(doc, x, y, w, h, player, imgData) {
                     doc.setFillColor('#2d3748');
                     doc.setDrawColor('#4a5568');
                     doc.roundedRect(x, y, w, h, 3, 3, 'FD');
                     
-                    // Card Header
                     doc.setFillColor('#1a202c');
                     doc.roundedRect(x, y, w, 20, 3, 3, 'F');
                     doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor('#ffffff');
                     doc.text('NYF Player Auction Card', x + w / 2, y + 12, { align: 'center' });
 
-                    // Image Box
-                    const imgBoxH = 50; // Image height
-                    const imgBoxW = w - 20; // Image width
+                    const imgBoxH = 50;
+                    const imgBoxW = w - 20;
                     const imgBoxX = x + 10;
                     const imgBoxY = y + 25;
-
-                    let imgDisplayW, imgDisplayH;
-                    const ratio = img.width / img.height;
-
-                    if ((imgBoxW / imgBoxH) > ratio) {
-                        imgDisplayH = imgBoxH;
-                        imgDisplayW = imgBoxH * ratio;
-                    } else {
-                        imgDisplayW = imgBoxW;
-                        imgDisplayH = imgBoxW / ratio;
-                    }
-
-                    const imgDisplayX = imgBoxX + (imgBoxW - imgDisplayW) / 2;
-                    const imgDisplayY = imgBoxY + (imgBoxH - imgDisplayH) / 2;
-
-                    doc.addImage(img, 'JPEG', imgDisplayX, imgDisplayY, imgDisplayW, imgDisplayH);
+                    
+                    doc.addImage(imgData, 'JPEG', imgBoxX, imgBoxY, imgBoxW, imgBoxH, undefined, 'FAST');
                     
                     doc.setFontSize(22); doc.setFont('Teko', 'bold'); doc.setTextColor('#ffffff');
                     doc.text(player.fullName, x + w / 2, y + 88, { align: 'center', maxWidth: w - 10 });
