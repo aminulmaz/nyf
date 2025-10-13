@@ -3,177 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HSL Auctioneer Portal - Auction Night LIVE</title>
+    <title>Auction Card Generator | HSL Night Cricket</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- jsPDF and html2canvas for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        @keyframes gradient-animation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #111827;
-            color: #f0f0f0;
-        }
-        .animated-bg {
-            background: linear-gradient(-45deg, #111827, #130f2b, #200f2b, #111827);
-            background-size: 400% 400%;
-            animation: gradient-animation 15s ease infinite;
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #111827; color: #F9FAFB; }
         .font-heading { font-family: 'Inter', sans-serif; font-weight: 900; }
-        .text-glow-pink { text-shadow: 0 0 12px #ec4899; }
-        .panel-glass {
-            background: rgba(31, 41, 55, 0.5);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(75, 85, 99, 0.5);
+        .text-gradient { background-image: linear-gradient(90deg, #3b82f6, #ec4899, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .panel-modern { background-color: #1F2937; border: 1px solid #374151; border-radius: 0.75rem; }
+        .btn-primary { background-image: linear-gradient(90deg, #3b82f6 0%, #ec4899 100%); color: white; font-weight: 700; border-radius: 0.5rem; transition: all 0.3s ease; }
+        .btn-primary:hover:not(:disabled) { transform: scale(1.05); box-shadow: 0 0 20px rgba(236, 72, 153, 0.5); }
+        .form-input { background-color: #374151; border: 1px solid #4b5563; border-radius: 0.5rem; transition: all 0.2s ease; }
+        .form-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4); }
+        .filter-btn { background-color: #374151; border: 1px solid #4b5563; color: #d1d5db; transition: all 0.2s ease; }
+        .filter-btn.active, .filter-btn:hover { background-color: #ec4899; color: white; border-color: #ec4899; }
+
+        /* Styles for the hidden card template for PDF generation */
+        #card-render-area { position: absolute; left: -9999px; top: -9999px; }
+        .auction-card-template {
+            width: 1280px; height: 720px; background-color: #111827;
+            background-image: radial-gradient(circle at top right, rgba(236, 72, 153, 0.2), transparent 40%), radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.2), transparent 40%);
+            padding: 40px; display: grid; grid-template-columns: 4fr 6fr; gap: 40px; align-items: center;
         }
-        .btn-primary { 
-            background-image: linear-gradient(to right, #8b5cf6 0%, #ec4899 100%);
-            color: white; font-weight: bold; transition: all 0.3s ease; 
-        }
-        .btn-primary:hover:not(:disabled) {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(236, 72, 153, 0.6);
-        }
-        .player-card.available:hover {
-            border-color: #ec4899;
-            cursor: pointer;
-            transform: translateY(-4px);
-            background: rgba(55, 65, 81, 0.7);
-        }
-        .auction-card-main {
-            border: 2px solid #ec4899;
-            box-shadow: 0 0 30px rgba(236, 72, 153, 0.5);
-        }
-        .h-screen-minus-header { height: calc(100vh - 64px); }
-        .form-input {
-            background-color: #1f2937;
-            border: 1px solid #4b5563;
-            transition: all 0.3s ease;
-        }
-        .form-input:focus {
-            outline: none;
-            border-color: #8b5cf6;
-            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.4);
-        }
-        .filter-btn {
-            background-color: #374151;
-            border: 1px solid #4b5563;
-            color: #d1d5db;
-        }
-        .filter-btn.active, .filter-btn:hover {
-            background-color: #ec4899;
-            color: white;
-            border-color: #ec4899;
-        }
+        .auction-card-template .player-image-container { width: 100%; height: 100%; border-radius: 1rem; border: 4px solid #ec4899; box-shadow: 0 0 30px rgba(236, 72, 153, 0.5); overflow: hidden; }
+        .auction-card-template .player-image { width: 100%; height: 100%; object-fit: cover; }
+        .auction-card-template .player-name { font-family: 'Inter', sans-serif; font-weight: 900; font-size: 80px; line-height: 1.1; text-transform: uppercase; }
+        .auction-card-template .player-skill { font-size: 40px; font-weight: 700; color: #3b82f6; }
+        .auction-card-template .base-price-label { font-size: 30px; font-weight: 600; color: #9CA3AF; margin-top: 40px; text-transform: uppercase; }
+        .auction-card-template .base-price-amount { font-family: 'Inter', sans-serif; font-weight: 900; font-size: 90px; color: #10B981; }
     </style>
 </head>
-<body class="overflow-hidden animated-bg">
+<body class="p-4 sm:p-8">
 
-    <header class="bg-gray-900/50 backdrop-blur-sm z-10 border-b border-gray-700/50">
-        <div class="container mx-auto px-4 flex justify-between items-center h-16">
-            <h1 class="text-2xl font-heading font-bold text-glow-pink">HSL Auction LIVE</h1>
-            <button id="reset-auction-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md transition-colors">Reset Auction</button>
+    <!-- Login View -->
+    <div id="login-container" class="flex items-center justify-center min-h-[80vh]">
+        <div class="w-full max-w-md">
+            <h1 class="font-heading text-3xl text-center mb-8">Card Generator <span class="text-gradient">Login</span></h1>
+            <form id="login-form" class="panel-modern p-8 space-y-6">
+                <div>
+                    <label for="email" class="block mb-2 font-semibold">Email</label>
+                    <input type="email" id="email" class="form-input w-full p-3" required>
+                </div>
+                <div>
+                    <label for="password" class="block mb-2 font-semibold">Password</label>
+                    <input type="password" id="password" class="form-input w-full p-3" required>
+                </div>
+                <button type="submit" class="btn-primary w-full py-3 text-lg">Sign In</button>
+                <p id="login-error" class="text-red-500 text-center h-4"></p>
+            </form>
         </div>
-    </header>
+    </div>
+    
+    <!-- Generator Panel (Hidden by default) -->
+    <div id="generator-panel" class="hidden">
+        <div class="container mx-auto">
+            <header class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="font-heading text-4xl sm:text-5xl">Auction Card <span class="text-gradient">Generator</span></h1>
+                    <p class="text-gray-400 mt-2">Generate printable, projector-ready auction cards from your Firebase player data.</p>
+                </div>
+                <button id="sign-out-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md transition-colors">Sign Out</button>
+            </header>
 
-    <main class="grid grid-cols-1 lg:grid-cols-4 gap-4 p-4 h-screen-minus-header">
-        <div class="panel-glass rounded-lg p-4 flex flex-col lg:col-span-1">
-            <h2 class="font-heading text-xl font-bold mb-4 text-center">Available Players</h2>
-            <div class="flex flex-wrap gap-2 mb-4" id="filter-container">
-                <button class="filter-btn active text-sm font-semibold py-1 px-3 rounded-full transition-colors" data-filter="all">All</button>
-                <button class="filter-btn text-sm font-semibold py-1 px-3 rounded-full transition-colors" data-filter="Batsman">Batsman</button>
-                <button class="filter-btn text-sm font-semibold py-1 px-3 rounded-full transition-colors" data-filter="Bowler">Bowler</button>
-                <button class="filter-btn text-sm font-semibold py-1 px-3 rounded-full transition-colors" data-filter="All-Rounder">All-Rounder</button>
-                <button class="filter-btn text-sm font-semibold py-1 px-3 rounded-full transition-colors" data-filter="Wicketkeeper">Wicketkeeper</button>
+            <div class="panel-modern p-6">
+                <h2 class="font-heading text-2xl mb-4">Step 1: Select Player Category</h2>
+                <div id="filter-container" class="flex flex-wrap gap-3">
+                    <button class="filter-btn active font-semibold py-2 px-4 rounded-md" data-filter="all">All Players</button>
+                    <button class="filter-btn font-semibold py-2 px-4 rounded-md" data-filter="Batsman">Batsman</button>
+                    <button class="filter-btn font-semibold py-2 px-4 rounded-md" data-filter="Bowler">Bowler</button>
+                    <button class="filter-btn font-semibold py-2 px-4 rounded-md" data-filter="All-Rounder">All-Rounder</button>
+                    <button class="filter-btn font-semibold py-2 px-4 rounded-md" data-filter="Wicketkeeper">Wicketkeeper</button>
+                </div>
             </div>
-            <div id="player-pool" class="overflow-y-auto space-y-2 pr-2"></div>
-        </div>
 
-        <div class="panel-glass rounded-lg p-4 flex flex-col gap-4 lg:col-span-2">
-            <div id="auction-stage" class="flex-grow flex items-center justify-center"></div>
-            <div class="flex-shrink-0">
-                <h2 class="font-heading text-xl font-bold mb-4 text-center">Recently Sold</h2>
-                <div id="sold-players-log" class="overflow-y-auto h-32 border-t border-pink-500/20 pt-2 space-y-1"></div>
+            <div class="panel-modern p-6 mt-6">
+                <h2 class="font-heading text-2xl mb-4">Step 2: Review Players</h2>
+                <p class="text-gray-400 mb-4">The following players in the selected category will be included in the PDF.</p>
+                <div id="player-preview" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 h-64 overflow-y-auto p-4 bg-gray-900/50 rounded-lg">
+                    <p class="text-gray-500">Connecting to Firebase...</p>
+                </div>
+            </div>
+
+            <div class="panel-modern p-6 mt-6">
+                <h2 class="font-heading text-2xl mb-4">Step 3: Generate PDF</h2>
+                <p class="text-gray-400 mb-4">This will create a multi-page PDF with one card per page. This process may take a moment for large groups.</p>
+                <button id="generate-pdf-btn" class="btn-primary w-full sm:w-auto py-3 px-8 text-lg" disabled>Generate PDF</button>
+                <p id="status-message" class="mt-4 text-yellow-400 h-6"></p>
             </div>
         </div>
+    </div>
 
-        <div class="panel-glass rounded-lg p-4 flex flex-col lg:col-span-1">
-            <h2 class="font-heading text-xl font-bold mb-4 text-center">Team Purses</h2>
-            <div id="teams-container" class="overflow-y-auto space-y-3 pr-2"></div>
+
+    <!-- Hidden Area for Rendering Cards -->
+    <div id="card-render-area">
+        <div id="auction-card-template" class="auction-card-template">
+            <div class="player-image-container"><img id="template-image" src="" class="player-image" crossorigin="anonymous"></div>
+            <div>
+                <h2 id="template-name" class="player-name text-gradient">Player Name</h2>
+                <p id="template-skill" class="player-skill">Player Skill</p>
+                <p class="base-price-label">Base Price</p>
+                <p id="template-price" class="base-price-amount">₹0</p>
+            </div>
         </div>
-    </main>
+    </div>
+
 
     <script type="module">
-        let db; let firebaseConnected = false;
-        let demoPlayers = [{ id: 'p1_demo', fullName: 'Arjun Sharma', playingRole: 'Batsman', basePrice: 200000, status: 'available', playerPhotoURL: 'https://placehold.co/400x300/111827/ec4899?text=Arjun' }, { id: 'p2_demo', fullName: 'Rohan Singh', playingRole: 'Bowler', basePrice: 150000, status: 'available', playerPhotoURL: 'https://placehold.co/400x300/111827/8b5cf6?text=Rohan' }, { id: 'p3_demo', fullName: 'Vikram Das', playingRole: 'All-Rounder', basePrice: 180000, status: 'available', playerPhotoURL: 'https://placehold.co/400x300/111827/ec4899?text=Vikram' }, { id: 'p4_demo', fullName: 'Manish Patel', playingRole: 'Wicketkeeper', basePrice: 120000, status: 'available', playerPhotoURL: 'https://placehold.co/400x300/111827/8b5cf6?text=Manish' }, { id: 'p_sold_demo', fullName: 'Prakash Roy', playingRole: 'Bowler', basePrice: 100000, status: 'sold', sellingPrice: 250000, soldToTeam: 't2_demo', soldAt: new Date().getTime() - 10000, playerPhotoURL: 'https://placehold.co/400x300/111827/ec4899?text=Prakash' }];
-        let demoTeams = [{ id: 't1_demo', name: 'Assasin Kalain', purse: 1000000, playersBought: 0 }, { id: 't2_demo', name: 'Narainpur Knight Riders', purse: 750000, playersBought: 1 }, { id: 't3_demo', name: 'Deccan Hyderabad', purse: 1000000, playersBought: 0 }, { id: 't4_demo', name: 'Bowerghat Bulls', purse: 1000000, playersBought: 0 }];
-        let allPlayersData = JSON.parse(JSON.stringify(demoPlayers));
-        let allTeamsData = JSON.parse(JSON.stringify(demoTeams));
-        let currentPlayerId = 'p1_demo';
-        let currentFilter = 'all';
+        import { firebaseConfig } from './firebaseconfig.js';
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-        const playerPoolEl = document.getElementById('player-pool');
-        const auctionStageEl = document.getElementById('auction-stage');
-        const soldPlayersLogEl = document.getElementById('sold-players-log');
-        const teamsContainerEl = document.getElementById('teams-container');
-
-        function renderAll() { renderPlayerPool(allPlayersData, currentFilter); renderSoldPlayers(allPlayersData, allTeamsData); renderTeams(allTeamsData); renderAuctionStage(currentPlayerId); }
-        function renderPlayerPool(players, filter) { const filtered = (filter === 'all' ? players : players.filter(p => p.playingRole === filter)).filter(p => p.status === 'available').sort((a,b) => a.fullName.localeCompare(b.name)); playerPoolEl.innerHTML = filtered.length > 0 ? filtered.map(p => `<div class="player-card available panel-glass rounded-md p-3 border border-transparent transition-all duration-300" data-id="${p.id}"><div class="flex justify-between items-center"><p class="font-bold text-lg">${p.fullName}</p><p class="text-xs font-semibold text-pink-400">${p.playingRole}</p></div><p class="text-sm text-gray-300">Base: ₹${p.basePrice.toLocaleString()}</p></div>`).join('') : '<p class="text-center text-gray-400 mt-4">No available players.</p>'; }
-        function renderSoldPlayers(players, teams) { const sold = players.filter(p => p.status === 'sold').sort((a,b) => (b.soldAt || 0) - (a.soldAt || 0)).slice(0, 5); soldPlayersLogEl.innerHTML = sold.length > 0 ? sold.map(p => { const team = teams.find(t => t.id === p.soldToTeam); return `<div class="text-sm flex justify-between items-center bg-gray-900/50 rounded p-2"><p>${p.fullName}</p><p class="text-right"><span class="font-bold text-blue-400">${team?.name || 'N/A'}</span> @ <span class="text-green-400 font-semibold">₹${p.sellingPrice.toLocaleString()}</span></p></div>` }).join('') : '<p class="text-center text-gray-400">No players sold yet.</p>'; }
-        function renderTeams(teams) { teamsContainerEl.innerHTML = teams.sort((a,b) => b.purse - a.purse).map(t => `<div class="panel-glass rounded-md p-3"><p class="font-bold text-lg text-blue-400">${t.name}</p><p class="text-sm font-semibold">Purse: <span class="text-green-400">₹${t.purse.toLocaleString()}</span></p><p class="text-xs text-gray-400">Players: ${t.playersBought || 0}</p></div>`).join(''); }
-        function renderAuctionStage(playerId) {
-            if (!playerId) { auctionStageEl.innerHTML = '<p class="text-gray-400 text-2xl text-center font-heading">Select a player to begin</p>'; return; }
-            const player = allPlayersData.find(p => p.id === playerId);
-            if (!player) return;
-            auctionStageEl.innerHTML = `
-                <div class="w-full h-full flex flex-col justify-center items-center gap-6">
-                    <div class="w-full max-w-md panel-glass rounded-lg p-6 auction-card-main relative">
-                        <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-pink-600 text-white font-bold uppercase px-4 py-1 rounded-full text-sm tracking-wider">On The Block</div>
-                        <img src="${player.playerPhotoURL || 'https://placehold.co/400x300/111827/ec4899?text=Player'}" alt="${player.fullName}" class="w-full h-56 object-cover rounded-md border-2 border-pink-500/50 mb-4">
-                        <h2 class="text-5xl font-heading font-black text-center">${player.fullName}</h2>
-                        <p class="text-center text-xl text-blue-400 font-semibold">${player.playingRole}</p>
-                        <div class="mt-4 pt-4 border-t border-pink-500/20 text-center">
-                            <p class="text-sm uppercase text-gray-400">Base Price</p>
-                            <p class="text-4xl font-heading font-black text-green-400">₹${player.basePrice.toLocaleString()}</p>
-                        </div>
-                    </div>
-                    <div class="w-full max-w-md panel-glass rounded-lg p-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <input type="number" id="selling-price-input" placeholder="Final Selling Price" class="form-input rounded-md p-3 text-white text-lg col-span-1 md:col-span-2" required>
-                            <select id="team-select" class="form-input rounded-md p-3 text-white text-lg"><option value="">Assign to Team...</option>${allTeamsData.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}</select>
-                            <button id="sell-player-btn" class="btn-primary p-3 rounded-md text-lg uppercase">Sell Player</button>
-                        </div>
-                         <button id="unsold-player-btn" class="bg-yellow-600 hover:bg-yellow-700 text-black font-bold p-3 rounded-md w-full mt-2 uppercase transition-colors">Mark Unsold</button>
-                    </div>
-                </div>`;
-        }
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         
-        playerPoolEl.addEventListener('click', (e) => { const card = e.target.closest('.player-card'); if (card) { currentPlayerId = card.dataset.id; renderAuctionStage(currentPlayerId); } });
-        document.getElementById('filter-container').addEventListener('click', (e) => { if (e.target.tagName === 'BUTTON') { currentFilter = e.target.dataset.filter; document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active')); e.target.classList.add('active'); renderPlayerPool(allPlayersData, currentFilter); } });
-        document.getElementById('reset-auction-btn').addEventListener('click', async () => { if (!confirm('ARE YOU SURE? This will reset the auction.')) return; if(firebaseConnected) { const { writeBatch, getDocs, query, collection, where } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"); const batch = writeBatch(db); const pSnap = await getDocs(query(collection(db, 'registrations'), where('status', 'in', ['sold', 'unsold']))); pSnap.forEach(d => batch.update(d.ref, { status: 'available', soldToTeam: null, sellingPrice: 0, soldAt: null })); const tSnap = await getDocs(collection(db, 'teams')); tSnap.forEach(d => batch.update(d.ref, { purse: 1000000, playersBought: 0 })); await batch.commit(); alert('Firebase auction has been reset!'); } else { allPlayersData = JSON.parse(JSON.stringify(demoPlayers)); allTeamsData = JSON.parse(JSON.stringify(demoTeams)); currentPlayerId = 'p1_demo'; renderAll(); alert('Demo auction has been reset!'); } });
-        auctionStageEl.addEventListener('click', async (e) => { if (!currentPlayerId) return; const handleSell = async (price, teamId) => { if(firebaseConnected) { const { doc, writeBatch } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"); const playerRef = doc(db, 'registrations', currentPlayerId); const teamRef = doc(db, 'teams', teamId); const team = allTeamsData.find(t => t.id === teamId); if (team.purse < price) { alert(`${team.name} does not have enough purse!`); return; } const batch = writeBatch(db); batch.update(playerRef, { status: 'sold', sellingPrice: price, soldToTeam: teamId, soldAt: new Date().getTime() }); batch.update(teamRef, { purse: team.purse - price, playersBought: (team.playersBought || 0) + 1 }); await batch.commit(); } else { const pIndex = allPlayersData.findIndex(p=>p.id === currentPlayerId); const tIndex = allTeamsData.findIndex(t=>t.id === teamId); if(allTeamsData[tIndex].purse < price) { alert(`${allTeamsData[tIndex].name} does not have enough purse!`); return; } allPlayersData[pIndex].status = 'sold'; allPlayersData[pIndex].sellingPrice = price; allPlayersData[pIndex].soldToTeam = teamId; allPlayersData[pIndex].soldAt = new Date().getTime(); allTeamsData[tIndex].purse -= price; allTeamsData[tIndex].playersBought = (allTeamsData[tIndex].playersBought || 0) + 1; } currentPlayerId = null; renderAll(); }; const handleUnsold = async () => { if(firebaseConnected) { const { doc, updateDoc } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"); await updateDoc(doc(db, 'registrations', currentPlayerId), { status: 'unsold' }); } else { const pIndex = allPlayersData.findIndex(p=>p.id === currentPlayerId); allPlayersData[pIndex].status = 'unsold'; } currentPlayerId = null; renderAll(); }; if (e.target.id === 'sell-player-btn') { const sellingPrice = document.getElementById('selling-price-input').value; const teamId = document.getElementById('team-select').value; if (!sellingPrice || !teamId) { alert('Please enter a selling price and select a team.'); return; } handleSell(parseInt(sellingPrice), teamId); } if (e.target.id === 'unsold-player-btn') { handleUnsold(); } });
+        const loginContainer = document.getElementById('login-container');
+        const generatorPanel = document.getElementById('generator-panel');
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+        const signOutBtn = document.getElementById('sign-out-btn');
+        
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                loginContainer.classList.add('hidden');
+                generatorPanel.classList.remove('hidden');
+                initializeGenerator();
+            } else {
+                loginContainer.classList.remove('hidden');
+                generatorPanel.classList.add('hidden');
+            }
+        });
 
-        async function initializeFirebase() {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
             try {
-                const { firebaseConfig } = await import('./firebase-config.js');
-                const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
-                const { getFirestore, collection, onSnapshot, query, where } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
-                const { getAuth, signInAnonymously } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                await signInAnonymously(getAuth(app));
-                firebaseConnected = true;
-                onSnapshot(query(collection(db, 'registrations'), where('status', 'in', ['available', 'sold', 'unsold', 'approved'])), (snapshot) => { allPlayersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); renderAll(); });
-                onSnapshot(collection(db, 'teams'), (snapshot) => { allTeamsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); renderAll(); });
-            } catch (error) { console.warn("Firebase not configured. Running in demo mode."); }
+                await signInWithEmailAndPassword(auth, loginForm.email.value, loginForm.password.value);
+                loginError.textContent = '';
+            } catch (error) {
+                loginError.textContent = 'Invalid email or password.';
+            }
+        });
+
+        signOutBtn.addEventListener('click', () => signOut(auth));
+
+        function initializeGenerator() {
+            let allPlayers = [];
+            let filteredPlayers = [];
+            let currentFilter = 'all';
+
+            const playerPreviewEl = document.getElementById('player-preview');
+            const generateBtn = document.getElementById('generate-pdf-btn');
+            const statusMessage = document.getElementById('status-message');
+            const db = getFirestore(app);
+
+            try {
+                const q = query(collection(db, "registrations"), where("status", "==", "approved"));
+                onSnapshot(q, (snapshot) => {
+                    allPlayers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    updateFilter();
+                    generateBtn.disabled = false;
+                    statusMessage.textContent = `${allPlayers.length} approved players found. Ready to generate.`;
+                });
+            } catch (e) {
+                playerPreviewEl.innerHTML = `<p class="text-red-500">Could not connect to Firestore.</p>`;
+                statusMessage.textContent = "Error: Firestore connection failed.";
+            }
+
+            function updateFilter() {
+                filteredPlayers = (currentFilter === 'all') ? allPlayers : allPlayers.filter(p => p.playingRole === currentFilter);
+                playerPreviewEl.innerHTML = filteredPlayers.map(p => `<div class="text-center p-2 rounded-md bg-gray-700"><p class="font-semibold truncate">${p.fullName}</p><p class="text-xs text-gray-400">${p.playingRole}</p></div>`).join('') || '<p class="text-gray-500">No players found in this category.</p>';
+            }
+
+            document.getElementById('filter-container').addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    currentFilter = e.target.dataset.filter;
+                    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    updateFilter();
+                }
+            });
+
+            generateBtn.addEventListener('click', async () => {
+                if (filteredPlayers.length === 0) { alert('No players to generate.'); return; }
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ orientation: 'landscape', unit: 'px', format: [1280, 720] });
+                const cardTemplate = document.getElementById('auction-card-template');
+                const templateName = document.getElementById('template-name');
+                const templateSkill = document.getElementById('template-skill');
+                const templatePrice = document.getElementById('template-price');
+                const templateImage = document.getElementById('template-image');
+                generateBtn.disabled = true;
+                
+                for (let i = 0; i < filteredPlayers.length; i++) {
+                    const player = filteredPlayers[i];
+                    statusMessage.textContent = `Generating card ${i + 1} of ${filteredPlayers.length}: ${player.fullName}`;
+                    
+                    templateName.textContent = player.fullName;
+                    templateSkill.textContent = player.playingRole;
+                    templatePrice.textContent = `₹${player.basePrice.toLocaleString('en-IN')}`;
+                    templateImage.src = player.playerPhotoURL;
+                    
+                    await new Promise(resolve => {
+                        templateImage.onload = resolve;
+                        templateImage.onerror = () => {
+                            templateImage.src = `https://placehold.co/400x400/111827/ec4899?text=${player.fullName.split(' ').map(n=>n[0]).join('')}`;
+                            new Promise(res => { templateImage.onload = res; }).then(resolve);
+                        };
+                    });
+                    
+                    const canvas = await html2canvas(cardTemplate, { scale: 1 });
+                    const imgData = canvas.toDataURL('image/jpeg', 0.9);
+                    if (i > 0) doc.addPage([1280, 720], 'landscape');
+                    doc.addImage(imgData, 'JPEG', 0, 0, 1280, 720);
+                }
+
+                statusMessage.textContent = `Saving PDF...`;
+                doc.save(`Auction-Cards-${currentFilter}.pdf`);
+                statusMessage.textContent = `PDF generated successfully!`;
+                generateBtn.disabled = false;
+            });
         }
-        
-        renderAll();
-        initializeFirebase();
     </script>
 </body>
 </html>
