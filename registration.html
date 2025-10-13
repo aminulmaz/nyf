@@ -424,14 +424,25 @@
             };
             
             try {
-                // Upload files
+                // Define file paths
                 const photoRef = ref(storage, `player_photos/${Date.now()}_${photoFile.name}`);
-                const photoSnap = await uploadBytes(photoRef, photoFile);
-                playerData.photoUrl = await getDownloadURL(photoSnap.ref);
-
                 const proofRef = ref(storage, `payment_proofs/${Date.now()}_${proofFile.name}`);
-                const proofSnap = await uploadBytes(proofRef, proofFile);
-                playerData.proofUrl = await getDownloadURL(proofSnap.ref);
+
+                // Start uploads in parallel
+                const photoUploadPromise = uploadBytes(photoRef, photoFile);
+                const proofUploadPromise = uploadBytes(proofRef, proofFile);
+
+                // Wait for both uploads to complete
+                const [photoSnap, proofSnap] = await Promise.all([photoUploadPromise, proofUploadPromise]);
+
+                // Get download URLs in parallel
+                const [photoUrl, proofUrl] = await Promise.all([
+                    getDownloadURL(photoSnap.ref),
+                    getDownloadURL(proofSnap.ref)
+                ]);
+
+                playerData.photoUrl = photoUrl;
+                playerData.proofUrl = proofUrl;
 
                 // Save to Firestore
                 await addDoc(collection(db, 'pending_players'), playerData);
