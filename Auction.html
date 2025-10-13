@@ -3,81 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HSL Auctioneer Portal - The Pavilion Theme</title>
+    <title>HSL Auctioneer Portal - Auction Night LIVE</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700;900&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
+        @keyframes gradient-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
         body {
-            font-family: 'Lato', sans-serif;
-            background-color: #013220; /* Deep Cricket Green */
+            font-family: 'Inter', sans-serif;
+            background: #111827;
             color: #f0f0f0;
-            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2-H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
-        .font-display { font-family: 'Merriweather', serif; }
-        .text-gold { color: #DAA520; }
-        .panel-dark-green {
-            background: rgba(0, 20, 10, 0.7);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(218, 165, 32, 0.3);
+        .animated-bg {
+            background: linear-gradient(-45deg, #111827, #130f2b, #200f2b, #111827);
+            background-size: 400% 400%;
+            animation: gradient-animation 15s ease infinite;
         }
-        .btn-gold { 
-            background-color: #DAA520; 
-            color: #111;
-            font-weight: bold;
-            transition: all 0.3s ease; 
+        .font-heading { font-family: 'Inter', sans-serif; font-weight: 900; }
+        .text-glow-pink { text-shadow: 0 0 12px #ec4899; }
+        .panel-glass {
+            background: rgba(31, 41, 55, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(75, 85, 99, 0.5);
         }
-        .btn-gold:hover:not(:disabled) {
-            background-color: #f0c040;
-            box-shadow: 0 0 15px rgba(218, 165, 32, 0.7);
+        .btn-primary { 
+            background-image: linear-gradient(to right, #8b5cf6 0%, #ec4899 100%);
+            color: white; font-weight: bold; transition: all 0.3s ease; 
+        }
+        .btn-primary:hover:not(:disabled) {
             transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(236, 72, 153, 0.6);
         }
         .player-card.available:hover {
-            border-color: #DAA520;
+            border-color: #ec4899;
             cursor: pointer;
             transform: translateY(-4px);
+            background: rgba(55, 65, 81, 0.7);
         }
         .auction-card-main {
-            border: 2px solid #DAA520;
-            box-shadow: 0 0 25px rgba(218, 165, 32, 0.4);
-            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18.273l8.445 8.445L11 35.164l-8.445-8.446L11 18.273zm50 50l8.445 8.445L61 85.164l-8.445-8.446L61 68.273zm-25-50l8.445 8.445L36 35.164l-8.445-8.446L36 18.273zm50 50l8.445 8.445L86 85.164l-8.445-8.446L86 68.273zM11 68.273l8.445 8.445L11 85.164l-8.445-8.446L11 68.273zM61 18.273l8.445 8.445L61 35.164l-8.445-8.446L61 18.273z' fill='%23DAA520' fill-opacity='0.08' fill-rule='evenodd'/%3E%3C/svg%3E");
+            border: 2px solid #ec4899;
+            box-shadow: 0 0 30px rgba(236, 72, 153, 0.5);
         }
         .h-screen-minus-header { height: calc(100vh - 64px); }
         .form-input {
-            background-color: rgba(0, 20, 10, 0.8);
-            border: 1px solid rgba(218, 165, 32, 0.4);
+            background-color: #1f2937;
+            border: 1px solid #4b5563;
             transition: all 0.3s ease;
         }
         .form-input:focus {
             outline: none;
-            border-color: #DAA520;
-            box-shadow: 0 0 15px rgba(218, 165, 32, 0.5);
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.4);
         }
         .filter-btn {
-            background-color: transparent;
-            border: 1px solid #DAA520;
-            color: #DAA520;
+            background-color: #374151;
+            border: 1px solid #4b5563;
+            color: #d1d5db;
         }
         .filter-btn.active, .filter-btn:hover {
-            background-color: #DAA520;
-            color: #111;
+            background-color: #ec4899;
+            color: white;
+            border-color: #ec4899;
         }
     </style>
 </head>
-<body class="overflow-hidden">
+<body class="overflow-hidden animated-bg">
 
-    <header class="bg-black/50 backdrop-blur-sm z-10 border-b border-gold/20">
+    <header class="bg-gray-900/50 backdrop-blur-sm z-10 border-b border-gray-700/50">
         <div class="container mx-auto px-4 flex justify-between items-center h-16">
-            <h1 class="text-2xl font-display font-bold text-gold">HSL Auction Portal</h1>
-            <div class="flex items-center gap-4">
-                 <button id="reset-auction-btn" class="bg-red-800 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-md transition-colors">Reset Auction</button>
-            </div>
+            <h1 class="text-2xl font-heading font-bold text-glow-pink">HSL Auction LIVE</h1>
+            <button id="reset-auction-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md transition-colors">Reset Auction</button>
         </div>
     </header>
 
     <main class="grid grid-cols-1 lg:grid-cols-4 gap-4 p-4 h-screen-minus-header">
-        <div class="panel-dark-green rounded-lg p-4 flex flex-col lg:col-span-1">
-            <h2 class="font-display text-xl font-bold mb-4 text-center">Available Players</h2>
+        <div class="panel-glass rounded-lg p-4 flex flex-col lg:col-span-1">
+            <h2 class="font-heading text-xl font-bold mb-4 text-center">Available Players</h2>
             <div class="flex flex-wrap gap-2 mb-4" id="filter-container">
                 <button class="filter-btn active text-sm font-semibold py-1 px-3 rounded-full transition-colors" data-filter="all">All</button>
                 <button class="filter-btn text-sm font-semibold py-1 px-3 rounded-full transition-colors" data-filter="Batsman">Batsman</button>
@@ -88,38 +93,24 @@
             <div id="player-pool" class="overflow-y-auto space-y-2 pr-2"></div>
         </div>
 
-        <div class="panel-dark-green rounded-lg p-4 flex flex-col gap-4 lg:col-span-2">
+        <div class="panel-glass rounded-lg p-4 flex flex-col gap-4 lg:col-span-2">
             <div id="auction-stage" class="flex-grow flex items-center justify-center"></div>
             <div class="flex-shrink-0">
-                <h2 class="font-display text-xl font-bold mb-4 text-center">Recently Sold</h2>
-                <div id="sold-players-log" class="overflow-y-auto h-32 border-t border-gold/20 pt-2 space-y-1"></div>
+                <h2 class="font-heading text-xl font-bold mb-4 text-center">Recently Sold</h2>
+                <div id="sold-players-log" class="overflow-y-auto h-32 border-t border-pink-500/20 pt-2 space-y-1"></div>
             </div>
         </div>
 
-        <div class="panel-dark-green rounded-lg p-4 flex flex-col lg:col-span-1">
-            <h2 class="font-display text-xl font-bold mb-4 text-center">Team Purses</h2>
+        <div class="panel-glass rounded-lg p-4 flex flex-col lg:col-span-1">
+            <h2 class="font-heading text-xl font-bold mb-4 text-center">Team Purses</h2>
             <div id="teams-container" class="overflow-y-auto space-y-3 pr-2"></div>
         </div>
     </main>
 
     <script type="module">
-        let db;
-        let firebaseConnected = false;
-
-        let demoPlayers = [
-            { id: 'p1_demo', fullName: 'Arjun Sharma', playingRole: 'Batsman', basePrice: 200000, status: 'available', playerPhotoURL: 'https://placehold.co/400x300/013220/DAA520?text=Arjun' },
-            { id: 'p2_demo', fullName: 'Rohan Singh', playingRole: 'Bowler', basePrice: 150000, status: 'available', playerPhotoURL: 'https://placehold.co/400x300/013220/DAA520?text=Rohan' },
-            { id: 'p3_demo', fullName: 'Vikram Das', playingRole: 'All-Rounder', basePrice: 180000, status: 'available', playerPhotoURL: 'https://placehold.co/400x300/013220/DAA520?text=Vikram' },
-            { id: 'p4_demo', fullName: 'Manish Patel', playingRole: 'Wicketkeeper', basePrice: 120000, status: 'available', playerPhotoURL: 'https://placehold.co/400x300/013220/DAA520?text=Manish' },
-            { id: 'p_sold_demo', fullName: 'Prakash Roy', playingRole: 'Bowler', basePrice: 100000, status: 'sold', sellingPrice: 250000, soldToTeam: 't2_demo', soldAt: new Date().getTime() - 10000, playerPhotoURL: 'https://placehold.co/400x300/013220/DAA520?text=Prakash' }
-        ];
-        let demoTeams = [
-            { id: 't1_demo', name: 'Assasin Kalain', purse: 1000000, playersBought: 0 },
-            { id: 't2_demo', name: 'Narainpur Knight Riders', purse: 750000, playersBought: 1 },
-            { id: 't3_demo', name: 'Deccan Hyderabad', purse: 1000000, playersBought: 0 },
-            { id: 't4_demo', name: 'Bowerghat Bulls', purse: 1000000, playersBought: 0 },
-        ];
-
+        let db; let firebaseConnected = false;
+        let demoPlayers = [{ id: 'p1_demo', fullName: 'Arjun Sharma', playingRole: 'Batsman', basePrice: 200000, status: 'available', playerPhotoURL: 'https://placehold.co/400x300/111827/ec4899?text=Arjun' }, { id: 'p2_demo', fullName: 'Rohan Singh', playingRole: 'Bowler', basePrice: 150000, status: 'available', playerPhotoURL: 'https://placehold.co/400x300/111827/8b5cf6?text=Rohan' }, { id: 'p3_demo', fullName: 'Vikram Das', playingRole: 'All-Rounder', basePrice: 180000, status: 'available', playerPhotoURL: 'https://placehold.co/400x300/111827/ec4899?text=Vikram' }, { id: 'p4_demo', fullName: 'Manish Patel', playingRole: 'Wicketkeeper', basePrice: 120000, status: 'available', playerPhotoURL: 'https://placehold.co/400x300/111827/8b5cf6?text=Manish' }, { id: 'p_sold_demo', fullName: 'Prakash Roy', playingRole: 'Bowler', basePrice: 100000, status: 'sold', sellingPrice: 250000, soldToTeam: 't2_demo', soldAt: new Date().getTime() - 10000, playerPhotoURL: 'https://placehold.co/400x300/111827/ec4899?text=Prakash' }];
+        let demoTeams = [{ id: 't1_demo', name: 'Assasin Kalain', purse: 1000000, playersBought: 0 }, { id: 't2_demo', name: 'Narainpur Knight Riders', purse: 750000, playersBought: 1 }, { id: 't3_demo', name: 'Deccan Hyderabad', purse: 1000000, playersBought: 0 }, { id: 't4_demo', name: 'Bowerghat Bulls', purse: 1000000, playersBought: 0 }];
         let allPlayersData = JSON.parse(JSON.stringify(demoPlayers));
         let allTeamsData = JSON.parse(JSON.stringify(demoTeams));
         let currentPlayerId = 'p1_demo';
@@ -130,139 +121,41 @@
         const soldPlayersLogEl = document.getElementById('sold-players-log');
         const teamsContainerEl = document.getElementById('teams-container');
 
-        function renderAll() {
-            renderPlayerPool(allPlayersData, currentFilter);
-            renderSoldPlayers(allPlayersData, allTeamsData);
-            renderTeams(allTeamsData);
-            renderAuctionStage(currentPlayerId);
-        }
-
-        function renderPlayerPool(players, filter) {
-            const filteredPlayers = (filter === 'all' ? players : players.filter(p => p.playingRole === filter)).filter(p => p.status === 'available').sort((a,b) => a.fullName.localeCompare(b.fullName));
-            playerPoolEl.innerHTML = filteredPlayers.length > 0 ? filteredPlayers.map(p => `<div class="player-card available panel-dark-green rounded-md p-3 border border-transparent transition-all duration-300" data-id="${p.id}"><div class="flex justify-between items-center"><p class="font-bold text-lg">${p.fullName}</p><p class="text-xs font-semibold text-gold">${p.playingRole}</p></div><p class="text-sm text-gray-300">Base: ₹${p.basePrice.toLocaleString()}</p></div>`).join('') : '<p class="text-center text-gray-400 mt-4">No available players in this category.</p>';
-        }
-
-        function renderSoldPlayers(players, teams) {
-            const soldPlayers = players.filter(p => p.status === 'sold').sort((a,b) => (b.soldAt || 0) - (a.soldAt || 0)).slice(0, 5);
-             soldPlayersLogEl.innerHTML = soldPlayers.length > 0 ? soldPlayers.map(p => {
-                 const team = teams.find(t => t.id === p.soldToTeam);
-                 return `<div class="text-sm flex justify-between items-center panel-dark-green rounded p-2"><p>${p.fullName}</p><p class="text-right"><span class="font-bold text-gold">${team?.name || 'N/A'}</span> @ <span class="text-white font-semibold">₹${p.sellingPrice.toLocaleString()}</span></p></div>`
-             }).join('') : '<p class="text-center text-gray-400">No players sold yet.</p>';
-        }
-
-        function renderTeams(teams) {
-             teamsContainerEl.innerHTML = teams.sort((a,b) => b.purse - a.purse).map(t => `<div class="panel-dark-green rounded-md p-3"><p class="font-bold text-lg">${t.name}</p><p class="text-sm font-semibold">Purse: <span class="text-white">₹${t.purse.toLocaleString()}</span></p><p class="text-xs text-gray-400">Players: ${t.playersBought || 0}</p></div>`).join('');
-        }
-        
+        function renderAll() { renderPlayerPool(allPlayersData, currentFilter); renderSoldPlayers(allPlayersData, allTeamsData); renderTeams(allTeamsData); renderAuctionStage(currentPlayerId); }
+        function renderPlayerPool(players, filter) { const filtered = (filter === 'all' ? players : players.filter(p => p.playingRole === filter)).filter(p => p.status === 'available').sort((a,b) => a.fullName.localeCompare(b.name)); playerPoolEl.innerHTML = filtered.length > 0 ? filtered.map(p => `<div class="player-card available panel-glass rounded-md p-3 border border-transparent transition-all duration-300" data-id="${p.id}"><div class="flex justify-between items-center"><p class="font-bold text-lg">${p.fullName}</p><p class="text-xs font-semibold text-pink-400">${p.playingRole}</p></div><p class="text-sm text-gray-300">Base: ₹${p.basePrice.toLocaleString()}</p></div>`).join('') : '<p class="text-center text-gray-400 mt-4">No available players.</p>'; }
+        function renderSoldPlayers(players, teams) { const sold = players.filter(p => p.status === 'sold').sort((a,b) => (b.soldAt || 0) - (a.soldAt || 0)).slice(0, 5); soldPlayersLogEl.innerHTML = sold.length > 0 ? sold.map(p => { const team = teams.find(t => t.id === p.soldToTeam); return `<div class="text-sm flex justify-between items-center bg-gray-900/50 rounded p-2"><p>${p.fullName}</p><p class="text-right"><span class="font-bold text-blue-400">${team?.name || 'N/A'}</span> @ <span class="text-green-400 font-semibold">₹${p.sellingPrice.toLocaleString()}</span></p></div>` }).join('') : '<p class="text-center text-gray-400">No players sold yet.</p>'; }
+        function renderTeams(teams) { teamsContainerEl.innerHTML = teams.sort((a,b) => b.purse - a.purse).map(t => `<div class="panel-glass rounded-md p-3"><p class="font-bold text-lg text-blue-400">${t.name}</p><p class="text-sm font-semibold">Purse: <span class="text-green-400">₹${t.purse.toLocaleString()}</span></p><p class="text-xs text-gray-400">Players: ${t.playersBought || 0}</p></div>`).join(''); }
         function renderAuctionStage(playerId) {
-            if (!playerId) { auctionStageEl.innerHTML = '<p class="text-gray-400 text-lg text-center font-display">Select a player from the pool to begin auction</p>'; return; }
+            if (!playerId) { auctionStageEl.innerHTML = '<p class="text-gray-400 text-2xl text-center font-heading">Select a player to begin</p>'; return; }
             const player = allPlayersData.find(p => p.id === playerId);
             if (!player) return;
-
             auctionStageEl.innerHTML = `
                 <div class="w-full h-full flex flex-col justify-center items-center gap-6">
-                    <div class="w-full max-w-md panel-dark-green rounded-lg p-6 auction-card-main">
-                        <img src="${player.playerPhotoURL || 'https://placehold.co/400x300/013220/DAA520?text=Player'}" alt="${player.fullName}" class="w-full h-48 object-cover rounded-md border-2 border-gold/50 mb-4">
-                        <h2 class="text-4xl font-display font-bold text-center">${player.fullName}</h2>
-                        <p class="text-center text-lg text-gold font-semibold">${player.playingRole}</p>
-                        <div class="mt-4 pt-4 border-t border-gold/20 text-center"><p class="text-sm uppercase text-gray-400">Base Price</p><p class="text-3xl font-display font-bold text-white">₹${player.basePrice.toLocaleString()}</p></div>
-                    </div>
-                    <div class="w-full max-w-md panel-dark-green rounded-lg p-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <input type="number" id="selling-price-input" placeholder="Final Selling Price" class="form-input rounded-md p-3 text-white col-span-1 md:col-span-2" required>
-                            <select id="team-select" class="form-input rounded-md p-3 text-white"><option value="">Assign to Team...</option>${allTeamsData.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}</select>
-                            <button id="sell-player-btn" class="btn-gold p-3 rounded-md text-lg uppercase">Sell Player</button>
+                    <div class="w-full max-w-md panel-glass rounded-lg p-6 auction-card-main relative">
+                        <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-pink-600 text-white font-bold uppercase px-4 py-1 rounded-full text-sm tracking-wider">On The Block</div>
+                        <img src="${player.playerPhotoURL || 'https://placehold.co/400x300/111827/ec4899?text=Player'}" alt="${player.fullName}" class="w-full h-56 object-cover rounded-md border-2 border-pink-500/50 mb-4">
+                        <h2 class="text-5xl font-heading font-black text-center">${player.fullName}</h2>
+                        <p class="text-center text-xl text-blue-400 font-semibold">${player.playingRole}</p>
+                        <div class="mt-4 pt-4 border-t border-pink-500/20 text-center">
+                            <p class="text-sm uppercase text-gray-400">Base Price</p>
+                            <p class="text-4xl font-heading font-black text-green-400">₹${player.basePrice.toLocaleString()}</p>
                         </div>
-                         <button id="unsold-player-btn" class="bg-gray-600 hover:bg-gray-500 text-white font-bold p-3 rounded-md w-full mt-2 uppercase transition-colors">Mark Unsold</button>
+                    </div>
+                    <div class="w-full max-w-md panel-glass rounded-lg p-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="number" id="selling-price-input" placeholder="Final Selling Price" class="form-input rounded-md p-3 text-white text-lg col-span-1 md:col-span-2" required>
+                            <select id="team-select" class="form-input rounded-md p-3 text-white text-lg"><option value="">Assign to Team...</option>${allTeamsData.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}</select>
+                            <button id="sell-player-btn" class="btn-primary p-3 rounded-md text-lg uppercase">Sell Player</button>
+                        </div>
+                         <button id="unsold-player-btn" class="bg-yellow-600 hover:bg-yellow-700 text-black font-bold p-3 rounded-md w-full mt-2 uppercase transition-colors">Mark Unsold</button>
                     </div>
                 </div>`;
         }
         
-        playerPoolEl.addEventListener('click', (e) => {
-            const card = e.target.closest('.player-card');
-            if (card) { currentPlayerId = card.dataset.id; renderAuctionStage(currentPlayerId); }
-        });
-
-        document.getElementById('filter-container').addEventListener('click', (e) => {
-            if (e.target.tagName === 'BUTTON') {
-                currentFilter = e.target.dataset.filter;
-                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-                e.target.classList.add('active');
-                renderPlayerPool(allPlayersData, currentFilter);
-            }
-        });
-
-        document.getElementById('reset-auction-btn').addEventListener('click', async () => {
-             if (!confirm('ARE YOU SURE? This will reset the auction.')) return;
-             if(firebaseConnected) {
-                const { writeBatch, getDocs, query, collection, where } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
-                const batch = writeBatch(db);
-                const playersSnapshot = await getDocs(query(collection(db, 'registrations'), where('status', 'in', ['sold', 'unsold'])));
-                playersSnapshot.forEach(d => batch.update(d.ref, { status: 'available', soldToTeam: null, sellingPrice: 0, soldAt: null }));
-                const teamsSnapshot = await getDocs(collection(db, 'teams'));
-                teamsSnapshot.forEach(d => batch.update(d.ref, { purse: 1000000, playersBought: 0 }));
-                await batch.commit();
-                alert('Firebase auction has been reset!');
-             } else {
-                allPlayersData = JSON.parse(JSON.stringify(demoPlayers));
-                allTeamsData = JSON.parse(JSON.stringify(demoTeams));
-                currentPlayerId = 'p1_demo';
-                renderAll();
-                alert('Demo auction has been reset!');
-             }
-        });
-
-        auctionStageEl.addEventListener('click', async (e) => {
-            if (!currentPlayerId) return;
-
-            const handleSell = async (price, teamId) => {
-                if(firebaseConnected) {
-                    const { doc, writeBatch } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
-                    const playerRef = doc(db, 'registrations', currentPlayerId);
-                    const teamRef = doc(db, 'teams', teamId);
-                    const team = allTeamsData.find(t => t.id === teamId);
-                    if (team.purse < price) { alert(`${team.name} does not have enough purse!`); return; }
-                    const batch = writeBatch(db);
-                    batch.update(playerRef, { status: 'sold', sellingPrice: price, soldToTeam: teamId, soldAt: new Date().getTime() });
-                    batch.update(teamRef, { purse: team.purse - price, playersBought: (team.playersBought || 0) + 1 });
-                    await batch.commit();
-                } else {
-                    const pIndex = allPlayersData.findIndex(p=>p.id === currentPlayerId);
-                    const tIndex = allTeamsData.findIndex(t=>t.id === teamId);
-                    if(allTeamsData[tIndex].purse < price) { alert(`${allTeamsData[tIndex].name} does not have enough purse!`); return; }
-                    allPlayersData[pIndex].status = 'sold';
-                    allPlayersData[pIndex].sellingPrice = price;
-                    allPlayersData[pIndex].soldToTeam = teamId;
-                    allPlayersData[pIndex].soldAt = new Date().getTime();
-                    allTeamsData[tIndex].purse -= price;
-                    allTeamsData[tIndex].playersBought = (allTeamsData[tIndex].playersBought || 0) + 1;
-                }
-                currentPlayerId = null;
-                renderAll();
-            };
-
-            const handleUnsold = async () => {
-                if(firebaseConnected) {
-                    const { doc, updateDoc } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
-                    await updateDoc(doc(db, 'registrations', currentPlayerId), { status: 'unsold' });
-                } else {
-                    const pIndex = allPlayersData.findIndex(p=>p.id === currentPlayerId);
-                    allPlayersData[pIndex].status = 'unsold';
-                }
-                currentPlayerId = null;
-                renderAll();
-            };
-
-            if (e.target.id === 'sell-player-btn') {
-                const sellingPrice = document.getElementById('selling-price-input').value;
-                const teamId = document.getElementById('team-select').value;
-                if (!sellingPrice || !teamId) { alert('Please enter a selling price and select a team.'); return; }
-                handleSell(parseInt(sellingPrice), teamId);
-            }
-            if (e.target.id === 'unsold-player-btn') {
-                handleUnsold();
-            }
-        });
+        playerPoolEl.addEventListener('click', (e) => { const card = e.target.closest('.player-card'); if (card) { currentPlayerId = card.dataset.id; renderAuctionStage(currentPlayerId); } });
+        document.getElementById('filter-container').addEventListener('click', (e) => { if (e.target.tagName === 'BUTTON') { currentFilter = e.target.dataset.filter; document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active')); e.target.classList.add('active'); renderPlayerPool(allPlayersData, currentFilter); } });
+        document.getElementById('reset-auction-btn').addEventListener('click', async () => { if (!confirm('ARE YOU SURE? This will reset the auction.')) return; if(firebaseConnected) { const { writeBatch, getDocs, query, collection, where } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"); const batch = writeBatch(db); const pSnap = await getDocs(query(collection(db, 'registrations'), where('status', 'in', ['sold', 'unsold']))); pSnap.forEach(d => batch.update(d.ref, { status: 'available', soldToTeam: null, sellingPrice: 0, soldAt: null })); const tSnap = await getDocs(collection(db, 'teams')); tSnap.forEach(d => batch.update(d.ref, { purse: 1000000, playersBought: 0 })); await batch.commit(); alert('Firebase auction has been reset!'); } else { allPlayersData = JSON.parse(JSON.stringify(demoPlayers)); allTeamsData = JSON.parse(JSON.stringify(demoTeams)); currentPlayerId = 'p1_demo'; renderAll(); alert('Demo auction has been reset!'); } });
+        auctionStageEl.addEventListener('click', async (e) => { if (!currentPlayerId) return; const handleSell = async (price, teamId) => { if(firebaseConnected) { const { doc, writeBatch } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"); const playerRef = doc(db, 'registrations', currentPlayerId); const teamRef = doc(db, 'teams', teamId); const team = allTeamsData.find(t => t.id === teamId); if (team.purse < price) { alert(`${team.name} does not have enough purse!`); return; } const batch = writeBatch(db); batch.update(playerRef, { status: 'sold', sellingPrice: price, soldToTeam: teamId, soldAt: new Date().getTime() }); batch.update(teamRef, { purse: team.purse - price, playersBought: (team.playersBought || 0) + 1 }); await batch.commit(); } else { const pIndex = allPlayersData.findIndex(p=>p.id === currentPlayerId); const tIndex = allTeamsData.findIndex(t=>t.id === teamId); if(allTeamsData[tIndex].purse < price) { alert(`${allTeamsData[tIndex].name} does not have enough purse!`); return; } allPlayersData[pIndex].status = 'sold'; allPlayersData[pIndex].sellingPrice = price; allPlayersData[pIndex].soldToTeam = teamId; allPlayersData[pIndex].soldAt = new Date().getTime(); allTeamsData[tIndex].purse -= price; allTeamsData[tIndex].playersBought = (allTeamsData[tIndex].playersBought || 0) + 1; } currentPlayerId = null; renderAll(); }; const handleUnsold = async () => { if(firebaseConnected) { const { doc, updateDoc } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"); await updateDoc(doc(db, 'registrations', currentPlayerId), { status: 'unsold' }); } else { const pIndex = allPlayersData.findIndex(p=>p.id === currentPlayerId); allPlayersData[pIndex].status = 'unsold'; } currentPlayerId = null; renderAll(); }; if (e.target.id === 'sell-player-btn') { const sellingPrice = document.getElementById('selling-price-input').value; const teamId = document.getElementById('team-select').value; if (!sellingPrice || !teamId) { alert('Please enter a selling price and select a team.'); return; } handleSell(parseInt(sellingPrice), teamId); } if (e.target.id === 'unsold-player-btn') { handleUnsold(); } });
 
         async function initializeFirebase() {
             try {
@@ -270,27 +163,15 @@
                 const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
                 const { getFirestore, collection, onSnapshot, query, where } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
                 const { getAuth, signInAnonymously } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
-
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 await signInAnonymously(getAuth(app));
                 firebaseConnected = true;
-                
-                onSnapshot(query(collection(db, 'registrations'), where('status', 'in', ['available', 'sold', 'unsold', 'approved'])), (snapshot) => {
-                    allPlayersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    renderAll();
-                });
-                onSnapshot(collection(db, 'teams'), (snapshot) => {
-                    allTeamsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    renderAll();
-                });
-
-            } catch (error) {
-                console.warn("Firebase not configured. Running in demo mode.");
-            }
+                onSnapshot(query(collection(db, 'registrations'), where('status', 'in', ['available', 'sold', 'unsold', 'approved'])), (snapshot) => { allPlayersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); renderAll(); });
+                onSnapshot(collection(db, 'teams'), (snapshot) => { allTeamsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); renderAll(); });
+            } catch (error) { console.warn("Firebase not configured. Running in demo mode."); }
         }
         
-        // --- INITIALIZE ---
         renderAll();
         initializeFirebase();
     </script>
