@@ -205,7 +205,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, doc, getDoc, setDoc, deleteDoc, addDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, doc, getDoc, setDoc, deleteDoc, addDoc, serverTimestamp, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -217,8 +217,6 @@
         const loginForm = document.getElementById('login-form');
         const loginError = document.getElementById('login-error');
         const logoutButton = document.getElementById('logout-button');
-        
-        let approvedPlayersData = []; // To hold data for PDF generation
 
         onAuthStateChanged(auth, user => {
             if (user) {
@@ -272,7 +270,6 @@
             onSnapshot(collection(db, 'pending_players'), snap => renderTableRows(tbodies.pendingPlayers, snap, (id, p) => `<tr><td>${p.fullName}</td><td>${p.phone}</td><td>${p.address}</td><td>${p.basePrice} Coins</td><td class="actions-cell"><button class="btn btn-proof" data-url="${p.photoUrl}">Photo</button><button class="btn btn-proof" data-url="${p.proofUrl}">Proof</button><button class="btn btn-approve" data-id="${id}">Approve</button><button class="btn btn-reject" data-id="${id}">Reject</button></td></tr>`));
             
             onSnapshot(collection(db, 'players'), snap => {
-                approvedPlayersData = snap.docs.map(doc => doc.data()); // Update data for PDF
                 renderTableRows(tbodies.approvedPlayers, snap, (id, p) => `<tr><td>${p.fullName}</td><td>${p.phone}</td><td>${p.address}</td><td>${p.role}</td><td>${p.basePrice} Coins</td><td class="actions-cell"><button class="btn btn-delete" data-collection="players" data-id="${id}">Delete</button></td></tr>`);
             });
 
@@ -338,15 +335,18 @@
 
         // --- PDF Generation ---
         const { jsPDF } = window.jspdf;
-        document.getElementById('generate-players-pdf').addEventListener('click', () => {
-             if (approvedPlayersData.length === 0) {
+        document.getElementById('generate-players-pdf').addEventListener('click', async () => {
+             const playersSnapshot = await getDocs(query(collection(db, 'players')));
+             if (playersSnapshot.empty) {
                 alert('No approved players to generate PDF for.');
                 return;
              }
+             const playersDataForPdf = playersSnapshot.docs.map(doc => doc.data());
+
              const docPdf = new jsPDF();
              docPdf.text("Approved Players List", 14, 15);
              
-             const tableData = approvedPlayersData.map(p => [
+             const tableData = playersDataForPdf.map(p => [
                 p.fullName, p.phone, p.address, p.role, `${p.basePrice} Coins`
              ]);
 
@@ -358,7 +358,7 @@
         });
 
         // --- Auction Card PDF Generation ---
-        const loadImageAsBase64 = (url) => {
+        const loadImageAsBase64 = (url, playerName) => {
             return new Promise(async (resolve, reject) => {
                 try {
                     const response = await fetch(url);
@@ -370,8 +370,8 @@
                     reader.readAsDataURL(blob);
                 } catch (error) {
                      console.warn(`Could not load image from ${url}. Using placeholder. Error: ${error}`);
-                     // Fetch a placeholder image as a fallback
-                     const placeholderResponse = await fetch(`https://placehold.co/250x300/2d3748/ffffff?text=Image+Error`);
+                     const initials = playerName.split(' ').map(n=>n[0]).join('');
+                     const placeholderResponse = await fetch(`https://placehold.co/250x300/2d3748/ffffff?text=${initials}`);
                      const placeholderBlob = await placeholderResponse.blob();
                      const reader = new FileReader();
                      reader.onloadend = () => resolve(reader.result);
@@ -382,29 +382,29 @@
         };
 
         document.getElementById('generate-auction-pdf').addEventListener('click', async () => {
-            if (approvedPlayersData.length === 0) {
+            const playersSnapshot = await getDocs(query(collection(db, 'players')));
+            if (playersSnapshot.empty) {
                 alert('No approved players to generate auction cards for.');
                 return;
             }
+            const auctionPlayersData = playersSnapshot.docs.map(doc => doc.data());
 
             const button = document.getElementById('generate-auction-pdf');
             const statusEl = document.getElementById('pdf-generation-status');
             button.disabled = true;
             button.textContent = 'Generating...';
-            statusEl.textContent = `Found ${approvedPlayersData.length} players. Loading all images...`;
+            statusEl.textContent = `Found ${auctionPlayersData.length} players. Loading all images...`;
 
             try {
-                // 1. Group players by role
-                const groupedPlayers = approvedPlayersData.reduce((acc, player) => {
+                const groupedPlayers = auctionPlayersData.reduce((acc, player) => {
                     const role = player.role || 'Uncategorized';
                     if (!acc[role]) { acc[role] = []; }
                     acc[role].push(player);
                     return acc;
                 }, {});
                 
-                // 2. Pre-load all images as Base64
                 const allPlayers = Object.values(groupedPlayers).flat();
-                const imagePromises = allPlayers.map(player => loadImageAsBase64(player.photoUrl));
+                const imagePromises = allPlayers.map(player => loadImageAsBase64(player.photoUrl, player.fullName));
 
                 const loadedImages = await Promise.all(imagePromises);
                 const imageMap = allPlayers.reduce((map, player, index) => {
@@ -414,7 +414,6 @@
 
                 statusEl.textContent = 'All images loaded. Creating PDFs...';
                 
-                // 3. Generate a separate PDF for each category
                 for (const role in groupedPlayers) {
                     const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
                     const pageW = 210, pageH = 297, margin = 10;
@@ -427,7 +426,7 @@
                     doc.setFontSize(30); doc.setTextColor('#4f46e5');
                     doc.text('MLA Haji Suzam Uddin Laskar Night Cricket Tournament', pageW / 2, 20, { align: 'center' });
                     doc.setFontSize(24); doc.setTextColor('#a855f7');
-                    doc.text(`Player Auction - ${role.toUpperCase()}S`, pageW / 2, 35, { align: 'center' });
+                    doc.text(`Player Auction - ${role.toUpperCase()}`, pageW / 2, 35, { align: 'center' });
                     
                     const playersInRole = groupedPlayers[role];
                     playersInRole.forEach((player, index) => {
@@ -438,7 +437,7 @@
                         drawCard(doc, pos.x, pos.y, cardW, cardH, player, imgData);
                     });
                     
-                    doc.deletePage(1); // Remove the blank first page
+                    doc.deletePage(1);
                     doc.save(`NYF-Auction-${role.replace(/\s/g, '_')}.pdf`);
                 }
 
