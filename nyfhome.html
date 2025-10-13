@@ -136,7 +136,6 @@
                          <div class="cricket-ball"><div class="cricket-ball-seam"></div></div>
                          <div class="panel-modern p-6 sm:p-8">
                             <div id="announcements-container" class="space-y-6">
-                                <!-- Announcements will be fetched from Firebase -->
                                 <p class="text-center text-gray-400">Loading announcements...</p>
                             </div>
                          </div>
@@ -163,7 +162,6 @@
                 <div class="fade-in-section">
                      <h2 class="text-4xl lg:text-5xl font-heading text-center mb-12">Tournament <span class="text-gradient">Fixtures</span></h2>
                      <div id="fixtures-container" class="space-y-12">
-                         <!-- Fixtures will be fetched from Firebase -->
                          <p class="text-center text-gray-400">Loading fixtures...</p>
                      </div>
                 </div>
@@ -178,12 +176,7 @@
     </footer>
 
     <script type="module">
-        import { firebaseConfig } from './firebase-config.js';
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
         // --- NON-FIREBASE FUNCTIONS (Run immediately) ---
-
         function setupCountdown() {
             const countdownElement = document.getElementById('countdown');
             if (!countdownElement) return;
@@ -227,9 +220,25 @@
             mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
         }
 
-        // --- FIREBASE DEPENDENT FUNCTIONS ---
+        // --- ASYNC FIREBASE INITIALIZATION ---
 
-        function setupFirebaseListeners(db) {
+        async function initializeFirebase() {
+            try {
+                const { firebaseConfig } = await import('./firebaseconfig.js');
+                const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+                const { getFirestore, collection, onSnapshot, query, orderBy } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+
+                const app = initializeApp(firebaseConfig);
+                const db = getFirestore(app);
+                setupFirebaseListeners(db, collection, onSnapshot, query, orderBy);
+            } catch (error) {
+                console.error("Firebase initialization failed. Please add your config to firebase-config.js.", error);
+                document.getElementById('announcements-container').innerHTML = '<p class="text-gray-400 text-center">Could not load announcements. Firebase may not be configured.</p>';
+                document.getElementById('fixtures-container').innerHTML = '<p class="text-gray-400 text-center">Could not load fixtures. Firebase may not be configured.</p>';
+            }
+        }
+
+        function setupFirebaseListeners(db, collection, onSnapshot, query, orderBy) {
             const announcementsContainer = document.getElementById('announcements-container');
             const qAnnouncements = query(collection(db, "announcements"), orderBy("createdAt", "desc"));
             onSnapshot(qAnnouncements, (snapshot) => {
@@ -260,23 +269,11 @@
         }
         
         // --- INITIALIZATION ---
-        
-        // Run non-Firebase dependent code immediately
         setupCountdown();
         populateCarousel();
         setupScrollAnimations();
         setupMobileMenu();
-
-        // Initialize Firebase and its listeners
-        try {
-            const app = initializeApp(firebaseConfig);
-            const db = getFirestore(app);
-            setupFirebaseListeners(db);
-        } catch (error) {
-            console.error("Firebase initialization failed. Please add your config to firebase-config.js.", error);
-            document.getElementById('announcements-container').innerHTML = '<p class="text-gray-400 text-center">Could not load announcements. Firebase may not be configured.</p>';
-            document.getElementById('fixtures-container').innerHTML = '<p class="text-gray-400 text-center">Could not load fixtures. Firebase may not be configured.</p>';
-        }
+        initializeFirebase(); // Firebase loads after the main content
     </script>
 </body>
 </html>
