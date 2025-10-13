@@ -151,6 +151,44 @@
             margin-bottom: 1rem;
         }
 
+        /* Prizes Section */
+        .prizes-grid {
+            display: grid;
+            gap: 2rem;
+        }
+        @media (min-width: 768px) { .prizes-grid { grid-template-columns: 1fr 1fr; } }
+        @media (min-width: 1024px) { .prizes-grid { grid-template-columns: repeat(3, 1fr); } }
+
+        .prize-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            text-align: center;
+        }
+        .prize-card.main-prize {
+            grid-column: 1 / -1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            text-align: center;
+        }
+         @media (min-width: 768px) { .prize-card.main-prize { flex-direction: row; text-align: left; } }
+        .prize-card.main-prize img {
+            max-width: 150px;
+            height: auto;
+        }
+        .prize-card h3 {
+            font-size: 1.5rem;
+            margin: 0 0 0.5rem 0;
+            color: var(--accent-yellow);
+        }
+        .prize-card p {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
 
         /* Announcements Section */
         @keyframes shimmer { 100% { left: 150%; } }
@@ -239,11 +277,11 @@
             <a href="index.html" class="nav-brand"><img src="media/logo.jpg" alt="NYF Logo"></a>
             <div class="nav-links">
                 <a href="index.html" class="active">Home</a>
-                <a href="about">About Tournament</a>
-                <a href="fixtures">Fixtures</a>
-                <a href="rules">Rules & Regulations</a>
-                <a href="player-registration">Player Registration</a>
-                <a href="contact">Contact</a>
+                <a href="about.html">About Tournament</a>
+                <a href="fixtures.html">Fixtures</a>
+                <a href="rules.html">Rules & Regulations</a>
+                <a href="player-registration.html">Player Registration</a>
+                <a href="contact.html">Contact</a>
             </div>
             <button id="mobile-menu-button">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" fill="none" viewBox="0 0 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
@@ -258,7 +296,7 @@
                 <h1 class="hero-title">MLA Haji Suzam Uddin Laskar Night Cricket Tournament</h1>
                 <p class="hero-subtitle">Organised by Narainpur Youth Federation</p>
                 <div class="hero-buttons">
-                    <a href="player-registration" class="btn btn-register">Register as a Player</a>
+                    <a href="player-registration.html" class="btn btn-register">Register as a Player</a>
                 </div>
             </section>
         </div>
@@ -287,7 +325,7 @@
             </div>
         </section>
 
-        <div class="container">
+          <div class="container">
             <section class="section">
                 <div id="announcements">
                      <h2 class="section-title">Latest Announcements</h2>
@@ -297,8 +335,36 @@
                 </div>
             </section>
         </div>
-
+        
         <section class="section" style="background-color: var(--bg-secondary);">
+            <div class="container">
+                <h2 class="section-title">Prizes & Awards</h2>
+                <div class="prizes-grid">
+                    <div class="prize-card main-prize">
+                        <img src="https://placehold.co/300x200/2d3748/fbbf24?text=Royal+Enfield" alt="Royal Enfield">
+                        <div>
+                            <h3>Champions</h3>
+                            <p>Royal Enfield With Trophy</p>
+                        </div>
+                    </div>
+                     <div class="prize-card main-prize">
+                        <img src="https://placehold.co/300x200/2d3748/fbbf24?text=Ntorq+Scooter" alt="Ntorq Scooter">
+                        <div>
+                            <h3>Runners Up</h3>
+                            <p>Ntorq With Trophy</p>
+                        </div>
+                    </div>
+                    <div class="prize-card"><h3>Most Valuable Player</h3><p>Cash 10K + Trophy</p></div>
+                    <div class="prize-card"><h3>Orange Cap</h3><p>Cash 2.5K + Trophy</p></div>
+                    <div class="prize-card"><h3>Purple Cap</h3><p>Cash 2.5K + Trophy</p></div>
+                    <div class="prize-card"><h3>Emerging Player</h3><p>Trophy</p></div>
+                    <div class="prize-card"><h3>Maximum Sixes</h3><p>Trophy</p></div>
+                    <div class="prize-card"><h3>Fair Play Award</h3><p>Trophy</p></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
             <div class="container">
                 <h2 class="section-title">Participating Teams</h2>
                 <div id="teams-grid" class="teams-grid"></div>
@@ -338,10 +404,10 @@
                 </div>
                 <div class="footer-col">
                     <h3>Quick Links</h3>
-                    <a href="about">About Tournament</a>
-                    <a href="fixtures">Fixtures</a>
-                    <a href="rules">Rules & Regulations</a>
-                    <a href="faq">FAQ</a>
+                    <a href="about.html">About Tournament</a>
+                    <a href="fixtures.html">Fixtures</a>
+                    <a href="rules.html">Rules & Regulations</a>
+                    <a href="faq.html">FAQ</a>
                 </div>
                 <div class="footer-col">
                     <h3>Contact Us</h3>
