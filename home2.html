@@ -1,449 +1,469 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Haji Sujamuddin Laskar Night Cricket - Night Tournament</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/phosphor-icons"></script>
-    <!-- SwiperJS for Carousel -->
-    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
-    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <title>MLA Haji Suzam Uddin Laskar Night Cricket Tournament</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --angle: 0deg;
+            --bg-dark: #1a202c;
+            --bg-secondary: #2d3748;
+            --primary-blue: #4f46e5;
+            --accent-violet: #a855f7;
+            --text-light: #ffffff;
+            --text-muted: #a0aec0;
+            --border-color: #4a5568;
         }
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #0a0a1a;
-            color: #e0e0e0;
+
+        /* General Styles */
+        body { 
+            font-family: 'Roboto', sans-serif; 
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            margin: 0;
+            overflow-x: hidden;
         }
-        .font-orbitron {
-            font-family: 'Orbitron', sans-serif;
+        .container {
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+            box-sizing: border-box;
         }
-        .neon-text {
-            text-shadow: 0 0 5px #00f, 0 0 10px #00f, 0 0 20px #00f, 0 0 40px #ff00de, 0 0 80px #ff00de, 0 0 90px #ff00de, 0 0 100px #ff00de, 0 0 150px #ff00de;
+        @media (min-width: 1280px) { .container { max-width: 1280px; } }
+        
+        h1, h2, h3 {
+             font-family: 'Teko', sans-serif;
+             font-weight: 700;
+             line-height: 1.1;
         }
-        .neon-text-pink {
-            text-shadow: 0 0 5px #ff00de, 0 0 10px #ff00de, 0 0 20px #ff00de;
+
+        /* Scroll Animations */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
         }
-        .glass-effect {
-            background: rgba(16, 16, 32, 0.6);
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Header */
+        .header {
+            background-color: rgba(26, 32, 44, 0.8);
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky; top: 0; z-index: 50;
         }
-        .hero-bg {
-            background-image: linear-gradient(rgba(10, 10, 26, 0.8), rgba(10, 10, 26, 1)), url('https://placehold.co/1200x800/0a0a1a/ff00de?text=Night+Cricket+Action');
-            background-size: cover;
-            background-position: center;
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
         }
-        .nav-link {
+        .nav-brand {
+            font-family: 'Teko', sans-serif;
+            font-size: 2.5rem; 
+            text-decoration: none; 
+            color: var(--text-light);
+        }
+        .nav-links { display: none; }
+        @media (min-width: 1024px) {
+            .nav-links {
+                display: flex; align-items: center;
+                gap: 2rem; font-size: 1rem;
+            }
+        }
+        .nav-links a { text-decoration: none; color: var(--text-muted); transition: color 0.3s ease; font-weight: 500; }
+        .nav-links a.active { color: var(--accent-violet); font-weight: 700; }
+        .nav-links a:not(.active):hover { color: var(--text-light); }
+        
+        #mobile-menu-button { display: block; background: none; border: none; color: white; cursor: pointer; }
+        @media (min-width: 1024px) { #mobile-menu-button { display: none; } }
+        #mobile-menu { display: none; padding: 0 1.5rem 1rem; background-color: var(--bg-secondary); }
+        #mobile-menu a { display: block; padding: 0.75rem 0; text-decoration: none; color: var(--text-muted); }
+
+        /* Hero Section */
+        .hero {
             position: relative;
-            transition: color 0.3s ease;
-        }
-        .nav-link:after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: -5px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #ff00de;
-            transition: width 0.3s ease;
-        }
-        .nav-link:hover:after, .nav-link.active:after {
-            width: 100%;
-        }
-        .page {
-            display: none;
-        }
-        .page.active {
-            display: block;
-        }
-        .btn-glow {
-             transition: all 0.3s ease;
-        }
-        .btn-glow:hover {
-            box-shadow: 0 0 15px #ff00de, 0 0 25px #ff00de;
-            transform: scale(1.05);
-        }
-        /* Swiper Carousel Styles */
-        .swiper-container {
-            width: 100%;
-            padding-top: 50px;
-            padding-bottom: 50px;
-        }
-        .swiper-slide {
-            background-position: center;
-            background-size: cover;
-            width: 300px;
-            height: 300px;
-        }
-        .swiper-slide img {
-            display: block;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 0.5rem;
-            border: 2px solid #ff00de80;
-        }
-        /* Animated Border for Announcement Box */
-        @property --angle {
-          syntax: '<angle>';
-          initial-value: 0deg;
-          inherits: false;
-        }
-        @keyframes rotate {
-          to {
-            --angle: 360deg;
-          }
-        }
-        .animated-border {
-            position: relative;
-            background-clip: padding-box;
-            border: 2px solid transparent;
-            border-radius: 0.75rem; /* 12px */
-        }
-        .animated-border::before {
-            content: '';
-            position: absolute;
-            top: 0; right: 0; bottom: 0; left: 0;
-            z-index: -1;
-            margin: -2px; /* Same as border width */
-            border-radius: inherit; /* Inherit border-radius */
-            background: conic-gradient(from var(--angle), #0a0a1a, #0a0a1a, #ff00de, #00f, #ff00de, #0a0a1a, #0a0a1a);
-            animation: rotate 4s linear infinite;
-        }
-        /* Schedule Card Styles */
-        .match-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .match-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), 0 0 30px rgba(255, 0, 222, 0.2);
-        }
-        .team-logo-initials {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
+            height: 85vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 900;
+            text-align: center;
+            overflow: hidden;
+            color: white;
+        }
+        .hero-slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+            z-index: 1;
+        }
+        .hero-slide.active { opacity: 1; }
+        .hero-slide::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+        }
+        .hero-content {
+            z-index: 2;
+            padding: 1.5rem;
+        }
+        .hero-content h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+            margin-bottom: 1rem;
+        }
+        @media(min-width: 768px) { .hero-content h1 { font-size: 4.5rem; } }
+        .hero-content p {
             font-size: 1.25rem;
+            max-width: 800px;
+            margin: 0 auto 2rem auto;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
         }
-        .logo-blue {
-             background: rgba(0, 100, 255, 0.2);
-             border: 2px solid #00f;
-             color: #00f;
-             text-shadow: 0 0 5px #00f;
+        .hero-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        .btn {
+            padding: 0.75rem 2rem;
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
         }
-        .logo-pink {
-            background: rgba(255, 0, 222, 0.2);
-             border: 2px solid #ff00de;
-             color: #ff00de;
-             text-shadow: 0 0 5px #ff00de;
+        .btn-primary { 
+            background: linear-gradient(to right, var(--primary-blue), var(--accent-violet));
+            color: white;
+            text-transform: uppercase;
+        }
+        .btn:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); 
+        }
+
+        /* General Section Styling */
+        .section { padding: 5rem 0; }
+        .section-title {
+            text-align: center;
+            font-size: 4rem;
+            margin-bottom: 3rem;
+            text-transform: uppercase;
+            background: linear-gradient(to right, var(--primary-blue), var(--accent-violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+        }
+        
+        /* Announcements */
+        .announcements { background-color: var(--bg-secondary); }
+        .announcement-grid {
+            display: grid; gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        }
+        .announcement-card {
+            background: linear-gradient(145deg, #3a475d, #252e3d);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            border: 2px solid var(--border-color);
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .announcement-card:hover {
+            border-color: var(--accent-violet);
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
+        }
+        .announcement-card h3 { margin: 0 0 0.75rem 0; font-size: 1.75rem; color: var(--accent-violet); }
+        .announcement-card p { margin: 0; color: var(--text-muted); }
+        
+        /* Teams Section */
+        .teams-grid { display: grid; gap: 1.5rem; }
+        @media(min-width: 640px) { .teams-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media(min-width: 1024px) { .teams-grid { grid-template-columns: repeat(4, 1fr); } }
+        .team-card {
+            background-color: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+        .team-card h3 { margin: 0 0 0.5rem 0; font-size: 1.75rem; }
+        .team-card p { color: var(--text-muted); margin: 0; }
+
+        /* Gallery Section */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        .gallery-item {
+            overflow: hidden;
+            border-radius: 0.5rem;
+            position: relative;
+            background-color: #111827;
+            height: 250px;
+        }
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* This prevents cropping */
+            display: block;
+            transition: transform 0.4s ease;
+        }
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Sponsors Section */
+        .sponsors-grid {
+            display: flex; flex-wrap: wrap; justify-content: center;
+            align-items: center; gap: 3rem;
+        }
+        .sponsor-logo {
+            filter: grayscale(100%) opacity(0.7);
+            transition: all 0.3s ease;
+        }
+        .sponsor-logo:hover {
+            filter: grayscale(0%) opacity(1);
+            transform: scale(1.1);
+        }
+        
+        /* Footer */
+        .footer {
+            background-color: #111827; color: var(--text-muted);
+            padding: 4rem 1.5rem; margin-top: 4rem; text-align: center;
+        }
+        .footer .nav-brand { display: inline-block; margin-bottom: 1.5rem; }
+        .footer-links {
+            display: flex; justify-content: center; gap: 1.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .footer-links a { text-decoration: none; color: var(--text-muted); transition: color 0.3s ease; }
+        .footer-links a:hover { color: white; }
+        .copyright {
+            margin-top: 2rem; font-size: 0.875rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 2rem;
+        }
+        
+        .placeholder-text {
+            grid-column: 1 / -1; /* Span full width in grid */
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            padding: 2rem;
         }
 
     </style>
 </head>
-<body class="overflow-x-hidden">
+<body>
 
-    <header id="header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 glass-effect">
-        <div class="container mx-auto px-4">
-            <nav class="flex justify-between items-center py-4">
-                <a href="#home" class="text-xl sm:text-2xl md:text-3xl font-orbitron font-bold neon-text-pink">HSL Cricket</a>
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="#home" class="nav-link text-lg font-semibold active">Home</a>
-                    <a href="#teams" class="nav-link text-lg font-semibold">Teams</a>
-                    <a href="#schedule" class="nav-link text-lg font-semibold">Schedule</a>
-                    <a href="#sponsors" class="nav-link text-lg font-semibold">Sponsors</a>
-                    <a href="#register" class="nav-link text-lg font-semibold">Register</a>
-                </div>
-                <button id="mobile-menu-button" class="md:hidden text-white">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                </button>
-            </nav>
-        </div>
-        <div id="mobile-menu" class="hidden md:hidden px-4 pb-4">
-            <a href="#home" class="block py-2 text-lg font-semibold nav-link active">Home</a>
-            <a href="#teams" class="block py-2 text-lg font-semibold nav-link">Teams</a>
-            <a href="#schedule" class="block py-2 text-lg font-semibold nav-link">Schedule</a>
-            <a href="#sponsors" class="block py-2 text-lg font-semibold nav-link">Sponsors</a>
-            <a href="#register" class="block py-2 text-lg font-semibold nav-link">Register</a>
-        </div>
+    <header class="header">
+        <nav class="container nav">
+            <a href="#" class="nav-brand">NYF</a>
+             <div class="nav-links">
+                <a href="#" class="active">Home</a>
+                <a href="fixtures.html">Fixtures</a>
+                <a href="rules.html">Rules</a>
+                <a href="player-registration.html">Player Registration</a>
+            </div>
+            <button id="mobile-menu-button">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+            </button>
+        </nav>
+        <div id="mobile-menu"></div>
     </header>
 
     <main>
-        <!-- Home Page -->
-        <section id="home" class="page active">
-            <div class="hero-bg min-h-screen flex items-center justify-center pt-24">
-                <div class="text-center text-white px-4">
-                    <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-orbitron font-black uppercase neon-text">Haji Sujamuddin Laskar<br>Night Cricket</h1>
-                    <p class="text-lg sm:text-xl md:text-2xl mt-6 mb-2 font-light text-gray-300">The ultimate showdown under the stars.</p>
-                    <p class="text-base sm:text-lg md:text-xl font-semibold text-blue-300 mb-8">Organised by Narainpur Youth Federation</p>
-                    <div id="countdown" class="flex justify-center space-x-2 sm:space-x-4 md:space-x-8 my-10"></div>
-                    <a href="#schedule" class="bg-pink-600 text-white font-bold py-3 px-8 rounded-full text-lg uppercase hover:bg-pink-700 btn-glow border-2 border-pink-500">View Schedule</a>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-slide active" style="background-image: url('media/slider1.jpg');"></div>
+            <div class="hero-slide" style="background-image: url('media/slider2.jpg');"></div>
+            <div class="hero-slide" style="background-image: url('media/slider3.jpg');"></div>
+
+            <div class="hero-content">
+                <h1>MLA Haji Suzam Uddin Laskar<br>Night Cricket Tournament</h1>
+                <p>Organised by Narainpur Youth Federation</p>
+                <div class="hero-buttons">
+                    <a href="player-registration.html" class="btn btn-primary">Register as a Player</a>
                 </div>
             </div>
-            <div class="py-16 bg-black/30">
-                <div class="container mx-auto px-4">
-                    <h2 class="text-4xl font-orbitron font-bold text-center mb-10 neon-text-pink">Latest Updates</h2>
-                    <div class="max-w-3xl mx-auto animated-border">
-                        <div class="glass-effect rounded-lg p-4 sm:p-6">
-                            <div class="space-y-4">
-                                <!-- Announcements -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="py-12 bg-gray-900/50">
-                <div class="container mx-auto px-4 overflow-hidden">
-                    <h2 class="text-4xl font-orbitron font-bold text-center mb-4 neon-text-pink">Moments From The Past</h2>
-                    <div class="swiper-container mySwiper">
-                        <div class="swiper-wrapper">
-                            <!-- Carousel slides -->
-                        </div>
-                        <div class="swiper-button-next text-pink-500"></div>
-                        <div class="swiper-button-prev text-pink-500"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="py-20 bg-gray-900/50">
-                <div class="container mx-auto px-4">
-                     <h2 class="text-4xl font-orbitron font-bold text-center mb-12 neon-text-pink">Tournament Highlights</h2>
-                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <!-- Highlights -->
-                     </div>
+        </section>
+        
+        <!-- Announcements Section -->
+        <section class="section announcements fade-in-section">
+            <div class="container">
+                <h2 class="section-title">Latest Updates</h2>
+                <div class="announcement-grid" id="announcements-grid">
+                    <!-- Placeholder will be shown by JS if empty -->
                 </div>
             </div>
         </section>
 
-        <!-- Other Pages -->
-        <section id="teams" class="page min-h-screen pt-32 bg-gray-900/50"></section>
-        <section id="schedule" class="page min-h-screen pt-32 bg-gray-900/50"></section>
-        <section id="sponsors" class="page min-h-screen pt-32 bg-gray-900/50"></section>
-        <section id="register" class="page min-h-screen pt-24 sm:pt-32 bg-gray-900/50"></section>
+        <!-- Teams Section -->
+        <section class="section fade-in-section">
+            <div class="container">
+                <h2 class="section-title">Participating Teams</h2>
+                <div class="teams-grid" id="teams-grid">
+                    <!-- Placeholder will be shown by JS if empty -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Gallery Section -->
+        <section class="section fade-in-section">
+            <div class="container">
+                <h2 class="section-title">Gallery</h2>
+                <div class="gallery-grid">
+                    <div class="gallery-item">
+                        <img src="media/gallery1.jpg" alt="Gallery Image 1" onerror="this.onerror=null;this.src='https://placehold.co/400x300/111827/a0aec0?text=Highlight+1';">
+                    </div>
+                    <div class="gallery-item">
+                        <img src="media/gallery2.jpg" alt="Gallery Image 2" onerror="this.onerror=null;this.src='https://placehold.co/400x300/111827/a0aec0?text=Highlight+2';">
+                    </div>
+                    <div class="gallery-item">
+                        <img src="media/gallery3.jpg" alt="Gallery Image 3" onerror="this.onerror=null;this.src='https://placehold.co/400x300/111827/a0aec0?text=Highlight+3';">
+                    </div>
+                     <div class="gallery-item">
+                        <img src="media/gallery4.jpg" alt="Gallery Image 4" onerror="this.onerror=null;this.src='https://placehold.co/400x300/111827/a0aec0?text=Highlight+4';">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Our Sponsors -->
+        <section class="section fade-in-section">
+            <div class="container">
+                <h2 class="section-title">Our Partners</h2>
+                <div class="sponsors-grid">
+                    <img src="https://placehold.co/150x60/1a202c/a0aec0?text=Sponsor+1" alt="Sponsor 1" class="sponsor-logo">
+                    <img src="https://placehold.co/150x60/1a202c/a0aec0?text=Sponsor+2" alt="Sponsor 2" class="sponsor-logo">
+                    <img src="https://placehold.co/150x60/1a202c/a0aec0?text=Sponsor+3" alt="Sponsor 3" class="sponsor-logo">
+                    <img src="https://placehold.co/150x60/1a202c/a0aec0?text=Sponsor+4" alt="Sponsor 4" class="sponsor-logo">
+                </div>
+            </div>
+        </section>
     </main>
 
-    <footer class="bg-black py-8">
-        <div class="container mx-auto px-4 text-center text-gray-400">
-            <p>&copy; 2025 Haji Sujamuddin Laskar Night Cricket. All Rights Reserved.</p>
-            <div class="flex justify-center space-x-6 mt-4">
-                <a href="#" class="hover:text-pink-500"><i class="ph-facebook-logo text-2xl"></i></a>
-                <a href="#" class="hover:text-pink-500"><i class="ph-twitter-logo text-2xl"></i></a>
-                <a href="#" class="hover:text-pink-500"><i class="ph-instagram-logo text-2xl"></i></a>
+    <footer class="footer">
+        <div class="container">
+            <a href="#" class="nav-brand">NYF</a>
+             <div class="footer-links">
+                <a href="#">Home</a>
+                <a href="fixtures.html">Fixtures</a>
+                <a href="rules.html">Rules</a>
+                <a href="player-registration.html">Player Registration</a>
+            </div>
+            <div class="copyright">
+                <p>Developed by Aminul Mazumder.</p>
             </div>
         </div>
     </footer>
 
-
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // --- DATA ---
-            const allTeams = [
-                { name: 'Assasin Kalain', slogan: 'Silent executioners of the game.' },
-                { name: 'Narainpur Knight Riders', slogan: 'Riding into battle, claiming victory.' },
-                { name: 'Deccan Hyderabad', slogan: 'Royal contenders from the south.' },
-                { name: 'Bowerghat Bulls', slogan: 'Charging down the pitch with raw power.' },
-                { name: 'Raising Punjab', slogan: 'Rising to the occasion, every time.' },
-                { name: 'Hailakandi Hurricanes', slogan: 'A storm of talent, unstoppable force.' },
-                { name: 'Silchar Super Strikers', slogan: 'Striking fear into the hearts of bowlers.' },
-                { name: 'Barak Valley Blasters', slogan: 'Explosive batting, fiery bowling.' },
-                { name: 'Katlicherra Kings', slogan: 'Royalty on the field, kings of the sport.' },
-                { name: 'Algapur Avengers', slogan: 'Assembling for victory, one match at a time.' },
-                { name: 'Lala Lions', slogan: 'Hunting for wickets with the heart of a lion.' },
-                { name: 'Rongpur Royals', slogan: 'A royal flush of cricketing skill.' },
-                { name: 'Karimganj Chargers', slogan: 'Electrifying the crowd with every play.' },
-                { name: 'Dholai Dragons', slogan: 'Breathing fire on the field.' },
-                { name: 'Panchgram Panthers', slogan: 'Stealthy, agile, and deadly in the chase.' },
-                { name: 'Badarpur Badshahs', slogan: 'The undisputed emperors of cricket.' },
-            ];
-            
-            // --- PAGE NAVIGATION ---
-            const pages = document.querySelectorAll('.page');
-            const navLinks = document.querySelectorAll('.nav-link');
-            const mobileMenuButton = document.getElementById('mobile-menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navLinks = document.querySelector('.nav-links').cloneNode(true);
+        mobileMenu.appendChild(navLinks);
 
-            function showPage(pageId) {
-                pages.forEach(page => page.classList.toggle('active', page.id === pageId));
-                navLinks.forEach(link => {
-                    const linkTarget = link.getAttribute('href').substring(1);
-                    document.querySelector(`a[href="#${linkTarget}"]`).classList.toggle('active', linkTarget === pageId);
-                    document.querySelector(`#mobile-menu a[href="#${linkTarget}"]`).classList.toggle('active', linkTarget === pageId);
-                });
-                window.scrollTo(0, 0);
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.style.display = mobileMenu.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // Hero Slider
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.hero-slide');
+        if (slides.length > 0) {
+            const slideInterval = setInterval(nextSlide, 5000);
+            function nextSlide() {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('active');
             }
-            
-            navLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const pageId = this.getAttribute('href').substring(1);
-                    showPage(pageId);
-                    if (!mobileMenu.classList.contains('hidden')) {
-                       mobileMenu.classList.add('hidden');
-                    }
-                });
-            });
-
-            const initialPage = window.location.hash.substring(1) || 'home';
-            showPage(initialPage);
-            
-            window.addEventListener('hashchange', () => {
-                const pageId = window.location.hash.substring(1) || 'home';
-                showPage(pageId);
-            });
-
-            mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
-            
-            const header = document.getElementById('header');
-            window.addEventListener('scroll', () => {
-                header.classList.toggle('py-2', window.scrollY > 50);
-                header.classList.toggle('py-4', window.scrollY <= 50);
-            });
-
-            // --- DYNAMIC CONTENT INJECTION ---
-            function populateHomePage() {
-                // Countdown
-                const countdownElement = document.getElementById('countdown');
-                if (countdownElement) {
-                    const countdownDate = new Date("Nov 15, 2025 18:00:00").getTime();
-                    const updateCountdown = setInterval(() => {
-                        const now = new Date().getTime();
-                        const distance = countdownDate - now;
-                        if (distance < 0) {
-                            clearInterval(updateCountdown);
-                            countdownElement.innerHTML = `<div class="text-3xl font-orbitron font-bold text-center w-full neon-text-pink">The Tournament has begun!</div>`;
-                            return;
-                        }
-                        const d = Math.floor(distance / (1000 * 60 * 60 * 24));
-                        const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                        const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                        const s = Math.floor((distance % (1000 * 60)) / 1000);
-                        countdownElement.innerHTML = `
-                            <div class="glass-effect p-2 rounded-lg w-16 sm:w-20 md:w-24 text-center"><div class="text-2xl sm:text-3xl md:text-4xl font-orbitron font-bold">${d}</div><div class="text-xs uppercase">Days</div></div>
-                            <div class="glass-effect p-2 rounded-lg w-16 sm:w-20 md:w-24 text-center"><div class="text-2xl sm:text-3xl md:text-4xl font-orbitron font-bold">${h}</div><div class="text-xs uppercase">Hours</div></div>
-                            <div class="glass-effect p-2 rounded-lg w-16 sm:w-20 md:w-24 text-center"><div class="text-2xl sm:text-3xl md:text-4xl font-orbitron font-bold">${m}</div><div class="text-xs uppercase">Minutes</div></div>
-                            <div class="glass-effect p-2 rounded-lg w-16 sm:w-20 md:w-24 text-center"><div class="text-2xl sm:text-3xl md:text-4xl font-orbitron font-bold">${s}</div><div class="text-xs uppercase">Seconds</div></div>`;
-                    }, 1000);
+        }
+        
+        // Scroll Animations
+        const sections = document.querySelectorAll('.fade-in-section');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
                 }
-                // Announcements
-                document.querySelector('#home .animated-border .space-y-4').innerHTML = `
-                    <div class="flex items-start space-x-4 p-3 rounded-lg hover:bg-white/5 transition-colors duration-200"><i class="ph-trophy text-3xl text-pink-400 mt-1"></i><div><h3 class="font-bold text-lg text-blue-300">First Round Fixtures Released!</h3><p class="text-gray-300">The randomly generated schedule for the first round is now live. Check the Schedule page!</p></div></div>
-                    <div class="flex items-start space-x-4 p-3 rounded-lg hover:bg-white/5 transition-colors duration-200"><i class="ph-calendar-check text-3xl text-pink-400 mt-1"></i><div><h3 class="font-bold text-lg text-blue-300">Tournament Kicks Off Nov 15th</h3><p class="text-gray-300">Get ready for two days of intense knockout cricket action under the lights.</p></div></div>`;
-                // Carousel
-                document.querySelector('#home .swiper-wrapper').innerHTML = `
-                    <div class="swiper-slide"><img src="https://placehold.co/400x400/0a0a1a/ff00de?text=Season+1+Champions" alt="Previous Season Image 1"></div>
-                    <div class="swiper-slide"><img src="https://placehold.co/400x400/0a0a1a/00f?text=Epic+Six" alt="Previous Season Image 2"></div>
-                    <div class="swiper-slide"><img src="https://placehold.co/400x400/0a0a1a/ff00de?text=Night+Finals+Crowd" alt="Previous Season Image 3"></div>
-                    <div class="swiper-slide"><img src="https://placehold.co/400x400/0a0a1a/00f?text=Winning+Shot" alt="Previous Season Image 4"></div>`;
-                // Highlights
-                document.querySelector('#home .grid').innerHTML = `
-                    <div class="glass-effect p-6 rounded-lg text-center"><i class="ph-trophy text-6xl text-yellow-400 mx-auto mb-4"></i><h3 class="text-2xl font-bold font-orbitron mb-2">Champions Prize</h3><p>Brand new <span class="font-bold text-white">Royal Enfield Hunter</span> bike.</p></div>
-                    <div class="glass-effect p-6 rounded-lg text-center"><i class="ph-motorcycle text-6xl text-gray-300 mx-auto mb-4"></i><h3 class="text-2xl font-bold font-orbitron mb-2">Runners Up Prize</h3><p>A stylish new <span class="font-bold text-white">Scooty</span>.</p></div>
-                    <div class="glass-effect p-6 rounded-lg text-center"><i class="ph-stadium text-6xl text-blue-400 mx-auto mb-4"></i><h3 class="text-2xl font-bold font-orbitron mb-2">Floodlit Action</h3><p>Cricket like never before under dazzling stadium lights.</p></div>
-                    <div class="glass-effect p-6 rounded-lg text-center"><i class="ph-users-three text-6xl text-pink-400 mx-auto mb-4"></i><h3 class="text-2xl font-bold font-orbitron mb-2">For The Fans</h3><p>Live DJ, food stalls, and an electrifying atmosphere.</p></div>`;
+            });
+        }, { threshold: 0.1 });
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+    </script>
+    
+    <script src="firebaseconfig.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        // Load Announcements
+        const announcementsGrid = document.getElementById('announcements-grid');
+        const announcementsQuery = query(collection(db, 'announcements'), orderBy('createdAt', 'desc'), limit(4));
+        onSnapshot(announcementsQuery, (snapshot) => {
+            if (snapshot.empty) {
+                announcementsGrid.innerHTML = '<p class="placeholder-text">No announcements have been made yet.</p>';
+                return;
             }
+            announcementsGrid.innerHTML = '';
+            snapshot.forEach(doc => {
+                const announcement = doc.data();
+                const card = document.createElement('div');
+                card.className = 'announcement-card';
+                card.innerHTML = `
+                    <h3>${announcement.headline}</h3>
+                    <p>${announcement.text}</p>
+                `;
+                announcementsGrid.appendChild(card);
+            });
+        });
 
-            function populateTeamsPage() {
-                const content = `<div class="container mx-auto px-4 py-16"><h2 class="text-4xl sm:text-5xl font-orbitron font-bold text-center mb-16 neon-text-pink">All 16 Teams</h2><div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">${allTeams.map(team => `<div class="glass-effect rounded-lg overflow-hidden text-center transition-transform duration-300 hover:-translate-y-2"><div class="p-6"><h3 class="text-2xl font-orbitron font-bold text-blue-300">${team.name}</h3><p class="mt-2 text-gray-400 h-12">${team.slogan}</p></div></div>`).join('')}</div></div>`;
-                document.getElementById('teams').innerHTML = content;
+        // Load Approved Teams
+        const teamsGrid = document.getElementById('teams-grid');
+        const teamsQuery = query(collection(db, 'approved_teams'));
+        onSnapshot(teamsQuery, (snapshot) => {
+            if (snapshot.empty) {
+                teamsGrid.innerHTML = '<p class="placeholder-text">No teams have been added yet.</p>';
+                return;
             }
-
-            function populateSchedulePage() {
-                // Function to get initials from team name
-                const getInitials = (name) => {
-                    const words = name.split(' ');
-                    if (words.length > 1) {
-                        return words.map(word => word[0]).join('').substring(0, 3).toUpperCase();
-                    }
-                    return name.substring(0, 3).toUpperCase();
-                };
-
-                const shuffledTeams = [...allTeams].sort(() => 0.5 - Math.random());
-                let fixturesHtml = '';
-                const matchesPerDay = 4;
-                const totalMatches = shuffledTeams.length / 2;
-                const matchTimes = ["06:00 PM", "07:30 PM", "09:00 PM", "10:30 PM"];
-                let matchCount = 0;
-
-                for (let day = 0; day < totalMatches / matchesPerDay; day++) {
-                    const matchDate = new Date('2025-11-15T00:00:00');
-                    matchDate.setDate(matchDate.getDate() + day);
-                    const formattedDate = matchDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
-                    fixturesHtml += `<div class="mb-12"><h3 class="text-3xl font-orbitron font-bold text-center text-blue-300 mb-8">${formattedDate}</h3><div class="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">`;
-
-                    for (let i = 0; i < matchesPerDay; i++) {
-                        if (matchCount < totalMatches) {
-                            const team1 = shuffledTeams[matchCount * 2];
-                            const team2 = shuffledTeams[matchCount * 2 + 1];
-                            fixturesHtml += `
-                                <div class="glass-effect rounded-lg p-6 match-card">
-                                    <div class="flex items-center justify-between">
-                                        <div class="w-2/5 text-center">
-                                            <div class="team-logo-initials logo-blue mx-auto">${getInitials(team1.name)}</div>
-                                            <h4 class="font-bold font-orbitron text-base mt-2">${team1.name}</h4>
-                                        </div>
-                                        <div class="text-center">
-                                            <p class="text-3xl font-bold text-pink-400 font-orbitron">VS</p>
-                                        </div>
-                                        <div class="w-2/5 text-center">
-                                            <div class="team-logo-initials logo-pink mx-auto">${getInitials(team2.name)}</div>
-                                            <h4 class="font-bold font-orbitron text-base mt-2">${team2.name}</h4>
-                                        </div>
-                                    </div>
-                                    <div class="text-center mt-4 pt-4 border-t border-gray-700">
-                                        <p class="text-lg font-semibold text-gray-300">Match Time: <span class="text-white font-bold">${matchTimes[i]}</span></p>
-                                    </div>
-                                </div>`;
-                            matchCount++;
-                        }
-                    }
-                    fixturesHtml += `</div></div>`;
-                }
-
-                const content = `<div class="container mx-auto px-4 py-16"><h2 class="text-4xl sm:text-5xl font-orbitron font-bold text-center mb-16 neon-text-pink">First Round Fixtures</h2>${fixturesHtml}</div>`;
-                document.getElementById('schedule').innerHTML = content;
-            }
-            
-            function populateSponsorsPage() {
-                document.getElementById('sponsors').innerHTML = `<div class="container mx-auto px-4 py-16"><h2 class="text-4xl sm:text-5xl font-orbitron font-bold text-center mb-16 neon-text-pink">Our Esteemed Sponsors</h2><div class="text-center mt-24"><h3 class="text-3xl font-orbitron font-bold mb-4">Become a Part of the Action!</h3><p class="text-lg text-gray-300 mb-6 max-w-2xl mx-auto">Support local cricket and promote your brand. Contact us to learn about sponsorship opportunities.</p><a href="mailto:sponsorship.nyf@example.com" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-full text-lg uppercase hover:bg-blue-700 btn-glow border-2 border-blue-500">Sponsor Us</a></div></div>`;
-            }
-
-            function populateRegisterPage() {
-                document.getElementById('register').innerHTML = `<div class="container mx-auto px-4 py-16"><div class="max-w-2xl mx-auto"><div class="glass-effect rounded-lg overflow-hidden"><div class="form-header"><h2 class="text-xl sm:text-2xl font-orbitron font-bold">PLAYER REGISTRATION</h2></div><form class="p-6 sm:p-8 space-y-6"><p class="text-center text-blue-300">Online player registrations shall start from 15th of October,Thank you for showing your interest see you soon.</p></form></div></div></div>`;
-            }
-
-            // --- INITIALIZE ---
-            populateHomePage();
-            populateTeamsPage();
-            populateSchedulePage();
-            populateSponsorsPage();
-            populateRegisterPage();
-
-            if (document.querySelector('.mySwiper')) {
-                new Swiper(".mySwiper", {
-                    effect: "coverflow",
-                    grabCursor: true,
-                    centeredSlides: true,
-                    slidesPerView: "auto",
-                    loop: true,
-                    autoplay: { delay: 2500, disableOnInteraction: false },
-                    coverflowEffect: { rotate: 50, stretch: 0, depth: 100, modifier: 1, slideShadows: true },
-                    navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
-                    breakpoints: { 320: { slidesPerView: 1, spaceBetween: 20 }, 768: { slidesPerView: "auto", spaceBetween: 30 } }
-                });
-            }
+            teamsGrid.innerHTML = '';
+            snapshot.forEach(doc => {
+                const team = doc.data();
+                const card = document.createElement('div');
+                card.className = 'team-card';
+                card.innerHTML = `
+                    <h3>${team.teamName}</h3>
+                    <p>${team.city}</p>
+                `;
+                teamsGrid.appendChild(card);
+            });
         });
     </script>
 </body>
 </html>
-
 
