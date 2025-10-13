@@ -23,6 +23,7 @@
             --border-color: #4a5568;
             --success-color: #48bb78;
             --danger-color: #e53e3e;
+            --accent-yellow: #fbbf24;
         }
 
         body { 
@@ -189,8 +190,8 @@
             <div id="auction-cards" class="tab-content">
                 <div class="section-header"><h2>Auction Card Generator</h2></div>
                 <div class="form-container">
-                    <p>This tool will generate a PDF file containing auction cards for all approved players, grouped by their playing role. This process may take a moment as it needs to download all player images.</p>
-                    <button class="submit-btn" id="generate-auction-pdf">Generate & Download PDF</button>
+                    <p>This tool will generate separate PDF files for each player category (Batsman, Bowler, etc.), containing auction cards for all approved players. This process may take a moment as it needs to download all player images.</p>
+                    <button class="submit-btn" id="generate-auction-pdf">Generate & Download All PDFs</button>
                     <p id="pdf-generation-status" style="text-align: center; margin-top: 1rem; color: var(--accent-violet);"></p>
                 </div>
             </div>
@@ -384,9 +385,10 @@
                         img.onload = () => resolve({ photoUrl: player.photoUrl, img });
                         img.onerror = () => {
                             const placeholder = new Image();
-                            placeholder.src = `https://placehold.co/200x250/2d3748/ffffff?text=${player.fullName.split(' ').map(n=>n[0]).join('')}`;
+                            placeholder.crossOrigin = 'Anonymous';
                             placeholder.onload = () => resolve({ photoUrl: player.photoUrl, img: placeholder });
                             placeholder.onerror = reject;
+                            placeholder.src = `https://placehold.co/250x300/2d3748/ffffff?text=${player.fullName.split(' ').map(n=>n[0]).join('')}`;
                         };
                         img.src = player.photoUrl;
                     });
@@ -398,47 +400,58 @@
                     return map;
                 }, {});
 
-                statusEl.textContent = 'All images loaded. Creating PDF...';
+                statusEl.textContent = 'All images loaded. Creating PDFs...';
                 
-                // 3. Generate PDF
-                const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
-                const pageW = 210, pageH = 297, margin = 10;
-                const cardW = (pageW - margin * 3) / 2, cardH = (pageH - margin * 3) / 2;
-                const positions = [
-                    { x: margin, y: margin }, { x: margin * 2 + cardW, y: margin },
-                    { x: margin, y: margin * 2 + cardH }, { x: margin * 2 + cardW, y: margin * 2 + cardH },
-                ];
-                let isFirstCategory = true;
-
+                // 3. Generate a separate PDF for each category
                 for (const role in groupedPlayers) {
-                    if (!isFirstCategory) { doc.addPage(); }
-                    isFirstCategory = false;
-
-                    doc.setFontSize(40);
-                    doc.setTextColor('#a855f7');
-                    doc.text(role.toUpperCase() + 'S', pageW / 2, pageH / 2, { align: 'center' });
-
+                    const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+                    const pageW = 210, pageH = 297, margin = 10;
+                    const cardW = (pageW - margin * 3) / 2, cardH = 120; // Fixed card height
+                    const positions = [
+                        { x: margin, y: margin }, { x: margin * 2 + cardW, y: margin },
+                        { x: margin, y: margin * 2 + cardH }, { x: margin * 2 + cardW, y: margin * 2 + cardH },
+                    ];
+                    
                     const playersInRole = groupedPlayers[role];
                     playersInRole.forEach((player, index) => {
-                        if (index % 4 === 0) { doc.addPage(); }
+                        if (index % 4 === 0 && index > 0) { doc.addPage(); }
                         
                         const pos = positions[index % 4];
                         const img = imageMap[player.photoUrl];
                         drawCard(doc, pos.x, pos.y, cardW, cardH, player, img);
                     });
+                     doc.save(`NYF-Auction-${role.replace(/\s/g, '_')}.pdf`);
                 }
-                
+
                 function drawCard(doc, x, y, w, h, player, img) {
                     doc.setFillColor('#2d3748');
                     doc.setDrawColor('#4a5568');
                     doc.roundedRect(x, y, w, h, 3, 3, 'FD');
-
-                    const imgH = 60, imgW = 60;
-                    const imgX = x + (w - imgW) / 2;
-                    doc.addImage(img, 'JPEG', imgX, y + 5, imgW, imgH);
                     
-                    doc.setFontSize(22); doc.setFont('helvetica', 'bold'); doc.setTextColor('#ffffff');
-                    doc.text(player.fullName, x + w / 2, y + 78, { align: 'center', maxWidth: w - 10 });
+                    // Image Box
+                    const imgBoxH = 65;
+                    const imgBoxW = w - 10;
+                    const imgBoxX = x + 5;
+                    const imgBoxY = y + 5;
+
+                    let imgDisplayW, imgDisplayH;
+                    const ratio = img.width / img.height;
+
+                    if ((imgBoxW / imgBoxH) > ratio) {
+                        imgDisplayH = imgBoxH;
+                        imgDisplayW = imgBoxH * ratio;
+                    } else {
+                        imgDisplayW = imgBoxW;
+                        imgDisplayH = imgBoxW / ratio;
+                    }
+
+                    const imgDisplayX = imgBoxX + (imgBoxW - imgDisplayW) / 2;
+                    const imgDisplayY = imgBoxY + (imgBoxH - imgDisplayH) / 2;
+
+                    doc.addImage(img, 'JPEG', imgDisplayX, imgDisplayY, imgDisplayW, imgDisplayH);
+                    
+                    doc.setFontSize(20); doc.setFont('helvetica', 'bold'); doc.setTextColor('#ffffff');
+                    doc.text(player.fullName, x + w / 2, y + 80, { align: 'center', maxWidth: w - 10 });
                     
                     doc.setFontSize(14); doc.setFont('helvetica', 'normal'); doc.setTextColor('#a0aec0');
                     doc.text(player.role, x + w / 2, y + 88, { align: 'center' });
@@ -447,25 +460,19 @@
                     doc.line(x + 10, y + 95, x + w - 10, y + 95);
 
                     doc.setFontSize(16); doc.setTextColor('#ffffff');
-                    doc.text('Base Price', x + w / 2, y + 105, { align: 'center' });
+                    doc.text('Base Price', x + w / 2, y + 103, { align: 'center' });
                     
-                    doc.setFontSize(28); doc.setFont('helvetica', 'bold'); doc.setTextColor('#fbbf24');
-                    doc.text(`${player.basePrice} Coins`, x + w / 2, y + 115, { align: 'center' });
-
-                    doc.setFontSize(12); doc.setFont('helvetica', 'normal'); doc.setTextColor('#a0aec0');
-                    doc.text(player.address, x + w / 2, y + h - 7, { align: 'center' });
+                    doc.setFontSize(26); doc.setFont('helvetica', 'bold'); doc.setTextColor('#fbbf24');
+                    doc.text(`${player.basePrice} Coins`, x + w / 2, y + 112, { align: 'center' });
                 }
-                
-                doc.deletePage(1);
-
-                doc.save('NYF-Auction-Cards.pdf');
 
             } catch (err) {
                 console.error("Failed to generate auction PDF:", err);
                 statusEl.textContent = 'An error occurred during PDF generation.';
             } finally {
                 button.disabled = false;
-                button.textContent = 'Generate & Download PDF';
+                button.textContent = 'Generate & Download All PDFs';
+                statusEl.textContent = `Successfully generated all PDF files!`;
                 setTimeout(() => { statusEl.textContent = ''; }, 5000);
             }
         });
