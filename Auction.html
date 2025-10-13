@@ -3,231 +3,474 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auction Card Generator | HSL Night Cricket</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-    <!-- jsPDF and html2canvas for PDF generation -->
+    <title>Admin Panel - NYF Tournament</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #111827; color: #F9FAFB; }
-        .font-heading { font-family: 'Inter', sans-serif; font-weight: 900; }
-        .text-gradient { background-image: linear-gradient(90deg, #3b82f6, #ec4899, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .panel-modern { background-color: #1F2937; border: 1px solid #374151; border-radius: 0.75rem; }
-        .btn-primary { background-image: linear-gradient(90deg, #3b82f6 0%, #ec4899 100%); color: white; font-weight: 700; border-radius: 0.5rem; transition: all 0.3s ease; }
-        .btn-primary:hover:not(:disabled) { transform: scale(1.05); box-shadow: 0 0 20px rgba(236, 72, 153, 0.5); }
-        .form-input { background-color: #374151; border: 1px solid #4b5563; border-radius: 0.5rem; transition: all 0.2s ease; }
-        .form-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4); }
-        .filter-btn { background-color: #374151; border: 1px solid #4b5563; color: #d1d5db; transition: all 0.2s ease; }
-        .filter-btn.active, .filter-btn:hover { background-color: #ec4899; color: white; border-color: #ec4899; }
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 
-        /* Styles for the hidden card template for PDF generation */
-        #card-render-area { position: absolute; left: -9999px; top: -9999px; }
-        .auction-card-template {
-            width: 1280px; height: 720px; background-color: #111827;
-            background-image: radial-gradient(circle at top right, rgba(236, 72, 153, 0.2), transparent 40%), radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.2), transparent 40%);
-            padding: 40px; display: grid; grid-template-columns: 4fr 6fr; gap: 40px; align-items: center;
+    <style>
+        :root {
+            --bg-dark: #1a202c;
+            --bg-secondary: #2d3748;
+            --primary-blue: #4f46e5;
+            --accent-violet: #a855f7;
+            --text-light: #ffffff;
+            --text-muted: #a0aec0;
+            --border-color: #4a5568;
+            --success-color: #48bb78;
+            --danger-color: #e53e3e;
         }
-        .auction-card-template .player-image-container { width: 100%; height: 100%; border-radius: 1rem; border: 4px solid #ec4899; box-shadow: 0 0 30px rgba(236, 72, 153, 0.5); overflow: hidden; }
-        .auction-card-template .player-image { width: 100%; height: 100%; object-fit: cover; }
-        .auction-card-template .player-name { font-family: 'Inter', sans-serif; font-weight: 900; font-size: 80px; line-height: 1.1; text-transform: uppercase; }
-        .auction-card-template .player-skill { font-size: 40px; font-weight: 700; color: #3b82f6; }
-        .auction-card-template .base-price-label { font-size: 30px; font-weight: 600; color: #9CA3AF; margin-top: 40px; text-transform: uppercase; }
-        .auction-card-template .base-price-amount { font-family: 'Inter', sans-serif; font-weight: 900; font-size: 90px; color: #10B981; }
+
+        body { 
+            font-family: 'Roboto', sans-serif; 
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .container {
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 1.5rem;
+            box-sizing: border-box;
+        }
+        @media (min-width: 1280px) { .container { max-width: 1280px; } }
+        
+        h1, h2, h3 {
+             font-family: 'Teko', sans-serif;
+             font-weight: 700;
+             line-height: 1.1;
+        }
+
+        /* Login Page Styles */
+        #login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .login-box { background-color: var(--bg-secondary); padding: 2.5rem; border-radius: 0.75rem; border: 1px solid var(--border-color); width: 100%; max-width: 400px; }
+        .login-box h1 { font-size: 2.5rem; text-align: center; margin-bottom: 2rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; font-weight: 500; margin-bottom: 0.5rem; color: var(--text-muted); }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 0.75rem 1rem;
+            border-radius: 0.375rem; border: 1px solid var(--border-color);
+            background-color: var(--bg-dark); color: var(--text-light);
+            box-sizing: border-box; transition: all 0.3s ease;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--accent-violet); box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.3); }
+        .submit-btn {
+            width: 100%; padding: 0.75rem; border: none; border-radius: 0.375rem;
+            background: linear-gradient(to right, var(--primary-blue), var(--accent-violet));
+            color: white; font-size: 1rem; font-weight: 600; cursor: pointer; transition: opacity 0.3s ease;
+        }
+        #login-error { color: var(--danger-color); text-align: center; margin-top: 1rem; display: none; }
+
+        /* Dashboard Styles */
+        #dashboard-container { display: none; }
+        .header { background-color: var(--bg-secondary); padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
+        .header h1 { margin: 0; font-size: 1.5rem; }
+        #logout-button { background-color: var(--danger-color); color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.375rem; cursor: pointer; }
+
+        .tabs { display: flex; border-bottom: 1px solid var(--border-color); overflow-x: auto; }
+        .tab-button { padding: 1rem 1.5rem; cursor: pointer; border: none; background-color: transparent; color: var(--text-muted); font-size: 1rem; font-weight: 500; white-space: nowrap; }
+        .tab-button.active { color: var(--accent-violet); border-bottom: 3px solid var(--accent-violet); }
+        .tab-content { display: none; padding-top: 2rem; }
+        .tab-content.active { display: block; }
+        
+        .section-header { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .pdf-btn { background-color: var(--success-color); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 0.375rem; cursor: pointer; font-weight: 500; }
+
+        .table-container { overflow-x: auto; background-color: var(--bg-secondary); border-radius: 0.5rem; border: 1px solid var(--border-color); }
+        .data-table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        .data-table th, .data-table td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        .data-table th { font-weight: 600; color: var(--text-light); }
+        .data-table tbody tr:last-child td { border-bottom: none; }
+        .actions-cell { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .actions-cell .btn { border: none; padding: 0.5rem 1rem; border-radius: 0.375rem; cursor: pointer; font-weight: 600; }
+        .btn-approve { background-color: var(--success-color); color: white; }
+        .btn-reject { background-color: var(--danger-color); color: white; }
+        .btn-proof { background: var(--primary-blue); color: white; }
+        .btn-delete { background-color: var(--danger-color); color: white; }
+
+        .form-container { background-color: var(--bg-secondary); padding: 1.5rem; border-radius: 0.5rem; border: 1px solid var(--border-color); margin-bottom: 2rem; }
+        .form-container h2 { font-size: 1.75rem; margin-top: 0; }
+        .form-grid-2 { display: grid; gap: 1.5rem; }
+        @media (min-width: 768px) { .form-grid-2 { grid-template-columns: repeat(2, 1fr); } }
+        
+        #announcements-grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+        .card { background-color: var(--bg-secondary); border-radius: 0.5rem; border: 1px solid var(--border-color); padding: 1.5rem; }
+        .card h3 { font-size: 1.5rem; margin-top: 0; color: var(--accent-violet); }
+        .card-actions { margin-top: 1rem; }
+        .placeholder { color: var(--text-muted); text-align: center; padding: 2rem; }
     </style>
 </head>
-<body class="p-4 sm:p-8">
+<body>
 
-    <!-- Login View -->
-    <div id="login-container" class="flex items-center justify-center min-h-[80vh]">
-        <div class="w-full max-w-md">
-            <h1 class="font-heading text-3xl text-center mb-8">Card Generator <span class="text-gradient">Login</span></h1>
-            <form id="login-form" class="panel-modern p-8 space-y-6">
-                <div>
-                    <label for="email" class="block mb-2 font-semibold">Email</label>
-                    <input type="email" id="email" class="form-input w-full p-3" required>
-                </div>
-                <div>
-                    <label for="password" class="block mb-2 font-semibold">Password</label>
-                    <input type="password" id="password" class="form-input w-full p-3" required>
-                </div>
-                <button type="submit" class="btn-primary w-full py-3 text-lg">Sign In</button>
-                <p id="login-error" class="text-red-500 text-center h-4"></p>
+    <div id="login-container">
+        <div class="login-box">
+            <h1>Admin Login</h1>
+            <form id="login-form">
+                <div class="form-group"><label for="admin-email">Email</label><input type="email" id="admin-email" required></div>
+                <div class="form-group"><label for="admin-password">Password</label><input type="password" id="admin-password" required></div>
+                <button type="submit" class="submit-btn">Login</button>
             </form>
-        </div>
-    </div>
-    
-    <!-- Generator Panel (Hidden by default) -->
-    <div id="generator-panel" class="hidden">
-        <div class="container mx-auto">
-            <header class="flex justify-between items-center mb-8">
-                <div>
-                    <h1 class="font-heading text-4xl sm:text-5xl">Auction Card <span class="text-gradient">Generator</span></h1>
-                    <p class="text-gray-400 mt-2">Generate printable, projector-ready auction cards from your Firebase player data.</p>
-                </div>
-                <button id="sign-out-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md transition-colors">Sign Out</button>
-            </header>
-
-            <div class="panel-modern p-6">
-                <h2 class="font-heading text-2xl mb-4">Step 1: Select Player Category</h2>
-                <div id="filter-container" class="flex flex-wrap gap-3">
-                    <button class="filter-btn active font-semibold py-2 px-4 rounded-md" data-filter="all">All Players</button>
-                    <button class="filter-btn font-semibold py-2 px-4 rounded-md" data-filter="Batsman">Batsman</button>
-                    <button class="filter-btn font-semibold py-2 px-4 rounded-md" data-filter="Bowler">Bowler</button>
-                    <button class="filter-btn font-semibold py-2 px-4 rounded-md" data-filter="All-Rounder">All-Rounder</button>
-                    <button class="filter-btn font-semibold py-2 px-4 rounded-md" data-filter="Wicketkeeper">Wicketkeeper</button>
-                </div>
-            </div>
-
-            <div class="panel-modern p-6 mt-6">
-                <h2 class="font-heading text-2xl mb-4">Step 2: Review Players</h2>
-                <p class="text-gray-400 mb-4">The following players in the selected category will be included in the PDF.</p>
-                <div id="player-preview" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 h-64 overflow-y-auto p-4 bg-gray-900/50 rounded-lg">
-                    <p class="text-gray-500">Connecting to Firebase...</p>
-                </div>
-            </div>
-
-            <div class="panel-modern p-6 mt-6">
-                <h2 class="font-heading text-2xl mb-4">Step 3: Generate PDF</h2>
-                <p class="text-gray-400 mb-4">This will create a multi-page PDF with one card per page. This process may take a moment for large groups.</p>
-                <button id="generate-pdf-btn" class="btn-primary w-full sm:w-auto py-3 px-8 text-lg" disabled>Generate PDF</button>
-                <p id="status-message" class="mt-4 text-yellow-400 h-6"></p>
-            </div>
+            <p id="login-error"></p>
         </div>
     </div>
 
-
-    <!-- Hidden Area for Rendering Cards -->
-    <div id="card-render-area">
-        <div id="auction-card-template" class="auction-card-template">
-            <div class="player-image-container"><img id="template-image" src="" class="player-image" crossorigin="anonymous"></div>
-            <div>
-                <h2 id="template-name" class="player-name text-gradient">Player Name</h2>
-                <p id="template-skill" class="player-skill">Player Skill</p>
-                <p class="base-price-label">Base Price</p>
-                <p id="template-price" class="base-price-amount">₹0</p>
+    <div id="dashboard-container">
+        <header class="header"><h1>Admin Dashboard</h1><button id="logout-button">Logout</button></header>
+        <main class="container">
+            <div class="tabs">
+                <button class="tab-button active" data-tab="pending-players">Pending Players</button>
+                <button class="tab-button" data-tab="approved-players">Approved Players</button>
+                <button class="tab-button" data-tab="manage-teams">Manage Teams</button>
+                <button class="tab-button" data-tab="manage-fixtures">Manage Fixtures</button>
+                <button class="tab-button" data-tab="announcements">Announcements</button>
+                <button class="tab-button" data-tab="auction-cards">Auction Cards</button>
             </div>
-        </div>
+
+            <div id="pending-players" class="tab-content active">
+                <div class="section-header"><h2>Pending Player Approvals</h2></div>
+                <div class="table-container"><table class="data-table"><thead><tr><th>Full Name</th><th>Phone</th><th>Address</th><th>Base Price</th><th>Actions</th></tr></thead><tbody id="pending-players-tbody"></tbody></table></div>
+            </div>
+            
+            <div id="approved-players" class="tab-content">
+                 <div class="section-header"><h2>Approved Player List</h2><button class="pdf-btn" id="generate-players-pdf">Download PDF</button></div>
+                <div class="table-container"><table class="data-table"><thead><tr><th>Full Name</th><th>Phone</th><th>Address</th><th>Role</th><th>Base Price</th><th>Actions</th></tr></thead><tbody id="approved-players-tbody"></tbody></table></div>
+            </div>
+
+            <div id="manage-teams" class="tab-content">
+                <div class="form-container">
+                    <h2>Add a New Team</h2>
+                    <form id="add-team-form">
+                        <div class="form-group"><label for="teamName">Team Name</label><input type="text" id="teamName" required></div>
+                        <div class="form-group"><label for="city">City / Town</label><input type="text" id="city" required></div>
+                        <button type="submit" class="submit-btn">Add Team</button>
+                    </form>
+                </div>
+                <div class="section-header"><h2>Current Teams</h2></div>
+                <div class="table-container"><table class="data-table"><thead><tr><th>Team Name</th><th>City</th><th>Actions</th></tr></thead><tbody id="teams-tbody"></tbody></table></div>
+            </div>
+
+            <div id="manage-fixtures" class="tab-content">
+                <div class="form-container">
+                    <h2>Add New Match Fixture</h2>
+                    <form id="add-fixture-form">
+                        <div class="form-grid-2">
+                            <div class="form-group"><label for="teamA">Team A</label><select id="teamA" required></select></div>
+                            <div class="form-group"><label for="teamB">Team B</label><select id="teamB" required></select></div>
+                            <div class="form-group"><label for="matchDate">Date</label><input type="date" id="matchDate" required></div>
+                            <div class="form-group"><label for="matchTime">Time</label><input type="time" id="matchTime" required></div>
+                            <div class="form-group" style="grid-column: 1 / -1;"><label for="venue">Venue</label><input type="text" id="venue" placeholder="e.g., City Stadium" required></div>
+                        </div>
+                        <button type="submit" class="submit-btn">Add Fixture</button>
+                    </form>
+                </div>
+                <div class="section-header"><h2>Current Fixtures</h2></div>
+                <div class="table-container"><table class="data-table"><thead><tr><th>Date</th><th>Match</th><th>Time</th><th>Venue</th><th>Actions</th></tr></thead><tbody id="fixtures-tbody"></tbody></table></div>
+            </div>
+
+            <div id="announcements" class="tab-content">
+                <div class="form-container">
+                    <h2>Create New Announcement</h2>
+                    <form id="announcement-form">
+                        <input type="text" id="announcement-headline" placeholder="Headline" class="form-group" required>
+                        <textarea id="announcement-text" placeholder="Description..." class="form-group" required></textarea>
+                        <button type="submit" class="submit-btn">Post Announcement</button>
+                    </form>
+                </div>
+                <div class="section-header"><h2>Current Announcements</h2></div>
+                <div id="announcements-grid"></div>
+            </div>
+            
+            <div id="auction-cards" class="tab-content">
+                <div class="section-header"><h2>Auction Card Generator</h2></div>
+                <div class="form-container">
+                    <p>This tool will generate a PDF file containing auction cards for all approved players, grouped by their playing role. This process may take a moment as it needs to download all player images.</p>
+                    <button class="submit-btn" id="generate-auction-pdf">Generate & Download PDF</button>
+                    <p id="pdf-generation-status" style="text-align: center; margin-top: 1rem; color: var(--accent-violet);"></p>
+                </div>
+            </div>
+        </main>
     </div>
 
-
+    <script src="firebaseconfig.js"></script>
     <script type="module">
-        import { firebaseConfig } from './firebaseconfig.js';
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, doc, getDoc, setDoc, deleteDoc, addDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        
+        const db = getFirestore(app);
+
+        // --- All UI Element selections, Auth Logic, and Event Listeners ---
         const loginContainer = document.getElementById('login-container');
-        const generatorPanel = document.getElementById('generator-panel');
+        const dashboardContainer = document.getElementById('dashboard-container');
         const loginForm = document.getElementById('login-form');
         const loginError = document.getElementById('login-error');
-        const signOutBtn = document.getElementById('sign-out-btn');
+        const logoutButton = document.getElementById('logout-button');
         
+        let approvedPlayersData = []; // To hold data for PDF generation
+
         onAuthStateChanged(auth, user => {
             if (user) {
-                loginContainer.classList.add('hidden');
-                generatorPanel.classList.remove('hidden');
-                initializeGenerator();
+                loginContainer.style.display = 'none';
+                dashboardContainer.style.display = 'block';
+                loadDashboardData();
             } else {
-                loginContainer.classList.remove('hidden');
-                generatorPanel.classList.add('hidden');
+                loginContainer.style.display = 'flex';
+                dashboardContainer.style.display = 'none';
             }
         });
 
-        loginForm.addEventListener('submit', async (e) => {
+        loginForm.addEventListener('submit', e => {
             e.preventDefault();
-            try {
-                await signInWithEmailAndPassword(auth, loginForm.email.value, loginForm.password.value);
-                loginError.textContent = '';
-            } catch (error) {
-                loginError.textContent = 'Invalid email or password.';
-            }
+            const email = document.getElementById('admin-email').value;
+            const password = document.getElementById('admin-password').value;
+            signInWithEmailAndPassword(auth, email, password).catch(err => {
+                loginError.textContent = 'Invalid credentials.';
+                loginError.style.display = 'block';
+            });
         });
 
-        signOutBtn.addEventListener('click', () => signOut(auth));
+        logoutButton.addEventListener('click', () => signOut(auth));
 
-        function initializeGenerator() {
-            let allPlayers = [];
-            let filteredPlayers = [];
-            let currentFilter = 'all';
-
-            const playerPreviewEl = document.getElementById('player-preview');
-            const generateBtn = document.getElementById('generate-pdf-btn');
-            const statusMessage = document.getElementById('status-message');
-            const db = getFirestore(app);
-
-            try {
-                const q = query(collection(db, "registrations"), where("status", "==", "approved"));
-                onSnapshot(q, (snapshot) => {
-                    allPlayers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    updateFilter();
-                    generateBtn.disabled = false;
-                    statusMessage.textContent = `${allPlayers.length} approved players found. Ready to generate.`;
-                });
-            } catch (e) {
-                playerPreviewEl.innerHTML = `<p class="text-red-500">Could not connect to Firestore.</p>`;
-                statusMessage.textContent = "Error: Firestore connection failed.";
+        // --- Data Rendering ---
+        const renderTableRows = (tbody, snapshot, rowGenerator) => {
+            if (snapshot.empty) {
+                const colCount = tbody.closest('table').querySelector('thead tr').children.length;
+                tbody.innerHTML = `<tr><td colspan="${colCount}" class="placeholder">${tbody.dataset.placeholder}</td></tr>`;
+            } else {
+                tbody.innerHTML = snapshot.docs.map(doc => rowGenerator(doc.id, doc.data())).join('');
             }
+        };
+        const renderCards = (grid, snapshot, cardGenerator) => {
+            grid.innerHTML = snapshot.empty ? `<p class="placeholder">${grid.dataset.placeholder}</p>` : snapshot.docs.map(doc => cardGenerator(doc.id, doc.data())).join('');
+        };
 
-            function updateFilter() {
-                filteredPlayers = (currentFilter === 'all') ? allPlayers : allPlayers.filter(p => p.playingRole === currentFilter);
-                playerPreviewEl.innerHTML = filteredPlayers.map(p => `<div class="text-center p-2 rounded-md bg-gray-700"><p class="font-semibold truncate">${p.fullName}</p><p class="text-xs text-gray-400">${p.playingRole}</p></div>`).join('') || '<p class="text-gray-500">No players found in this category.</p>';
-            }
+        // --- Load Data ---
+        function loadDashboardData() {
+            const tbodies = {
+                pendingPlayers: document.getElementById('pending-players-tbody'),
+                approvedPlayers: document.getElementById('approved-players-tbody'),
+                teams: document.getElementById('teams-tbody'),
+                fixtures: document.getElementById('fixtures-tbody'),
+            };
+            tbodies.pendingPlayers.dataset.placeholder = "No pending player registrations.";
+            tbodies.approvedPlayers.dataset.placeholder = "No approved players yet.";
+            tbodies.teams.dataset.placeholder = "No teams have been added yet.";
+            tbodies.fixtures.dataset.placeholder = "No fixtures have been scheduled.";
 
-            document.getElementById('filter-container').addEventListener('click', (e) => {
-                if (e.target.tagName === 'BUTTON') {
-                    currentFilter = e.target.dataset.filter;
-                    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-                    e.target.classList.add('active');
-                    updateFilter();
-                }
+            onSnapshot(collection(db, 'pending_players'), snap => renderTableRows(tbodies.pendingPlayers, snap, (id, p) => `<tr><td>${p.fullName}</td><td>${p.phone}</td><td>${p.address}</td><td>${p.basePrice} Coins</td><td class="actions-cell"><button class="btn btn-proof" data-url="${p.photoUrl}">Photo</button><button class="btn btn-proof" data-url="${p.proofUrl}">Proof</button><button class="btn btn-approve" data-id="${id}">Approve</button><button class="btn btn-reject" data-id="${id}">Reject</button></td></tr>`));
+            
+            onSnapshot(collection(db, 'players'), snap => {
+                approvedPlayersData = snap.docs.map(doc => doc.data()); // Update data for PDF
+                renderTableRows(tbodies.approvedPlayers, snap, (id, p) => `<tr><td>${p.fullName}</td><td>${p.phone}</td><td>${p.address}</td><td>${p.role}</td><td>${p.basePrice} Coins</td><td class="actions-cell"><button class="btn btn-delete" data-collection="players" data-id="${id}">Delete</button></td></tr>`);
             });
 
-            generateBtn.addEventListener('click', async () => {
-                if (filteredPlayers.length === 0) { alert('No players to generate.'); return; }
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF({ orientation: 'landscape', unit: 'px', format: [1280, 720] });
-                const cardTemplate = document.getElementById('auction-card-template');
-                const templateName = document.getElementById('template-name');
-                const templateSkill = document.getElementById('template-skill');
-                const templatePrice = document.getElementById('template-price');
-                const templateImage = document.getElementById('template-image');
-                generateBtn.disabled = true;
-                
-                for (let i = 0; i < filteredPlayers.length; i++) {
-                    const player = filteredPlayers[i];
-                    statusMessage.textContent = `Generating card ${i + 1} of ${filteredPlayers.length}: ${player.fullName}`;
-                    
-                    templateName.textContent = player.fullName;
-                    templateSkill.textContent = player.playingRole;
-                    templatePrice.textContent = `₹${player.basePrice.toLocaleString('en-IN')}`;
-                    templateImage.src = player.playerPhotoURL;
-                    
-                    await new Promise(resolve => {
-                        templateImage.onload = resolve;
-                        templateImage.onerror = () => {
-                            templateImage.src = `https://placehold.co/400x400/111827/ec4899?text=${player.fullName.split(' ').map(n=>n[0]).join('')}`;
-                            new Promise(res => { templateImage.onload = res; }).then(resolve);
-                        };
-                    });
-                    
-                    const canvas = await html2canvas(cardTemplate, { scale: 1 });
-                    const imgData = canvas.toDataURL('image/jpeg', 0.9);
-                    if (i > 0) doc.addPage([1280, 720], 'landscape');
-                    doc.addImage(imgData, 'JPEG', 0, 0, 1280, 720);
-                }
-
-                statusMessage.textContent = `Saving PDF...`;
-                doc.save(`Auction-Cards-${currentFilter}.pdf`);
-                statusMessage.textContent = `PDF generated successfully!`;
-                generateBtn.disabled = false;
+            onSnapshot(collection(db, 'approved_teams'), snap => renderTableRows(tbodies.teams, snap, (id, t) => `<tr><td>${t.teamName}</td><td>${t.city}</td><td class="actions-cell"><button class="btn btn-delete" data-collection="approved_teams" data-id="${id}">Delete</button></td></tr>`));
+            onSnapshot(query(collection(db, 'fixtures'), orderBy('matchDate', 'asc')), snap => renderTableRows(tbodies.fixtures, snap, (id, f) => `<tr><td>${new Date(f.matchDate).toLocaleDateString()}</td><td>${f.teamA} vs ${f.teamB}</td><td>${f.matchTime}</td><td>${f.venue}</td><td class="actions-cell"><button class="btn btn-delete" data-collection="fixtures" data-id="${id}">Delete</button></td></tr>`));
+            
+            const announcementGrid = document.getElementById('announcements-grid');
+            announcementGrid.dataset.placeholder = "No announcements posted.";
+            onSnapshot(query(collection(db, 'announcements'), orderBy('createdAt', 'desc')), snap => renderCards(announcementGrid, snap, (id, a) => `<div class="card"><h3>${a.headline}</h3><p>${a.text}</p><div class="card-actions"><button class="btn btn-delete" data-collection="announcements" data-id="${id}">Delete</button></div></div>`));
+        
+            const teamASelect = document.getElementById('teamA');
+            const teamBSelect = document.getElementById('teamB');
+            onSnapshot(collection(db, 'approved_teams'), snap => {
+                const options = snap.docs.map(doc => `<option value="${doc.data().teamName}">${doc.data().teamName}</option>`).join('');
+                teamASelect.innerHTML = options;
+                teamBSelect.innerHTML = options;
             });
         }
+
+        // --- Actions (Approve, Reject, Delete) ---
+        document.addEventListener('click', async e => {
+            const { classList, dataset } = e.target;
+            if (classList.contains('btn-approve')) {
+                const docRef = doc(db, 'pending_players', dataset.id);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    await setDoc(doc(db, 'players', dataset.id), docSnap.data());
+                    await deleteDoc(docRef);
+                    alert('Player approved!');
+                }
+            } else if (classList.contains('btn-reject') && confirm('Reject this player?')) {
+                await deleteDoc(doc(db, 'pending_players', dataset.id));
+            } else if (classList.contains('btn-delete') && confirm('Delete this item?')) {
+                await deleteDoc(doc(db, dataset.collection, dataset.id));
+            } else if (classList.contains('btn-proof')) {
+                window.open(dataset.url, '_blank');
+            }
+        });
+
+        // --- Forms (Announcements, Add Team, Add Fixture) ---
+        document.getElementById('announcement-form').addEventListener('submit', async e => { e.preventDefault(); const f = e.target; await addDoc(collection(db, 'announcements'), { headline: f.elements['announcement-headline'].value, text: f.elements['announcement-text'].value, createdAt: serverTimestamp() }); f.reset(); });
+        document.getElementById('add-team-form').addEventListener('submit', async e => { e.preventDefault(); const f = e.target; await addDoc(collection(db, 'approved_teams'), { teamName: f.elements['teamName'].value, city: f.elements['city'].value }); f.reset(); });
+        document.getElementById('add-fixture-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const f = e.target;
+            const teamA = f.elements['teamA'].value; const teamB = f.elements['teamB'].value;
+            if (teamA === teamB) { alert("Teams cannot be the same."); return; }
+            await addDoc(collection(db, 'fixtures'), { teamA, teamB, matchDate: f.elements['matchDate'].value, matchTime: f.elements['matchTime'].value, venue: f.elements['venue'].value });
+            f.reset();
+        });
+
+        // --- Tabs ---
+        const tabs = document.querySelector('.tabs');
+        const tabContents = document.querySelectorAll('.tab-content');
+        tabs.addEventListener('click', e => {
+            if (e.target.matches('.tab-button')) {
+                tabs.querySelector('.active').classList.remove('active');
+                e.target.classList.add('active');
+                tabContents.forEach(c => c.classList.remove('active'));
+                document.getElementById(e.target.dataset.tab).classList.add('active');
+            }
+        });
+
+        // --- PDF Generation ---
+        const { jsPDF } = window.jspdf;
+        document.getElementById('generate-players-pdf').addEventListener('click', () => {
+             if (approvedPlayersData.length === 0) {
+                alert('No approved players to generate PDF for.');
+                return;
+             }
+             const docPdf = new jsPDF();
+             docPdf.text("Approved Players List", 14, 15);
+             
+             const tableData = approvedPlayersData.map(p => [
+                p.fullName, p.phone, p.address, p.role, `${p.basePrice} Coins`
+             ]);
+
+             docPdf.autoTable({ 
+                head: [['Full Name', 'Phone', 'Address', 'Role', 'Base Price']],
+                body: tableData, startY: 25, theme: 'grid'
+            });
+             docPdf.save('approved-players.pdf');
+        });
+
+        // --- Auction Card PDF Generation ---
+        document.getElementById('generate-auction-pdf').addEventListener('click', async () => {
+            if (approvedPlayersData.length === 0) {
+                alert('No approved players to generate auction cards for.');
+                return;
+            }
+
+            const button = document.getElementById('generate-auction-pdf');
+            const statusEl = document.getElementById('pdf-generation-status');
+            button.disabled = true;
+            button.textContent = 'Generating...';
+            statusEl.textContent = `Found ${approvedPlayersData.length} players. Loading all images...`;
+
+            try {
+                // 1. Group players by role
+                const groupedPlayers = approvedPlayersData.reduce((acc, player) => {
+                    const role = player.role || 'Uncategorized';
+                    if (!acc[role]) { acc[role] = []; }
+                    acc[role].push(player);
+                    return acc;
+                }, {});
+                
+                // 2. Pre-load all images
+                const allPlayers = Object.values(groupedPlayers).flat();
+                const imagePromises = allPlayers.map(player => {
+                    return new Promise((resolve, reject) => {
+                        const img = new Image();
+                        img.crossOrigin = 'Anonymous';
+                        img.onload = () => resolve({ photoUrl: player.photoUrl, img });
+                        img.onerror = () => {
+                            const placeholder = new Image();
+                            placeholder.src = `https://placehold.co/200x250/2d3748/ffffff?text=${player.fullName.split(' ').map(n=>n[0]).join('')}`;
+                            placeholder.onload = () => resolve({ photoUrl: player.photoUrl, img: placeholder });
+                            placeholder.onerror = reject;
+                        };
+                        img.src = player.photoUrl;
+                    });
+                });
+
+                const loadedImages = await Promise.all(imagePromises);
+                const imageMap = loadedImages.reduce((map, { photoUrl, img }) => {
+                    map[photoUrl] = img;
+                    return map;
+                }, {});
+
+                statusEl.textContent = 'All images loaded. Creating PDF...';
+                
+                // 3. Generate PDF
+                const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+                const pageW = 210, pageH = 297, margin = 10;
+                const cardW = (pageW - margin * 3) / 2, cardH = (pageH - margin * 3) / 2;
+                const positions = [
+                    { x: margin, y: margin }, { x: margin * 2 + cardW, y: margin },
+                    { x: margin, y: margin * 2 + cardH }, { x: margin * 2 + cardW, y: margin * 2 + cardH },
+                ];
+                let isFirstCategory = true;
+
+                for (const role in groupedPlayers) {
+                    if (!isFirstCategory) { doc.addPage(); }
+                    isFirstCategory = false;
+
+                    doc.setFontSize(40);
+                    doc.setTextColor('#a855f7');
+                    doc.text(role.toUpperCase() + 'S', pageW / 2, pageH / 2, { align: 'center' });
+
+                    const playersInRole = groupedPlayers[role];
+                    playersInRole.forEach((player, index) => {
+                        if (index % 4 === 0) { doc.addPage(); }
+                        
+                        const pos = positions[index % 4];
+                        const img = imageMap[player.photoUrl];
+                        drawCard(doc, pos.x, pos.y, cardW, cardH, player, img);
+                    });
+                }
+                
+                function drawCard(doc, x, y, w, h, player, img) {
+                    doc.setFillColor('#2d3748');
+                    doc.setDrawColor('#4a5568');
+                    doc.roundedRect(x, y, w, h, 3, 3, 'FD');
+
+                    const imgH = 60, imgW = 60;
+                    const imgX = x + (w - imgW) / 2;
+                    doc.addImage(img, 'JPEG', imgX, y + 5, imgW, imgH);
+                    
+                    doc.setFontSize(22); doc.setFont('helvetica', 'bold'); doc.setTextColor('#ffffff');
+                    doc.text(player.fullName, x + w / 2, y + 78, { align: 'center', maxWidth: w - 10 });
+                    
+                    doc.setFontSize(14); doc.setFont('helvetica', 'normal'); doc.setTextColor('#a0aec0');
+                    doc.text(player.role, x + w / 2, y + 88, { align: 'center' });
+
+                    doc.setDrawColor('#4a5568');
+                    doc.line(x + 10, y + 95, x + w - 10, y + 95);
+
+                    doc.setFontSize(16); doc.setTextColor('#ffffff');
+                    doc.text('Base Price', x + w / 2, y + 105, { align: 'center' });
+                    
+                    doc.setFontSize(28); doc.setFont('helvetica', 'bold'); doc.setTextColor('#fbbf24');
+                    doc.text(`${player.basePrice} Coins`, x + w / 2, y + 115, { align: 'center' });
+
+                    doc.setFontSize(12); doc.setFont('helvetica', 'normal'); doc.setTextColor('#a0aec0');
+                    doc.text(player.address, x + w / 2, y + h - 7, { align: 'center' });
+                }
+                
+                doc.deletePage(1);
+
+                doc.save('NYF-Auction-Cards.pdf');
+
+            } catch (err) {
+                console.error("Failed to generate auction PDF:", err);
+                statusEl.textContent = 'An error occurred during PDF generation.';
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Generate & Download PDF';
+                setTimeout(() => { statusEl.textContent = ''; }, 5000);
+            }
+        });
+
     </script>
 </body>
 </html>
-
 
