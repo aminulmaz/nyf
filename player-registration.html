@@ -6,44 +6,46 @@
     <title>Player Registration - NYF Tournament</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --primary-purple: #9f7aea;
-            --primary-blue: #6366f1;
-            --accent-red: #f87171;
-            --accent-yellow: #fbbf24;
-            --text-dark: #e2e8f0;
-            --text-light: #a0aec0;
-            --bg-light: #1a202c;
+            --bg-dark: #1a202c;
             --bg-secondary: #2d3748;
+            --primary-blue: #4f46e5;
+            --accent-violet: #a855f7;
+            --text-light: #ffffff;
+            --text-muted: #a0aec0;
             --border-color: #4a5568;
             --success-color: #48bb78;
         }
 
         body { 
             font-family: 'Roboto', sans-serif; 
-            background-color: var(--bg-light);
-            color: var(--text-dark);
+            background-color: var(--bg-dark);
+            color: var(--text-light);
             margin: 0;
             overflow-x: hidden;
         }
         .container {
             width: 100%;
-            margin-left: auto;
-            margin-right: auto;
-            padding-left: 1.5rem;
-            padding-right: 1.5rem;
+            margin: 0 auto;
+            padding: 1.5rem;
             box-sizing: border-box;
         }
         @media (min-width: 1024px) { .container { max-width: 1024px; } }
         
-        /* Header */
+        h1, h2, h3 {
+             font-family: 'Teko', sans-serif;
+             font-weight: 700;
+             line-height: 1.1;
+        }
+        
+       /* Header */
         .header {
-            background-color: rgba(26, 32, 44, 0.8);
-            backdrop-filter: blur(10px);
+            background: linear-gradient(to right, #8e2de2, #4a00e0);
+            color: white;
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
             position: sticky; top: 0; z-index: 50;
         }
@@ -51,34 +53,27 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem 0;
+            padding: 0.5rem 1rem;
         }
-        .nav-brand {
-            font-size: 1.875rem; font-weight: 700;
-            text-decoration: none; color: white;
+        .nav-brand img {
+            height: 50px;
+            width: auto;
         }
         .nav-links { display: none; }
-        @media (min-width: 768px) {
+        @media (min-width: 1024px) {
             .nav-links {
                 display: flex; align-items: center;
-                gap: 1.5rem; font-size: 0.875rem;
+                gap: 2rem; font-size: 1rem;
             }
         }
-        .nav-links a { text-decoration: none; color: var(--text-light); transition: color 0.3s ease; }
-        .nav-links a.active { color: white; font-weight: 600; }
-        .nav-links a:not(.active):hover { color: white; }
-        .nav-links .admin-link {
-            background-color: var(--primary-blue);
-            padding: 0.5rem 1rem; border-radius: 0.375rem; color: white;
-        }
-        .nav-links .admin-link:hover { opacity: 0.9; }
-
-        /* Mobile Menu */
+        .nav-links a { text-decoration: none; color: var(--text-muted); transition: color 0.3s ease; font-weight: 500; }
+        .nav-links a.active { color: var(--text-light); font-weight: 700; border-bottom: 2px solid var(--accent-violet);}
+        .nav-links a:not(.active):hover { color: var(--text-light); }
+        
         #mobile-menu-button { display: block; background: none; border: none; color: white; cursor: pointer; }
-        @media (min-width: 768px) { #mobile-menu-button { display: none; } }
-        #mobile-menu { display: none; padding: 0 1.5rem 1rem; background-color: var(--bg-secondary); }
+        @media (min-width: 1024px) { #mobile-menu-button { display: none; } }
+        #mobile-menu { display: none; padding: 0 1.5rem 1rem; background: linear-gradient(to right, #8e2de2, #4a00e0); }
         #mobile-menu a { display: block; padding: 0.75rem 0; text-decoration: none; color: var(--text-light); }
-        #mobile-menu a.admin-link { background-color: var(--primary-blue); border-radius: 0.375rem; text-align: center; margin-top: 0.5rem; color: white; padding: 0.75rem;}
 
         /* Main Content & Form */
         main { padding: 2rem 0; }
@@ -94,11 +89,15 @@
         @media (min-width: 768px) { .form-container { padding: 2.5rem; } }
 
         .section-title {
-            font-size: 1.8rem; font-weight: 800;
+            font-size: 2.5rem;
             text-align: center; margin-bottom: 2rem;
-            color: var(--text-dark);
+            color: var(--text-light);
+            background: linear-gradient(to right, var(--primary-blue), var(--accent-violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        @media (min-width: 768px) { .section-title { font-size: 2rem; } }
+        @media (min-width: 768px) { .section-title { font-size: 3rem; } }
 
         /* Payment Section */
         .payment-section {
@@ -108,18 +107,22 @@
             padding: 1.5rem; margin-bottom: 2.5rem;
         }
         .payment-section h3 {
-            font-size: 1.25rem; font-weight: 700;
-            margin-top: 0; margin-bottom: 1rem; color: var(--accent-yellow);
+            font-size: 1.75rem; margin-top: 0; margin-bottom: 1rem; color: var(--accent-violet);
         }
-        @media (min-width: 768px) { .payment-section h3 { font-size: 1.5rem; } }
         .payment-section p {
-            color: var(--text-light);
+            color: var(--text-muted);
             margin-bottom: 1.5rem;
             max-width: 500px; margin-left: auto; margin-right: auto;
         }
         .qr-code {
             max-width: 180px; background-color: white; padding: 1rem;
             border-radius: 0.5rem; margin: 0 auto;
+            display: flex; align-items: center; justify-content: center;
+        }
+         .qr-code img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Prevents cropping */
         }
         
         /* Form Fields */
@@ -130,51 +133,113 @@
         }
         .form-group label {
             display: block; font-weight: 500;
-            margin-bottom: 0.5rem; color: var(--text-light);
+            margin-bottom: 0.75rem; color: var(--text-light);
+            font-size: 1.1rem;
         }
-        .form-group input, .form-group select {
+        .form-group input[type="text"], .form-group input[type="tel"] {
             width: 100%; padding: 0.75rem 1rem;
-            border-radius: 0.375rem; border: 1px solid var(--border-color);
-            background-color: var(--bg-light); color: var(--text-dark);
+            border-radius: 0.375rem; border: 2px solid var(--border-color);
+            background-color: var(--bg-dark); color: var(--text-light);
             box-sizing: border-box; transition: all 0.3s ease;
         }
-        .form-group input:focus, .form-group select:focus {
-            outline: none; border-color: var(--primary-purple);
-            box-shadow: 0 0 0 3px rgba(159, 122, 234, 0.3);
+        .form-group input:focus {
+            outline: none; border-color: var(--accent-violet);
+            box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.3);
         }
 
+        /* Custom Radio/Checkbox */
+        .choice-group { 
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.75rem; 
+        }
+        .choice-group input { display: none; }
+        .choice-group label {
+            padding: 0.75rem 1.25rem;
+            border: 2px solid var(--border-color);
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            background-color: var(--bg-dark);
+        }
+         .choice-group label:hover {
+            border-color: var(--accent-violet);
+        }
+        .choice-group input:checked + label {
+            background-color: var(--primary-blue);
+            border-color: var(--accent-violet);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+        }
+
+
         /* File Input */
+        input[type="file"] {
+             background: var(--bg-dark);
+             border: 2px solid var(--border-color);
+             border-radius: 0.375rem;
+             color: var(--text-muted);
+        }
         input[type="file"]::file-selector-button {
-            background: linear-gradient(to right, var(--primary-purple), var(--primary-blue));
+            background: linear-gradient(to right, var(--primary-blue), var(--accent-violet));
             color: white; font-weight: 600; padding: 0.75rem 1rem;
             margin-right: 1rem; border: none;
             border-radius: 0.375rem 0 0 0.375rem; cursor: pointer;
         }
+        .file-note { font-size: 0.875rem; color: var(--text-muted); margin-top: 0.5rem; }
         
         /* Submit Button */
         .submit-btn {
             width: 100%; padding: 1rem; border: none; border-radius: 0.375rem;
-            background: linear-gradient(to right, var(--accent-red), #ef4444);
+            background: linear-gradient(to right, var(--primary-blue), var(--accent-violet));
             color: white; font-size: 1.125rem; font-weight: 700; cursor: pointer;
-            transition: all 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
         }
-        .submit-btn:hover { opacity: 0.9; box-shadow: 0 10px 15px -3px rgba(248, 113, 113, 0.2); }
+        .submit-btn:hover { opacity: 0.9; }
         .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         /* Success Message */
         .success-message { text-align: center; padding: 2rem; }
-        .success-message h3 { font-size: 1.5rem; color: var(--success-color); }
-        .home-link { color: var(--accent-yellow); text-decoration: none; margin-top: 1rem; display: inline-block; }
-
+        .success-message h3 { font-size: 2rem; color: var(--success-color); }
+        .home-link { color: var(--accent-violet); text-decoration: none; margin-top: 1rem; display: inline-block; font-weight: 600; }
+        
         /* Footer */
         .footer {
-            background-color: #111827; color: var(--text-light);
+            background-color: #111827;
             padding: 4rem 1.5rem; margin-top: 4rem; text-align: center;
         }
-        .copyright {
-            margin-top: 2rem; font-size: 0.875rem;
-            border-top: 1px solid var(--border-color);
-            padding-top: 2rem;
+
+        /* Loading Overlay */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: none; /* Initially hidden */
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+            color: white;
+            font-size: 1.2rem;
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid var(--accent-violet);
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -182,25 +247,19 @@
 
     <header class="header">
         <nav class="container nav">
-            <a href="index.html" class="nav-brand">NYF CRICKET</a>
-            <div class="nav-links">
+            <a href="index.html" class="nav-brand"><img src="media/logo.jpg" alt="NYF Logo"></a>
+             <div class="nav-links">
                 <a href="index.html">Home</a>
+                <a href="fixtures.html">Fixtures</a>
+                <a href="rules.html">Rules</a>
                 <a href="player-registration.html" class="active">Player Registration</a>
-                <a href="team-registration.html">Team Registration</a>
-                <a href="admin.html" class="admin-link">Admin Panel</a>
+                <a href="faq.html">FAQ</a>
             </div>
             <button id="mobile-menu-button">
-                <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" fill="none" viewBox="0 0 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
             </button>
         </nav>
-        <div id="mobile-menu">
-            <a href="index.html">Home</a>
-            <a href="player-registration.html">Player Registration</a>
-            <a href="team-registration.html">Team Registration</a>
-            
-        </div>
+        <div id="mobile-menu"></div>
     </header>
 
     <main>
@@ -211,14 +270,14 @@
                 <!-- Step 1: Payment -->
                 <div class="payment-section">
                     <h3>Step 1: Complete Your Payment</h3>
-                    <p>Please pay the registration fee by scanning the UPI QR code below. Take a screenshot of the successful payment to upload in the next step.</p>
+                    <p>Scan the UPI QR code to pay the registration fee. Take a screenshot of the successful payment to upload in the next step.</p>
                     <div class="qr-code">
                         <img src="media/qrcode.jpg" alt="UPI Payment QR Code" onerror="this.onerror=null;this.src='https://placehold.co/200x200?text=QR+Code';">
                     </div>
                 </div>
 
                 <!-- Step 2: Form -->
-                <h3 style="text-align: center; font-size: 1.5rem; margin-bottom: 2rem;">Step 2: Fill Your Details</h3>
+                <h3 style="text-align: center; font-size: 2rem; margin-bottom: 2rem;">Step 2: Fill Your Details</h3>
                 <form id="player-registration-form">
                     <div class="form-grid">
                         <div class="form-group">
@@ -229,28 +288,45 @@
                             <label for="phone">Phone Number</label>
                             <input type="tel" id="phone" placeholder="e.g., 9876543210" required>
                         </div>
-                        <div class="form-group">
-                            <label for="email">Email Address</label>
-                            <input type="email" id="email" placeholder="e.g., john.doe@example.com" required>
+
+                        <div class="form-group form-group-full">
+                            <label>Address</label>
+                            <div class="choice-group">
+                                <input type="radio" name="address" id="hailakandi" value="Hailakandi" required><label for="hailakandi">Hailakandi</label>
+                                <input type="radio" name="address" id="silchar" value="Silchar"><label for="silchar">Silchar</label>
+                                <input type="radio" name="address" id="sribhumi" value="Sribhumi (Karimganj)"><label for="sribhumi">Sribhumi (Karimganj)</label>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="age">Age</label>
-                            <input type="number" id="age" placeholder="e.g., 25" required>
+
+                        <div class="form-group form-group-full">
+                            <label>Playing Role</label>
+                            <div class="choice-group">
+                                <input type="radio" name="role" id="batsman" value="Batsman" required><label for="batsman">Batsman</label>
+                                <input type="radio" name="role" id="bowler" value="Bowler"><label for="bowler">Bowler</label>
+                                <input type="radio" name="role" id="wicket-keeper" value="Wicket Keeper"><label for="wicket-keeper">Wicket Keeper</label>
+                                <input type="radio" name="role" id="all-rounder" value="All Rounder"><label for="all-rounder">All Rounder</label>
+                            </div>
                         </div>
-                         <div class="form-group form-group-full">
-                            <label for="role">Primary Playing Role</label>
-                            <select id="role" required>
-                                <option value="" disabled selected>Select your role</option>
-                                <option value="Batsman">Batsman</option>
-                                <option value="Bowler">Bowler</option>
-                                <option value="All-Rounder">All-Rounder</option>
-                                <option value="Wicket-Keeper">Wicket-Keeper</option>
-                            </select>
+
+                        <div class="form-group form-group-full">
+                            <label>Base Price</label>
+                            <div class="choice-group">
+                                <input type="radio" name="basePrice" id="price50" value="50" required><label for="price50">₹50</label>
+                                <input type="radio" name="basePrice" id="price100" value="100"><label for="price100">₹100</label>
+                            </div>
                         </div>
-                         <div class="form-group form-group-full">
-                            <label for="paymentProof">Upload Payment Proof (Screenshot)</label>
+
+                         <div class="form-group">
+                            <label for="playerPhoto">Upload Player Photo</label>
+                            <input type="file" id="playerPhoto" accept="image/*" required>
+                            <p class="file-note">Max file size: 2MB</p>
+                        </div>
+                         <div class="form-group">
+                            <label for="paymentProof">Upload Payment Proof</label>
                             <input type="file" id="paymentProof" accept="image/*" required>
+                            <p class="file-note">Max file size: 1MB</p>
                         </div>
+
                         <div class="form-group-full">
                             <button type="submit" class="submit-btn" id="submit-button">Submit Registration</button>
                         </div>
@@ -262,17 +338,31 @@
 
     <footer class="footer">
         <div class="container">
-             <p>&copy; 2025 NYF Cricket Tournament. All Rights Reserved.</p>
+            <p>&copy; 2025 NYF Cricket Tournament. All Rights Reserved. | Developed by Aminul Mazumder.</p>
         </div>
     </footer>
+    
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <p>Uploading files, please wait...</p>
+    </div>
 
     <script>
-        document.getElementById('mobile-menu-button').addEventListener('click', () => {
-            const menu = document.getElementById('mobile-menu');
-            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navLinksContainer = document.querySelector('.nav-links');
+        
+        mobileMenu.innerHTML = ''; // Clear previous links
+        navLinksContainer.querySelectorAll('a').forEach(link => {
+            mobileMenu.appendChild(link.cloneNode(true));
+        });
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.style.display = mobileMenu.style.display === 'block' ? 'none' : 'block';
         });
     </script>
-    
+
     <script src="firebaseconfig.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -282,57 +372,89 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const storage = getStorage(app);
-
+        
         const registrationForm = document.getElementById('player-registration-form');
         const submitButton = document.getElementById('submit-button');
         const formWrapper = document.getElementById('form-wrapper');
+        const loadingOverlay = document.getElementById('loading-overlay');
 
         registrationForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            loadingOverlay.style.display = 'flex'; // Show loading overlay
             submitButton.disabled = true;
             submitButton.textContent = 'Submitting...';
 
-            const fullName = document.getElementById('fullName').value;
-            const phone = document.getElementById('phone').value;
-            const email = document.getElementById('email').value;
-            const age = document.getElementById('age').value;
-            const role = document.getElementById('role').value;
+            const photoFile = document.getElementById('playerPhoto').files[0];
             const proofFile = document.getElementById('paymentProof').files[0];
 
-            if (!proofFile) {
-                alert('Please upload a payment proof screenshot.');
+            const hideLoading = () => {
+                loadingOverlay.style.display = 'none';
                 submitButton.disabled = false;
                 submitButton.textContent = 'Submit Registration';
+            };
+
+            // File Size Validation
+            if (photoFile.size > 2 * 1024 * 1024) { // 2MB
+                alert('Player photo must be under 2MB.');
+                hideLoading();
                 return;
             }
+            if (proofFile.size > 1 * 1024 * 1024) { // 1MB
+                alert('Payment proof must be under 1MB.');
+                hideLoading();
+                return;
+            }
+            
+            const selectedRole = document.querySelector('input[name="role"]:checked');
+            if (!selectedRole) {
+                 alert('Please select a playing role.');
+                 hideLoading();
+                 return;
+            }
 
+            const playerData = {
+                fullName: document.getElementById('fullName').value,
+                phone: document.getElementById('phone').value,
+                address: document.querySelector('input[name="address"]:checked').value,
+                role: selectedRole.value,
+                basePrice: document.querySelector('input[name="basePrice"]:checked').value,
+                photoUrl: '',
+                proofUrl: ''
+            };
+            
             try {
-                // 1. Upload proof to Firebase Storage
+                // Upload files
+                const photoRef = ref(storage, `player_photos/${Date.now()}_${photoFile.name}`);
+                const photoSnap = await uploadBytes(photoRef, photoFile);
+                playerData.photoUrl = await getDownloadURL(photoSnap.ref);
+
                 const proofRef = ref(storage, `payment_proofs/${Date.now()}_${proofFile.name}`);
-                const snapshot = await uploadBytes(proofRef, proofFile);
-                const proofUrl = await getDownloadURL(snapshot.ref);
+                const proofSnap = await uploadBytes(proofRef, proofFile);
+                playerData.proofUrl = await getDownloadURL(proofSnap.ref);
 
-                // 2. Save player data to Firestore's "pending_players" collection
-                await addDoc(collection(db, 'pending_players'), {
-                    fullName, phone, email, age, role, proofUrl
-                });
+                // Save to Firestore
+                await addDoc(collection(db, 'pending_players'), playerData);
+                
+                loadingOverlay.style.display = 'none'; // Hide on success
 
-                // 3. Show success message
+                // Show success message
                 formWrapper.innerHTML = `
                     <div class="success-message">
                         <h3>Registration Submitted!</h3>
-                        <p>Your registration has been received and is pending approval. Thank you!</p>
-                        <a href="index.html" class="home-link">Back to Home</a>
+                        <p>Your application has been received and is now pending approval.</p>
+                        <div>
+                            <a href="index.html" class="home-link">Back to Home</a>
+                        </div>
                     </div>
                 `;
-
             } catch (error) {
                 console.error("Error submitting registration: ", error);
                 alert('An error occurred. Please check the console and try again.');
-                submitButton.disabled = false;
-                submitButton.textContent = 'Submit Registration';
+                hideLoading();
             }
         });
+
     </script>
 </body>
 </html>
