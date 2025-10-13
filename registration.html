@@ -44,22 +44,20 @@
         
        /* Header */
         .header {
-            background-color: rgba(26, 32, 44, 0.8);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(to right, #8e2de2, #4a00e0);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
             position: sticky; top: 0; z-index: 50;
         }
         .nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.75rem 0;
+            padding: 0.5rem 1rem;
         }
-        .nav-brand {
-            font-family: 'Teko', sans-serif;
-            font-size: 2.5rem; 
-            text-decoration: none; 
-            color: var(--text-light);
+        .nav-brand img {
+            height: 50px;
+            width: auto;
         }
         .nav-links { display: none; }
         @media (min-width: 1024px) {
@@ -69,13 +67,13 @@
             }
         }
         .nav-links a { text-decoration: none; color: var(--text-muted); transition: color 0.3s ease; font-weight: 500; }
-        .nav-links a.active { color: var(--accent-violet); font-weight: 700; }
+        .nav-links a.active { color: var(--text-light); font-weight: 700; border-bottom: 2px solid var(--accent-violet);}
         .nav-links a:not(.active):hover { color: var(--text-light); }
         
         #mobile-menu-button { display: block; background: none; border: none; color: white; cursor: pointer; }
         @media (min-width: 1024px) { #mobile-menu-button { display: none; } }
-        #mobile-menu { display: none; padding: 0 1.5rem 1rem; background-color: var(--bg-secondary); }
-        #mobile-menu a { display: block; padding: 0.75rem 0; text-decoration: none; color: var(--text-muted); }
+        #mobile-menu { display: none; padding: 0 1.5rem 1rem; background: linear-gradient(to right, #8e2de2, #4a00e0); }
+        #mobile-menu a { display: block; padding: 0.75rem 0; text-decoration: none; color: var(--text-light); }
 
         /* Main Content & Form */
         main { padding: 2rem 0; }
@@ -94,6 +92,10 @@
             font-size: 2.5rem;
             text-align: center; margin-bottom: 2rem;
             color: var(--text-light);
+            background: linear-gradient(to right, var(--primary-blue), var(--accent-violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         @media (min-width: 768px) { .section-title { font-size: 3rem; } }
 
@@ -115,6 +117,12 @@
         .qr-code {
             max-width: 180px; background-color: white; padding: 1rem;
             border-radius: 0.5rem; margin: 0 auto;
+            display: flex; align-items: center; justify-content: center;
+        }
+         .qr-code img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Prevents cropping */
         }
         
         /* Form Fields */
@@ -128,35 +136,52 @@
             margin-bottom: 0.75rem; color: var(--text-light);
             font-size: 1.1rem;
         }
-        .form-group input[type="text"], .form-group input[type="email"], .form-group input[type="tel"] {
+        .form-group input[type="text"], .form-group input[type="tel"] {
             width: 100%; padding: 0.75rem 1rem;
-            border-radius: 0.375rem; border: 1px solid var(--border-color);
+            border-radius: 0.375rem; border: 2px solid var(--border-color);
             background-color: var(--bg-dark); color: var(--text-light);
             box-sizing: border-box; transition: all 0.3s ease;
         }
         .form-group input:focus {
             outline: none; border-color: var(--accent-violet);
-            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.3);
+            box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.3);
         }
 
         /* Custom Radio/Checkbox */
-        .choice-group { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+        .choice-group { 
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.75rem; 
+        }
         .choice-group input { display: none; }
         .choice-group label {
             padding: 0.75rem 1.25rem;
-            border: 1px solid var(--border-color);
-            border-radius: 2rem;
+            border: 2px solid var(--border-color);
+            border-radius: 0.375rem;
             cursor: pointer;
             transition: all 0.3s ease;
+            text-align: center;
+            background-color: var(--bg-dark);
+        }
+         .choice-group label:hover {
+            border-color: var(--accent-violet);
         }
         .choice-group input:checked + label {
             background-color: var(--primary-blue);
-            border-color: var(--primary-blue);
+            border-color: var(--accent-violet);
             color: white;
             font-weight: 600;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
         }
 
+
         /* File Input */
+        input[type="file"] {
+             background: var(--bg-dark);
+             border: 2px solid var(--border-color);
+             border-radius: 0.375rem;
+             color: var(--text-muted);
+        }
         input[type="file"]::file-selector-button {
             background: linear-gradient(to right, var(--primary-blue), var(--accent-violet));
             color: white; font-weight: 600; padding: 0.75rem 1rem;
@@ -178,7 +203,7 @@
         /* Success Message */
         .success-message { text-align: center; padding: 2rem; }
         .success-message h3 { font-size: 2rem; color: var(--success-color); }
-        .home-link, .pdf-link { color: var(--accent-violet); text-decoration: none; margin: 1rem 0.5rem 0; display: inline-block; font-weight: 600; }
+        .home-link { color: var(--accent-violet); text-decoration: none; margin-top: 1rem; display: inline-block; font-weight: 600; }
         
         /* Footer */
         .footer {
@@ -191,15 +216,16 @@
 
     <header class="header">
         <nav class="container nav">
-            <a href="index.html" class="nav-brand">NYF</a>
+            <a href="index.html" class="nav-brand"><img src="media/logo.jpg" alt="NYF Logo"></a>
              <div class="nav-links">
                 <a href="index.html">Home</a>
                 <a href="fixtures.html">Fixtures</a>
                 <a href="rules.html">Rules</a>
                 <a href="player-registration.html" class="active">Player Registration</a>
+                <a href="faq.html">FAQ</a>
             </div>
             <button id="mobile-menu-button">
-                <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" fill="none" viewBox="0 0 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
             </button>
         </nav>
         <div id="mobile-menu"></div>
@@ -223,17 +249,13 @@
                 <h3 style="text-align: center; font-size: 2rem; margin-bottom: 2rem;">Step 2: Fill Your Details</h3>
                 <form id="player-registration-form">
                     <div class="form-grid">
-                        <div class="form-group form-group-full">
+                        <div class="form-group">
                             <label for="fullName">Full Name</label>
                             <input type="text" id="fullName" placeholder="e.g., John Doe" required>
                         </div>
                         <div class="form-group">
                             <label for="phone">Phone Number</label>
                             <input type="tel" id="phone" placeholder="e.g., 9876543210" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email Address</label>
-                            <input type="email" id="email" placeholder="e.g., john.doe@example.com" required>
                         </div>
 
                         <div class="form-group form-group-full">
@@ -246,12 +268,20 @@
                         </div>
 
                         <div class="form-group form-group-full">
-                            <label>Playing Role (Select all that apply)</label>
+                            <label>Playing Role</label>
                             <div class="choice-group">
-                                <input type="checkbox" name="role" id="batsman" value="Batsman"><label for="batsman">Batsman</label>
-                                <input type="checkbox" name="role" id="bowler" value="Bowler"><label for="bowler">Bowler</label>
-                                <input type="checkbox" name="role" id="wicket-keeper" value="Wicket Keeper"><label for="wicket-keeper">Wicket Keeper</label>
-                                <input type="checkbox" name="role" id="all-rounder" value="All Rounder"><label for="all-rounder">All Rounder</label>
+                                <input type="radio" name="role" id="batsman" value="Batsman" required><label for="batsman">Batsman</label>
+                                <input type="radio" name="role" id="bowler" value="Bowler"><label for="bowler">Bowler</label>
+                                <input type="radio" name="role" id="wicket-keeper" value="Wicket Keeper"><label for="wicket-keeper">Wicket Keeper</label>
+                                <input type="radio" name="role" id="all-rounder" value="All Rounder"><label for="all-rounder">All Rounder</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group form-group-full">
+                            <label>Base Price</label>
+                            <div class="choice-group">
+                                <input type="radio" name="basePrice" id="price50" value="50" required><label for="price50">₹50</label>
+                                <input type="radio" name="basePrice" id="price100" value="100"><label for="price100">₹100</label>
                             </div>
                         </div>
 
@@ -282,16 +312,23 @@
     </footer>
 
     <script>
-        document.getElementById('mobile-menu-button').addEventListener('click', () => {
-            const menu = document.getElementById('mobile-menu');
-            const navLinks = document.querySelector('.nav-links').cloneNode(true);
-            if (menu.children.length === 0) menu.appendChild(navLinks);
-            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navLinksContainer = document.querySelector('.nav-links');
+        
+        // Clear the mobile menu to prevent duplicates on potential re-runs
+        mobileMenu.innerHTML = '';
+
+        // Clone each link individually and append to the mobile menu
+        navLinksContainer.querySelectorAll('a').forEach(link => {
+            mobileMenu.appendChild(link.cloneNode(true));
+        });
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.style.display = mobileMenu.style.display === 'block' ? 'none' : 'block';
         });
     </script>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 
     <script src="firebaseconfig.js"></script>
     <script type="module">
@@ -306,56 +343,6 @@
         const registrationForm = document.getElementById('player-registration-form');
         const submitButton = document.getElementById('submit-button');
         const formWrapper = document.getElementById('form-wrapper');
-        let latestPlayerData = null;
-
-        const { jsPDF } = window.jspdf;
-
-        function generatePdf(playerData) {
-            const doc = new jsPDF();
-            doc.setFontSize(22);
-            doc.text("Player Registration Form", 105, 20, null, null, "center");
-            doc.setFontSize(12);
-            doc.text("MLA Haji Suzam Uddin Laskar Night Cricket Tournament", 105, 30, null, null, "center");
-
-            if (playerData.photoUrl) {
-                 try {
-                    // Note: Due to CORS, this might not work with all image URLs. 
-                    // It works with Firebase Storage URLs if CORS is configured.
-                    const img = new Image();
-                    img.crossOrigin = 'Anonymous';
-                    img.src = playerData.photoUrl;
-                    img.onload = () => {
-                        doc.addImage(img, 'JPEG', 150, 40, 40, 50);
-                        generatePdfBody();
-                    }
-                    img.onerror = () => generatePdfBody();
-                 } catch (e) {
-                     generatePdfBody();
-                 }
-            } else {
-                 generatePdfBody();
-            }
-
-            function generatePdfBody() {
-                doc.autoTable({
-                    startY: 40,
-                    head: [['Field', 'Details']],
-                    body: [
-                        ['Full Name', playerData.fullName],
-                        ['Phone', playerData.phone],
-                        ['Email', playerData.email],
-                        ['Address', playerData.address],
-                        ['Playing Role(s)', playerData.role.join(', ')],
-                    ],
-                    theme: 'grid',
-                    columnStyles: { 0: { fontStyle: 'bold' } },
-                    margin: { left: 14, right: 70 }
-                });
-
-                doc.save(`${playerData.fullName}-registration.pdf`);
-            }
-        }
-
 
         registrationForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -379,9 +366,9 @@
                 return;
             }
             
-            const selectedRoles = Array.from(document.querySelectorAll('input[name="role"]:checked')).map(el => el.value);
-            if (selectedRoles.length === 0) {
-                 alert('Please select at least one playing role.');
+            const selectedRole = document.querySelector('input[name="role"]:checked');
+            if (!selectedRole) {
+                 alert('Please select a playing role.');
                  submitButton.disabled = false;
                  submitButton.textContent = 'Submit Registration';
                  return;
@@ -390,9 +377,9 @@
             const playerData = {
                 fullName: document.getElementById('fullName').value,
                 phone: document.getElementById('phone').value,
-                email: document.getElementById('email').value,
                 address: document.querySelector('input[name="address"]:checked').value,
-                role: selectedRoles,
+                role: selectedRole.value,
+                basePrice: document.querySelector('input[name="basePrice"]:checked').value,
                 photoUrl: '',
                 proofUrl: ''
             };
@@ -410,17 +397,13 @@
                 // Save to Firestore
                 await addDoc(collection(db, 'pending_players'), playerData);
                 
-                latestPlayerData = playerData; // Store for re-download
-                generatePdf(playerData); // Auto-download PDF
-
                 // Show success message
                 formWrapper.innerHTML = `
                     <div class="success-message">
                         <h3>Registration Submitted!</h3>
-                        <p>Your application has been received and your registration PDF has been downloaded.</p>
+                        <p>Your application has been received and is now pending approval.</p>
                         <div>
                             <a href="index.html" class="home-link">Back to Home</a>
-                            <a href="#" id="download-pdf-again" class="pdf-link">Download PDF Again</a>
                         </div>
                     </div>
                 `;
@@ -429,18 +412,6 @@
                 alert('An error occurred. Please check the console and try again.');
                 submitButton.disabled = false;
                 submitButton.textContent = 'Submit Registration';
-            }
-        });
-
-        // Event listener for re-downloading PDF
-         document.addEventListener('click', (e) => {
-            if (e.target.id === 'download-pdf-again') {
-                e.preventDefault();
-                if (latestPlayerData) {
-                    generatePdf(latestPlayerData);
-                } else {
-                    alert('No data available to generate PDF.');
-                }
             }
         });
 
