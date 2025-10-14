@@ -372,15 +372,17 @@
         const loadImageAsBase64 = (url, playerName) => {
             return new Promise(async (resolve) => {
                 try {
-                    const response = await fetch(url);
-                    if (!response.ok) throw new Error('Network response was not ok');
+                    // Google Drive links from forms need a specific proxy to bypass CORS for direct fetching
+                    const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(url)}`;
+                    const response = await fetch(proxyUrl);
+                    if (!response.ok) throw new Error('Network response was not ok via proxy');
                     const blob = await response.blob();
                     const reader = new FileReader();
                     reader.onloadend = () => resolve(reader.result);
                     reader.onerror = () => resolve(createPlaceholder(playerName));
                     reader.readAsDataURL(blob);
                 } catch (error) {
-                     console.warn(`CORS or network error for ${url}. Using placeholder.`);
+                     console.warn(`Could not load image from ${url}. Error: ${error}. Using placeholder.`);
                      resolve(createPlaceholder(playerName));
                 }
             });
