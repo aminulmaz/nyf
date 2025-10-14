@@ -329,109 +329,40 @@
             }
         });
         
-        // --- PDF Generation with Photos ---
+        // --- PDF Generation (Text Only) ---
         const { jsPDF } = window.jspdf;
         
-        const loadImageAsBase64 = (url, playerName) => {
-            return new Promise(async (resolve) => {
-                try {
-                    const response = await fetch(url);
-                    if (!response.ok) throw new Error('Network response was not ok');
-                    const blob = await response.blob();
-                    const reader = new FileReader();
-                    reader.onloadend = () => resolve(reader.result);
-                    reader.onerror = () => resolve(createPlaceholder(playerName));
-                    reader.readAsDataURL(blob);
-                } catch (error) {
-                     console.warn(`CORS or network error for ${url}. Using placeholder.`);
-                     resolve(createPlaceholder(playerName));
-                }
-            });
-        };
-        
-        const createPlaceholder = (playerName) => {
-            const initials = playerName.split(' ').map(n => n[0]).join('');
-            const canvas = document.createElement('canvas');
-            canvas.width = 100; canvas.height = 100;
-            const context = canvas.getContext('2d');
-            context.fillStyle = '#2d3748';
-            context.fillRect(0, 0, 100, 100);
-            context.fillStyle = '#ffffff';
-            context.font = 'bold 40px Roboto';
-            context.textAlign = 'center';
-            context.textBaseline = 'middle';
-            context.fillText(initials, 50, 50);
-            return canvas.toDataURL('image/jpeg');
-        };
-
         document.getElementById('generate-players-pdf').addEventListener('click', async () => {
              const pdfButton = document.getElementById('generate-players-pdf');
-             const statusEl = document.getElementById('pdf-status');
-             
              pdfButton.disabled = true;
              pdfButton.textContent = 'Generating...';
-             statusEl.textContent = 'Fetching player data...';
 
              const playersSnapshot = await getDocs(query(collection(db, 'players')));
              if (playersSnapshot.empty) {
                 alert('No approved players to generate PDF for.');
                 pdfButton.disabled = false;
-                pdfButton.textContent = 'Download PDF with Photos';
-                statusEl.textContent = '';
+                pdfButton.textContent = 'Download PDF';
                 return;
              }
              const playersDataForPdf = playersSnapshot.docs.map(doc => doc.data());
 
-             statusEl.textContent = `Found ${playersDataForPdf.length} players. Loading images...`;
-
-             const imagePromises = playersDataForPdf.map(p => loadImageAsBase64(p.photoUrl, p.fullName));
-             const loadedImages = await Promise.all(imagePromises);
-             const imageMap = playersDataForPdf.reduce((map, player, index) => {
-                map[player.photoUrl] = loadedImages[index];
-                return map;
-             }, {});
-             
-             statusEl.textContent = 'All images loaded. Creating PDF...';
-
              const docPdf = new jsPDF();
              docPdf.text("Approved Players List - NYF Tournament", 14, 15);
              
-             const head = [['Photo', 'Name', 'Phone', 'Address', 'Role', 'Base Price']];
-             const body = playersDataForPdf.map(p => [
-                { data: p }, 
-                p.fullName,
-                p.phone,
-                p.address,
-                p.role,
-                `${p.basePrice} Coins`
+             const tableData = playersDataForPdf.map(p => [
+                p.fullName, p.phone, p.address, p.role, `${p.basePrice} Coins`
              ]);
 
              docPdf.autoTable({ 
-                head: head,
-                body: body, 
+                head: [['Full Name', 'Phone', 'Address', 'Role', 'Base Price']],
+                body: tableData, 
                 startY: 25, 
-                theme: 'grid',
-                didDrawCell: function(data) {
-                    if (data.section === 'body' && data.column.index === 0) {
-                        const player = data.cell.raw.data;
-                        const imgData = imageMap[player.photoUrl];
-                        const imgSize = 18;
-                        const x = data.cell.x + (data.cell.width - imgSize) / 2;
-                        const y = data.cell.y + (data.cell.height - imgSize) / 2;
-                        if (imgData) {
-                            docPdf.addImage(imgData, 'JPEG', x, y, imgSize, imgSize);
-                        }
-                    }
-                },
-                bodyStyles: { minCellHeight: 22 },
-                columnStyles: { 0: { minCellWidth: 22 } }
+                theme: 'grid'
             });
 
-             docPdf.save('approved-players-with-photos.pdf');
+             docPdf.save('approved-players.pdf');
              pdfButton.disabled = false;
-             pdfButton.textContent = 'Download PDF with Photos';
-             statusEl.textContent = 'PDF generated successfully!';
-             setTimeout(() => statusEl.textContent = '', 5000);
+             pdfButton.textContent = 'Download PDF';
         });
 
     </script>
