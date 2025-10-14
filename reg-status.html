@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Registration Status - NYF Tournament</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-dark: #1a202c;
+            --bg-secondary: #2d3748;
+            --primary-blue: #4f46e5;
+            --accent-violet: #a855f7;
+            --text-light: #ffffff;
+            --text-muted: #a0aec0;
+            --border-color: #4a5568;
+            --success-color: #48bb78;
+            --danger-color: #e53e3e;
+            --pending-color: #fbbf24;
+        }
+
+        body { 
+            font-family: 'Roboto', sans-serif; 
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            margin: 0;
+        }
+        .container {
+            width: 100%;
+            margin: 0 auto;
+            padding: 1.5rem;
+            box-sizing: border-box;
+            max-width: 800px;
+            text-align: center;
+        }
+        
+        h1, h2, h3 {
+             font-family: 'Teko', sans-serif;
+             font-weight: 700;
+             line-height: 1.1;
+        }
+        
+       /* Header */
+        .header {
+            background: linear-gradient(to right, #8e2de2, #4a00e0);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+        .nav-brand img { height: 50px; }
+        .nav-links { display: none; }
+        @media (min-width: 1024px) {
+            .nav-links { display: flex; align-items: center; gap: 2rem; font-size: 1rem; }
+        }
+        .nav-links a { text-decoration: none; color: var(--text-muted); font-weight: 500; }
+        .nav-links a.active { color: var(--text-light); border-bottom: 2px solid var(--accent-violet);}
+        
+        main { padding: 4rem 0; }
+        .status-container {
+            background-color: var(--bg-secondary);
+            padding: 2.5rem;
+            border-radius: 0.75rem;
+        }
+
+        h1 {
+            font-size: 3rem;
+            background: linear-gradient(to right, var(--primary-blue), var(--accent-violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        p {
+            color: var(--text-muted);
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+
+        .status-form {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .status-form input {
+            flex-grow: 1;
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            border: 2px solid var(--border-color);
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+        .status-form button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.375rem;
+            background: linear-gradient(to right, var(--primary-blue), var(--accent-violet));
+            color: white;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        #status-result {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            display: none; /* Hidden by default */
+        }
+        #status-result.success { background-color: rgba(72, 187, 120, 0.1); border: 1px solid var(--success-color); }
+        #status-result.pending { background-color: rgba(251, 191, 36, 0.1); border: 1px solid var(--pending-color); }
+        #status-result.danger { background-color: rgba(229, 62, 62, 0.1); border: 1px solid var(--danger-color); }
+        
+        #status-result h3 { margin: 0 0 0.5rem 0; font-size: 1.5rem; }
+        #status-result.success h3 { color: var(--success-color); }
+        #status-result.pending h3 { color: var(--pending-color); }
+        #status-result.danger h3 { color: var(--danger-color); }
+
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <nav class="nav">
+            <a href="index.html" class="nav-brand"><img src="media/logo.jpg" alt="NYF Logo"></a>
+             <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="fixtures.html">Fixtures</a>
+                <a href="rules.html">Rules</a>
+                <a href="player-registration.html">Player Registration</a>
+                <a href="status.html" class="active">Check Status</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="status-container">
+                <h1>Check Your Registration Status</h1>
+                <p>Enter the phone number you used to register to see the current status of your application.</p>
+                <form id="status-form" class="status-form">
+                    <input type="tel" id="phone-input" placeholder="Enter your 10-digit phone number" required>
+                    <button type="submit">Check Status</button>
+                </form>
+                <div id="status-result">
+                    <h3 id="status-heading"></h3>
+                    <p id="status-message"></p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script src="firebaseconfig.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const statusForm = document.getElementById('status-form');
+        const phoneInput = document.getElementById('phone-input');
+        const statusResult = document.getElementById('status-result');
+        const statusHeading = document.getElementById('status-heading');
+        const statusMessage = document.getElementById('status-message');
+
+        statusForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const phoneNumber = phoneInput.value.trim();
+            if (!phoneNumber || phoneNumber.length < 10) {
+                alert('Please enter a valid phone number.');
+                return;
+            }
+
+            statusResult.style.display = 'none';
+            statusResult.className = '';
+
+            try {
+                // Check in approved players
+                const approvedQuery = query(collection(db, 'players'), where('phone', '==', phoneNumber));
+                const approvedSnapshot = await getDocs(approvedQuery);
+                if (!approvedSnapshot.empty) {
+                    displayStatus('success', 'Approved!', 'Congratulations! Your registration has been approved. You are eligible for the auction.');
+                    return;
+                }
+
+                // Check in pending players
+                const pendingQuery = query(collection(db, 'pending_players'), where('phone', '==', phoneNumber));
+                const pendingSnapshot = await getDocs(pendingQuery);
+                if (!pendingSnapshot.empty) {
+                    displayStatus('pending', 'Pending Review', 'Your application has been received and is currently under review by the committee.');
+                    return;
+                }
+
+                // Check in rejected players
+                const rejectedQuery = query(collection(db, 'rejected_players'), where('phone', '==', phoneNumber));
+                const rejectedSnapshot = await getDocs(rejectedQuery);
+                if (!rejectedSnapshot.empty) {
+                    displayStatus('danger', 'Not Approved', 'We regret to inform you that your application was not approved at this time. Please contact the organizers for more details.');
+                    return;
+                }
+                
+                // If not found anywhere
+                displayStatus('danger', 'Not Found', 'No registration was found with this phone number. Please make sure you entered it correctly.');
+
+            } catch (error) {
+                console.error("Error checking status:", error);
+                alert('An error occurred while checking your status. Please try again.');
+            }
+        });
+
+        function displayStatus(type, heading, message) {
+            statusResult.style.display = 'block';
+            statusResult.classList.add(type);
+            statusHeading.textContent = heading;
+            statusMessage.textContent = message;
+        }
+    </script>
+</body>
+</html>
