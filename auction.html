@@ -130,6 +130,7 @@
             <div class="tabs">
                 <button class="tab-button active" data-tab="pending-players">Pending Players</button>
                 <button class="tab-button" data-tab="approved-players">Approved Players</button>
+                <button class="tab-button" data-tab="rejected-players">Rejected Players</button>
                 <button class="tab-button" data-tab="manage-teams">Manage Teams</button>
                 <button class="tab-button" data-tab="manage-fixtures">Manage Fixtures</button>
                 <button class="tab-button" data-tab="announcements">Announcements</button>
@@ -137,15 +138,17 @@
 
             <div id="pending-players" class="tab-content active">
                 <div class="section-header"><h2>Pending Player Approvals</h2></div>
-                <div class="table-container"><table class="data-table"><thead><tr><th>Full Name</th><th>Phone</th><th>Address</th><th>Base Price</th><th>Actions</th></tr></thead><tbody id="pending-players-tbody"></tbody></table></div>
+                <div class="table-container"><table class="data-table"><thead><tr><th>Full Name</th><th>Phone</th><th>Actions</th></tr></thead><tbody id="pending-players-tbody"></tbody></table></div>
             </div>
             
             <div id="approved-players" class="tab-content">
-                 <div class="section-header">
-                    <h2>Approved Player List</h2>
-                    <button class="pdf-btn" id="generate-players-pdf">Download PDF</button>
-                 </div>
-                <div class="table-container"><table class="data-table"><thead><tr><th>Full Name</th><th>Phone</th><th>Address</th><th>Role</th><th>Base Price</th><th>Actions</th></tr></thead><tbody id="approved-players-tbody"></tbody></table></div>
+                 <div class="section-header"><h2>Approved Player List</h2><button class="pdf-btn" id="generate-players-pdf">Download PDF</button></div>
+                <div class="table-container"><table class="data-table"><thead><tr><th>Full Name</th><th>Phone</th><th>Role</th><th>Actions</th></tr></thead><tbody id="approved-players-tbody"></tbody></table></div>
+            </div>
+
+            <div id="rejected-players" class="tab-content">
+                <div class="section-header"><h2>Rejected Player List</h2></div>
+                <div class="table-container"><table class="data-table"><thead><tr><th>Full Name</th><th>Phone</th><th>Actions</th></tr></thead><tbody id="rejected-players-tbody"></tbody></table></div>
             </div>
 
             <div id="manage-teams" class="tab-content">
@@ -255,19 +258,21 @@
             const tbodies = {
                 pendingPlayers: document.getElementById('pending-players-tbody'),
                 approvedPlayers: document.getElementById('approved-players-tbody'),
+                rejectedPlayers: document.getElementById('rejected-players-tbody'),
                 teams: document.getElementById('teams-tbody'),
                 fixtures: document.getElementById('fixtures-tbody'),
             };
             tbodies.pendingPlayers.dataset.placeholder = "No pending player registrations.";
             tbodies.approvedPlayers.dataset.placeholder = "No approved players yet.";
+            tbodies.rejectedPlayers.dataset.placeholder = "No players have been rejected.";
             tbodies.teams.dataset.placeholder = "No teams have been added yet.";
             tbodies.fixtures.dataset.placeholder = "No fixtures have been scheduled.";
 
-            onSnapshot(collection(db, 'pending_players'), snap => renderTableRows(tbodies.pendingPlayers, snap, (id, p) => `<tr><td>${p.fullName}</td><td>${p.phone}</td><td>${p.address}</td><td>${p.basePrice} Coins</td><td class="actions-cell"><button class="btn btn-proof" data-url="${p.photoUrl}">Photo</button><button class="btn btn-proof" data-url="${p.proofUrl}">Proof</button><button class="btn btn-approve" data-id="${id}">Approve</button><button class="btn btn-reject" data-id="${id}">Reject</button></td></tr>`));
+            onSnapshot(collection(db, 'pending_players'), snap => renderTableRows(tbodies.pendingPlayers, snap, (id, p) => `<tr><td>${p.fullName}</td><td>${p.phone}</td><td class="actions-cell"><button class="btn btn-proof" data-url="${p.photoUrl}">Photo</button><button class="btn btn-proof" data-url="${p.proofUrl}">Proof</button><button class="btn btn-approve" data-id="${id}">Approve</button><button class="btn btn-reject" data-id="${id}">Reject</button></td></tr>`));
             
-            onSnapshot(collection(db, 'players'), snap => {
-                renderTableRows(tbodies.approvedPlayers, snap, (id, p) => `<tr><td>${p.fullName}</td><td>${p.phone}</td><td>${p.address}</td><td>${p.role}</td><td>${p.basePrice} Coins</td><td class="actions-cell"><button class="btn btn-proof" data-url="${p.photoUrl}">View Photo</button><button class="btn btn-delete" data-collection="players" data-id="${id}">Delete</button></td></tr>`);
-            });
+            onSnapshot(collection(db, 'players'), snap => renderTableRows(tbodies.approvedPlayers, snap, (id, p) => `<tr><td>${p.fullName}</td><td>${p.phone}</td><td>${p.role}</td><td class="actions-cell"><button class="btn btn-delete" data-collection="players" data-id="${id}">Delete</button></td></tr>`));
+
+            onSnapshot(collection(db, 'rejected_players'), snap => renderTableRows(tbodies.rejectedPlayers, snap, (id, p) => `<tr><td>${p.fullName}</td><td>${p.phone}</td><td class="actions-cell"><button class="btn btn-delete" data-collection="rejected_players" data-id="${id}">Delete</button></td></tr>`));
 
             onSnapshot(collection(db, 'approved_teams'), snap => renderTableRows(tbodies.teams, snap, (id, t) => `<tr><td>${t.teamName}</td><td>${t.city}</td><td class="actions-cell"><button class="btn btn-delete" data-collection="approved_teams" data-id="${id}">Delete</button></td></tr>`));
             onSnapshot(query(collection(db, 'fixtures'), orderBy('matchDate', 'asc')), snap => renderTableRows(tbodies.fixtures, snap, (id, f) => `<tr><td>${new Date(f.matchDate).toLocaleDateString()}</td><td>${f.teamA} vs ${f.teamB}</td><td>${f.matchTime}</td><td>${f.venue}</td><td class="actions-cell"><button class="btn btn-delete" data-collection="fixtures" data-id="${id}">Delete</button></td></tr>`));
@@ -288,17 +293,20 @@
         // --- Actions (Approve, Reject, Delete) ---
         document.addEventListener('click', async e => {
             const { classList, dataset } = e.target;
-            if (classList.contains('btn-approve')) {
+            if (classList.contains('btn-approve') || classList.contains('btn-reject')) {
                 const docRef = doc(db, 'pending_players', dataset.id);
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
-                    await setDoc(doc(db, 'players', dataset.id), docSnap.data());
+                    if (classList.contains('btn-approve')) {
+                        await setDoc(doc(db, 'players', dataset.id), docSnap.data());
+                        alert('Player approved!');
+                    } else {
+                        await setDoc(doc(db, 'rejected_players', dataset.id), docSnap.data());
+                        alert('Player rejected!');
+                    }
                     await deleteDoc(docRef);
-                    alert('Player approved!');
                 }
-            } else if (classList.contains('btn-reject') && confirm('Reject this player?')) {
-                await deleteDoc(doc(db, 'pending_players', dataset.id));
-            } else if (classList.contains('btn-delete') && confirm('Delete this item?')) {
+            } else if (classList.contains('btn-delete') && confirm('Delete this item permanently?')) {
                 await deleteDoc(doc(db, dataset.collection, dataset.id));
             } else if (classList.contains('btn-proof')) {
                 window.open(dataset.url, '_blank');
