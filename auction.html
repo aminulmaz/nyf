@@ -590,48 +590,55 @@
                 }
 
                 function drawCard(doc, x, y, w, h, player, role) {
-                    // Set a dark background for the entire page
-                    doc.setFillColor('#1a202c');
+                    // Page Background
+                    doc.setFillColor(26, 32, 44); // --bg-dark
                     doc.rect(0, 0, doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight(), 'F');
-
-                    doc.setDrawColor('#a855f7');
+                    
+                    // Card Background and Border
+                    doc.setDrawColor(168, 85, 247); // --accent-violet
                     doc.setLineWidth(0.5);
-                    doc.setFillColor('#2d3748');
+                    doc.setFillColor(45, 55, 72); // --bg-secondary
                     doc.roundedRect(x, y, w, h, 3, 3, 'FD');
                     
-                    doc.setFillColor('#1a202c');
+                    // Header
+                    doc.setFillColor(26, 32, 44); // --bg-dark
                     doc.roundedRect(x, y, w, 15, 3, 3, 'F');
                     doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor('#ffffff');
                     doc.text(role.toUpperCase(), x + w / 2, y + 9, { align: 'center' });
 
+                    // Photo Box
                     const imgBoxX = x + 5, imgBoxY = y + 20, imgBoxW = w - 10, imgBoxH = 50;
-                    doc.setDrawColor('#4a5568');
+                    doc.setDrawColor(74, 85, 104); // --border-color
                     doc.setLineWidth(0.2);
                     doc.rect(imgBoxX, imgBoxY, imgBoxW, imgBoxH);
-                    doc.setFontSize(8); doc.setTextColor('#a0aec0');
+                    doc.setFontSize(8); doc.setTextColor(160, 174, 192); // --text-muted
                     doc.text('PASTE PLAYER PHOTO HERE', x + w/2, imgBoxY + imgBoxH / 2, {align: 'center'});
                     
-                    let currentY = y + 83;
-                    doc.setFontSize(20); doc.setFont('Teko', 'bold'); doc.setTextColor('#ffffff');
+                    // Player Name
+                    let currentY = y + 80;
+                    doc.setFontSize(22); doc.setFont('Teko', 'bold'); doc.setTextColor('#ffffff');
                     var splitName = doc.splitTextToSize(player.fullName.toUpperCase(), w - 15);
                     doc.text(splitName, x + w / 2, currentY, { align: 'center' });
-                    currentY += (splitName.length * 6) + 5; // DYNAMICALLY ADD GAP
+                    currentY += (splitName.length * 7) + 3; // DYNAMICALLY ADD GAP
 
-                    doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.setTextColor('#ffffff');
+                    // Player Details
+                    doc.setFontSize(12); doc.setFont('helvetica', 'bold'); doc.setTextColor('#e2e8f0'); // Brighter text
                     const details = `${player.role}  •  ${player.address}`;
                     doc.text(details, x + w / 2, currentY, { align: 'center' });
-                    currentY += 12;
+                    currentY += 10;
 
-                    doc.setDrawColor('#4a5568');
-                    doc.setLineWidth(0.2);
+                    // Divider
+                    doc.setDrawColor(74, 85, 104); // --border-color
                     doc.line(x + 10, currentY, x + w - 10, currentY);
+                    currentY += 6;
+                    
+                    // Base Price Label
+                    doc.setFontSize(10); doc.setTextColor('#ffffff');
+                    doc.text('BASE PRICE', x + w / 2, currentY, { align: 'center' });
                     currentY += 8;
                     
-                    doc.setFontSize(12); doc.setTextColor('#ffffff');
-                    doc.text('BASE PRICE', x + w / 2, currentY, { align: 'center' });
-                    currentY += 9;
-                    
-                    doc.setFontSize(26); doc.setFont('Teko', 'bold'); doc.setTextColor('#fbbf24');
+                    // Base Price Value
+                    doc.setFontSize(24); doc.setFont('Teko', 'bold'); doc.setTextColor('#fbbf24');
                     doc.text(`${player.basePrice} COINS`, x + w / 2, currentY, { align: 'center' });
                 }
 
