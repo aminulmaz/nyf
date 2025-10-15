@@ -11,7 +11,6 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 
     <style>
         :root {
@@ -83,8 +82,8 @@
         .tab-content.active { display: block; }
         
         .section-header { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-        .pdf-btn, .backup-btn { background-color: var(--success-color); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 0.375rem; cursor: pointer; font-weight: 500; }
-        .pdf-btn:disabled, .backup-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .pdf-btn { background-color: var(--success-color); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 0.375rem; cursor: pointer; font-weight: 500; }
+        .pdf-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
         .table-controls { display: flex; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem; }
         .search-input {
@@ -102,10 +101,15 @@
         .data-table th { font-weight: 600; color: var(--text-light); }
         .data-table tbody tr:last-child td { border-bottom: none; }
         .actions-cell { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-        .actions-cell .btn { border: none; padding: 0.5rem 1rem; border-radius: 0.375rem; cursor: pointer; font-weight: 600; }
+        .actions-cell .btn, .actions-cell .btn-link { 
+            border: none; padding: 0.5rem 1rem; border-radius: 0.375rem; 
+            cursor: pointer; font-weight: 600; text-decoration: none;
+            display: inline-block; font-size: 0.875rem;
+        }
         .btn-approve { background-color: var(--success-color); color: white; }
         .btn-reject { background-color: var(--danger-color); color: white; }
         .btn-proof { background: var(--primary-blue); color: white; }
+        .btn-notify { background-color: var(--accent-yellow); color: #1a202c; }
         .btn-delete { background-color: var(--danger-color); color: white; }
 
         .pagination-controls {
@@ -164,12 +168,12 @@
                 <button class="tab-button" data-tab="manage-teams">Manage Teams</button>
                 <button class="tab-button" data-tab="manage-fixtures">Manage Fixtures</button>
                 <button class="tab-button" data-tab="announcements">Announcements</button>
-                <button class="tab-button" data-tab="backup">Backup Data</button>
+                <button class="tab-button" data-tab="auction-cards">Auction Cards</button>
             </div>
 
             <div id="pending-players" class="tab-content active">
                 <div class="section-header"><h2>Pending Player Approvals</h2></div>
-                <div class="table-container"><table class="data-table"><thead><tr><th>Full Name</th><th>Phone</th><th>Address</th><th>Base Price</th><th>Actions</th></tr></thead><tbody id="pending-players-tbody"></tbody></table></div>
+                <div class="table-container"><table class="data-table"><thead><tr><th>Full Name</th><th>Phone</th><th>Email</th><th>Actions</th></tr></thead><tbody id="pending-players-tbody"></tbody></table></div>
             </div>
             
             <div id="approved-players" class="tab-content">
@@ -233,16 +237,12 @@
                 <div id="announcements-grid"></div>
             </div>
             
-            <div id="backup" class="tab-content">
-                 <div class="form-container">
-                    <h2>Download Data Backups (CSV)</h2>
-                    <p>Click the buttons below to download a CSV backup of your important tournament data. These files can be opened in any spreadsheet program like Excel or Google Sheets.</p>
-                    <div class="form-grid-2" style="margin-top: 2rem;">
-                         <button class="backup-btn" data-collection="players">Download Approved Players</button>
-                         <button class="backup-btn" data-collection="pending_players">Download Pending Players</button>
-                         <button class="backup-btn" data-collection="approved_teams">Download Teams</button>
-                         <button class="backup-btn" data-collection="fixtures">Download Fixtures</button>
-                    </div>
+            <div id="auction-cards" class="tab-content">
+                <div class="section-header"><h2>Auction Card Generator</h2></div>
+                <div class="form-container">
+                    <p>This tool will generate separate PDF files for each player category (Batsman, Bowler, etc.), containing professionally designed auction cards for all approved players. This process may take a moment as it needs to download all player images.</p>
+                    <button class="submit-btn" id="generate-auction-pdf">Generate & Download All PDFs</button>
+                    <p id="pdf-generation-status" style="text-align: center; margin-top: 1rem; color: var(--accent-violet);"></p>
                 </div>
             </div>
         </main>
@@ -344,11 +344,18 @@
             tbodies.fixtures.dataset.placeholder = "No fixtures have been scheduled.";
 
             onSnapshot(collection(db, 'pending_players'), snap => {
-                const rowsHtml = snap.docs.map(doc => {
+                 const rowsHtml = snap.docs.map(doc => {
                     const p = doc.data();
-                    return `<tr><td>${p.fullName}</td><td>${p.phone}</td><td>${p.address}</td><td>${p.basePrice} Coins</td><td class="actions-cell"><button class="btn btn-proof" data-url="${p.photoUrl}">Photo</button><button class="btn btn-proof" data-url="${p.proofUrl}">Proof</button><button class="btn btn-approve" data-id="${doc.id}">Approve</button><button class="btn btn-reject" data-id="${doc.id}">Reject</button></td></tr>`;
+                     const mailtoLink = `mailto:${p.email}?subject=NYF%20Tournament%20Registration%20Approved&body=Congratulations%20${encodeURIComponent(p.fullName)},%0D%0A%0D%0AYour%20registration%20for%20the%20NYF%20Night%20Cricket%20Tournament%20has%20been%20approved!%0D%0A%0D%0AWe%20look%20forward%20to%20seeing%20you%20at%20the%20auction.%0D%0A%0D%0ARegards,%0D%0AThe%20NYF%20Organizing%20Committee.`;
+                    return `<tr><td>${p.fullName}</td><td>${p.phone}</td><td>${p.email}</td><td class="actions-cell">
+                        <button class="btn btn-proof" data-url="${p.photoUrl}">Photo</button>
+                        <button class="btn btn-proof" data-url="${p.proofUrl}">Proof</button>
+                        <a href="${mailtoLink}" class="btn-link btn-notify">Notify</a>
+                        <button class="btn btn-approve" data-id="${doc.id}">Approve</button>
+                        <button class="btn btn-reject" data-id="${doc.id}">Reject</button>
+                    </td></tr>`
                 }).join('');
-                tbodies.pendingPlayers.innerHTML = snap.empty ? `<tr><td colspan="5" class="placeholder">${tbodies.pendingPlayers.dataset.placeholder}</td></tr>` : rowsHtml;
+                 tbodies.pendingPlayers.innerHTML = snap.empty ? `<tr><td colspan="4" class="placeholder">${tbodies.pendingPlayers.dataset.placeholder}</td></tr>` : rowsHtml;
             });
             
             onSnapshot(collection(db, 'players'), snap => {
