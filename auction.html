@@ -590,6 +590,10 @@
                 }
 
                 function drawCard(doc, x, y, w, h, player, role) {
+                    // Set a dark background for the entire page
+                    doc.setFillColor('#1a202c');
+                    doc.rect(0, 0, doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight(), 'F');
+
                     doc.setDrawColor('#a855f7');
                     doc.setLineWidth(0.5);
                     doc.setFillColor('#2d3748');
@@ -611,7 +615,7 @@
                     doc.setFontSize(20); doc.setFont('Teko', 'bold'); doc.setTextColor('#ffffff');
                     var splitName = doc.splitTextToSize(player.fullName.toUpperCase(), w - 15);
                     doc.text(splitName, x + w / 2, currentY, { align: 'center' });
-                    currentY += (splitName.length * 7) + 2; 
+                    currentY += (splitName.length * 6) + 5; // DYNAMICALLY ADD GAP
 
                     doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.setTextColor('#ffffff');
                     const details = `${player.role}  •  ${player.address}`;
