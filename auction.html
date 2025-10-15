@@ -168,7 +168,6 @@
                 <button class="tab-button" data-tab="manage-teams">Manage Teams</button>
                 <button class="tab-button" data-tab="manage-fixtures">Manage Fixtures</button>
                 <button class="tab-button" data-tab="announcements">Announcements</button>
-                <button class="tab-button" data-tab="auction-cards">Auction Cards</button>
             </div>
 
             <div id="pending-players" class="tab-content active">
@@ -237,14 +236,6 @@
                 <div id="announcements-grid"></div>
             </div>
             
-            <div id="auction-cards" class="tab-content">
-                <div class="section-header"><h2>Auction Card Generator</h2></div>
-                <div class="form-container">
-                    <p>This tool will generate separate PDF files for each player category (Batsman, Bowler, etc.), containing professionally designed auction cards for all approved players. This process may take a moment as it needs to download all player images.</p>
-                    <button class="submit-btn" id="generate-auction-pdf">Generate & Download All PDFs</button>
-                    <p id="pdf-generation-status" style="text-align: center; margin-top: 1rem; color: var(--accent-violet);"></p>
-                </div>
-            </div>
         </main>
         <footer class="footer">Developed by <a href="https://github.com/your-profile" target="_blank" class="developer-name">Aminul Mazumder</a></footer>
     </div>
@@ -468,7 +459,7 @@
             }
         });
         
-        // --- PDF Generation (Grouped by Role) ---
+        // --- PDF Generation (Grouped by Role with Photo Space) ---
         const { jsPDF } = window.jspdf;
         
         document.getElementById('generate-players-pdf').addEventListener('click', async () => {
@@ -510,7 +501,11 @@
                  }
                 
                  const tableData = groupedPlayers[role].map(p => [
-                    p.fullName, p.phone, p.address, `${p.basePrice} Coins`
+                    '', // Empty cell for photo
+                    p.fullName, 
+                    p.phone, 
+                    p.address, 
+                    `${p.basePrice} Coins`
                  ]);
 
                  docPdf.autoTable({ 
@@ -528,10 +523,12 @@
                 });
 
                  docPdf.autoTable({ 
-                    head: [['Full Name', 'Phone', 'Address', 'Base Price']],
+                    head: [['Photo', 'Full Name', 'Phone', 'Address', 'Base Price']],
                     body: tableData, 
                     startY: docPdf.autoTable.previous.finalY, 
-                    theme: 'grid'
+                    theme: 'grid',
+                    bodyStyles: { minCellHeight: 25 }, // Make rows taller
+                    columnStyles: { 0: { minCellWidth: 25 } } // Make photo column wider
                 });
                 
                 yPos = docPdf.autoTable.previous.finalY + 15;
@@ -542,43 +539,6 @@
              docPdf.save('approved-players-by-role.pdf');
              pdfButton.disabled = false;
              pdfButton.textContent = 'Download PDF';
-        });
-
-         // --- CSV Backup ---
-        document.addEventListener('click', async (e) => {
-            if (e.target.matches('.backup-btn')) {
-                const button = e.target;
-                const collectionName = button.dataset.collection;
-                
-                button.textContent = 'Exporting...';
-                button.disabled = true;
-
-                try {
-                    const snapshot = await getDocs(query(collection(db, collectionName)));
-                    if (snapshot.empty) {
-                        alert(`No data found in ${collectionName} to export.`);
-                        return;
-                    }
-                    const data = snapshot.docs.map(doc => doc.data());
-                    const csv = Papa.unparse(data);
-
-                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-                    const link = document.createElement("a");
-                    const url = URL.createObjectURL(blob);
-                    link.setAttribute("href", url);
-                    link.setAttribute("download", `${collectionName}_backup_${new Date().toISOString().split('T')[0]}.csv`);
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-
-                } catch (error) {
-                    console.error(`Failed to export ${collectionName}:`, error);
-                    alert(`An error occurred while exporting ${collectionName}.`);
-                } finally {
-                    button.textContent = `Download ${collectionName.replace('_', ' ')}`;
-                    button.disabled = false;
-                }
-            }
         });
 
     </script>
