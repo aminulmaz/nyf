@@ -433,7 +433,7 @@
             }
         });
         
-        // --- PDF Generation (Text Only) ---
+        // --- PDF Generation (Grouped by Role) ---
         const { jsPDF } = window.jspdf;
         
         document.getElementById('generate-players-pdf').addEventListener('click', async () => {
@@ -449,22 +449,60 @@
                 return;
              }
              const playersDataForPdf = playersSnapshot.docs.map(doc => doc.data());
+             
+             // Group players by role
+             const groupedPlayers = playersDataForPdf.reduce((acc, player) => {
+                const role = player.role || 'Uncategorized';
+                if (!acc[role]) { acc[role] = []; }
+                acc[role].push(player);
+                return acc;
+             }, {});
 
              const docPdf = new jsPDF();
-             docPdf.text("Approved Players List - NYF Tournament", 14, 15);
-             
-             const tableData = playersDataForPdf.map(p => [
-                p.fullName, p.phone, p.address, p.role, `${p.basePrice} Coins`
-             ]);
+             let isFirstPage = true;
 
-             docPdf.autoTable({ 
-                head: [['Full Name', 'Phone', 'Address', 'Role', 'Base Price']],
-                body: tableData, 
-                startY: 25, 
-                theme: 'grid'
-            });
+             docPdf.setFontSize(22);
+             docPdf.text("Approved Players List - NYF Tournament", docPdf.internal.pageSize.getWidth() / 2, 15, { align: 'center' });
 
-             docPdf.save('approved-players.pdf');
+             let yPos = 25;
+
+             for (const role in groupedPlayers) {
+                 if (!isFirstPage) {
+                     docPdf.addPage();
+                     yPos = 15;
+                 }
+                
+                 const tableData = groupedPlayers[role].map(p => [
+                    p.fullName, p.phone, p.address, `${p.basePrice} Coins`
+                 ]);
+
+                 docPdf.autoTable({ 
+                    head: [[role.toUpperCase()]],
+                    body: [],
+                    startY: yPos,
+                    theme: 'plain',
+                    headStyles: {
+                        fillColor: [79, 70, 229],
+                        textColor: [255, 255, 255],
+                        fontStyle: 'bold',
+                        halign: 'center',
+                        fontSize: 14
+                    }
+                });
+
+                 docPdf.autoTable({ 
+                    head: [['Full Name', 'Phone', 'Address', 'Base Price']],
+                    body: tableData, 
+                    startY: docPdf.autoTable.previous.finalY, 
+                    theme: 'grid'
+                });
+                
+                yPos = docPdf.autoTable.previous.finalY + 15;
+                isFirstPage = false;
+             }
+
+
+             docPdf.save('approved-players-by-role.pdf');
              pdfButton.disabled = false;
              pdfButton.textContent = 'Download PDF';
         });
