@@ -10,7 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
 
     <style>
-        /* Base Styles from your preferred design */
         :root {
             --primary-purple: #9f7aea;
             --primary-blue: #6366f1;
@@ -151,6 +150,44 @@
             margin-bottom: 1rem;
         }
 
+        /* Prizes Section */
+        .prizes-grid {
+            display: grid;
+            gap: 2rem;
+        }
+        @media (min-width: 768px) { .prizes-grid { grid-template-columns: 1fr 1fr; } }
+        @media (min-width: 1024px) { .prizes-grid { grid-template-columns: repeat(3, 1fr); } }
+
+        .prize-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            text-align: center;
+        }
+        .prize-card.main-prize {
+            grid-column: 1 / -1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            text-align: center;
+        }
+         @media (min-width: 768px) { .prize-card.main-prize { flex-direction: row; text-align: left; } }
+        .prize-card.main-prize img {
+            max-width: 150px;
+            height: auto;
+        }
+        .prize-card h3 {
+            font-size: 1.5rem;
+            margin: 0 0 0.5rem 0;
+            color: var(--accent-yellow);
+        }
+        .prize-card p {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
 
         /* Announcements Section */
         @keyframes shimmer { 100% { left: 150%; } }
@@ -168,6 +205,7 @@
             background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.4), transparent);
             animation: shimmer 4s infinite linear;
         }
+        .announcement-link { text-decoration: none; }
         .announcement-item { padding: 1rem 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 1rem; }
         .announcement-item:last-child { border-bottom: none; padding-bottom: 0; }
         .announcement-item:first-child { padding-top: 0; }
@@ -229,6 +267,14 @@
             margin-top: 3rem;
             text-align: center; 
         }
+        .developer-name {
+            font-weight: 700;
+            color: var(--accent-yellow);
+            text-decoration: none;
+        }
+        .developer-name:hover {
+            text-decoration: underline;
+        }
 
     </style>
 </head>
@@ -238,11 +284,11 @@
         <nav class="container nav">
             <a href="index.html" class="nav-brand"><img src="media/logo.jpg" alt="NYF Logo"></a>
             <div class="nav-links">
-                <a href="index" class="active">Home</a>
+                <a href="index.html" class="active">Home</a>
                 <a href="about">About Tournament</a>
                 <a href="fixtures">Fixtures</a>
                 <a href="rules">Rules & Regulations</a>
-                <a href="player-registration">Player Registration</a>
+                <a href="player-reg.html">Player Registration</a>
                 <a href="contact">Contact</a>
             </div>
             <button id="mobile-menu-button">
@@ -276,7 +322,7 @@
                 <h2 class="section-title">About The Tournament</h2>
                 <div class="about-grid">
                     <div class="about-image">
-                        <img src="media/slider2.jpg" alt="About the tournament">
+                        <img src="https://placehold.co/600x400/2d3748/a0aec0?text=Tournament+Action" alt="About the tournament">
                     </div>
                     <div class="about-text">
                         <h3>Experience the Thrill of Night Cricket</h3>
@@ -286,7 +332,8 @@
                 </div>
             </div>
         </section>
-
+        
+    
         <div class="container">
             <section class="section">
                 <div id="announcements">
@@ -298,7 +345,7 @@
             </section>
         </div>
 
-        <section class="section" style="background-color: var(--bg-secondary);">
+        <section class="section">
             <div class="container">
                 <h2 class="section-title">Participating Teams</h2>
                 <div id="teams-grid" class="teams-grid"></div>
@@ -338,18 +385,18 @@
                 </div>
                 <div class="footer-col">
                     <h3>Quick Links</h3>
-                    <a href="about.html">About Tournament</a>
-                    <a href="fixtures.html">Fixtures</a>
-                    <a href="rules.html">Rules & Regulations</a>
-                    <a href="faq.html">FAQ</a>
+                    <a href="about">About Tournament</a>
+                    <a href="fixtures">Fixtures</a>
+                    <a href="rules">Rules & Regulations</a>
+                    
                 </div>
                 <div class="footer-col">
                     <h3>Contact Us</h3>
-                    <a href="mailto:aminulmazumder@zohomail.in">will be updated soon</a>
-                    <a href="tel:+919999999999">will be updated soo</a>
+                    <a href="mailto:info@nyfcricket.com">info@nyfcricket.com</a>
+                    <a href="tel:+919999999999">+91 999 999 9999</a>
                 </div>
             </div>
-            <footer class="footer"><div class="copyright">Developed by <span class="developer-name">Aminul Mazumder</span></div></footer>
+            <div class="copyright">Developed by <a href="https://www.facebook.com/Aminulmzr" target="_blank" class="developer-name">Aminul Mazumder</a></div>
         </div>
     </footer>
 
@@ -400,7 +447,11 @@
             const bellIcon = `<svg class="announcement-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>`;
             announcementsList.innerHTML = snapshot.docs.map(doc => {
                 const item = doc.data();
-                return `<div class="announcement-item">${bellIcon}<div><p><strong>${item.headline}:</strong> ${item.text}</p></div></div>`;
+                const content = `<div class="announcement-item">${bellIcon}<div><p><strong>${item.headline}:</strong> ${item.text}</p></div></div>`;
+                if (item.link) {
+                    return `<a href="${item.link}" target="_blank" class="announcement-link">${content}</a>`;
+                }
+                return content;
             }).join('');
         });
 
