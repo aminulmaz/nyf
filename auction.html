@@ -11,6 +11,7 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 
     <style>
         :root {
@@ -82,8 +83,8 @@
         .tab-content.active { display: block; }
         
         .section-header { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-        .pdf-btn { background-color: var(--success-color); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 0.375rem; cursor: pointer; font-weight: 500; }
-        .pdf-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .pdf-btn, .backup-btn { background-color: var(--success-color); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 0.375rem; cursor: pointer; font-weight: 500; }
+        .pdf-btn:disabled, .backup-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
         .table-controls { display: flex; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem; }
         .search-input {
@@ -101,17 +102,11 @@
         .data-table th { font-weight: 600; color: var(--text-light); }
         .data-table tbody tr:last-child td { border-bottom: none; }
         .actions-cell { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-        .actions-cell .btn, .actions-cell .btn-link { 
-            border: none; padding: 0.5rem 1rem; border-radius: 0.375rem; 
-            cursor: pointer; font-weight: 600; text-decoration: none;
-            display: inline-block; font-size: 0.875rem;
-        }
+        .actions-cell .btn { border: none; padding: 0.5rem 1rem; border-radius: 0.375rem; cursor: pointer; font-weight: 600; }
         .btn-approve { background-color: var(--success-color); color: white; }
         .btn-reject { background-color: var(--danger-color); color: white; }
         .btn-proof { background: var(--primary-blue); color: white; }
-        .btn-notify { background-color: var(--accent-yellow); color: #1a202c; }
         .btn-delete { background-color: var(--danger-color); color: white; }
-
 
         .pagination-controls {
             display: flex;
@@ -166,15 +161,15 @@
             <div class="tabs">
                 <button class="tab-button active" data-tab="pending-players">Pending Players</button>
                 <button class="tab-button" data-tab="approved-players">Approved Players</button>
-                <button class="tab-button" data-tab="rejected-players">Rejected Players</button>
                 <button class="tab-button" data-tab="manage-teams">Manage Teams</button>
                 <button class="tab-button" data-tab="manage-fixtures">Manage Fixtures</button>
                 <button class="tab-button" data-tab="announcements">Announcements</button>
+                <button class="tab-button" data-tab="backup">Backup Data</button>
             </div>
 
             <div id="pending-players" class="tab-content active">
                 <div class="section-header"><h2>Pending Player Approvals</h2></div>
-                <div class="table-container"><table class="data-table"><thead><tr><th>Full Name</th><th>Phone</th><th>Email</th><th>Actions</th></tr></thead><tbody id="pending-players-tbody"></tbody></table></div>
+                <div class="table-container"><table class="data-table"><thead><tr><th>Full Name</th><th>Phone</th><th>Address</th><th>Base Price</th><th>Actions</th></tr></thead><tbody id="pending-players-tbody"></tbody></table></div>
             </div>
             
             <div id="approved-players" class="tab-content">
@@ -191,11 +186,6 @@
                     <button id="prev-page">Previous</button>
                     <button id="next-page">Next</button>
                 </div>
-            </div>
-            
-             <div id="rejected-players" class="tab-content">
-                <div class="section-header"><h2>Rejected Player List</h2></div>
-                <div class="table-container"><table class="data-table"><thead><tr><th>Full Name</th><th>Phone</th><th>Actions</th></tr></thead><tbody id="rejected-players-tbody"></tbody></table></div>
             </div>
 
             <div id="manage-teams" class="tab-content">
@@ -243,6 +233,18 @@
                 <div id="announcements-grid"></div>
             </div>
             
+            <div id="backup" class="tab-content">
+                 <div class="form-container">
+                    <h2>Download Data Backups (CSV)</h2>
+                    <p>Click the buttons below to download a CSV backup of your important tournament data. These files can be opened in any spreadsheet program like Excel or Google Sheets.</p>
+                    <div class="form-grid-2" style="margin-top: 2rem;">
+                         <button class="backup-btn" data-collection="players">Download Approved Players</button>
+                         <button class="backup-btn" data-collection="pending_players">Download Pending Players</button>
+                         <button class="backup-btn" data-collection="approved_teams">Download Teams</button>
+                         <button class="backup-btn" data-collection="fixtures">Download Fixtures</button>
+                    </div>
+                </div>
+            </div>
         </main>
         <footer class="footer">Developed by <a href="https://github.com/your-profile" target="_blank" class="developer-name">Aminul Mazumder</a></footer>
     </div>
@@ -333,44 +335,26 @@
         function loadDashboardData() {
             const tbodies = {
                 pendingPlayers: document.getElementById('pending-players-tbody'),
-                approvedPlayers: document.getElementById('approved-players-tbody'),
-                rejectedPlayers: document.getElementById('rejected-players-tbody'),
                 teams: document.getElementById('teams-tbody'),
                 fixtures: document.getElementById('fixtures-tbody'),
             };
             document.getElementById('approved-players-tbody').dataset.placeholder = "No approved players yet.";
             tbodies.pendingPlayers.dataset.placeholder = "No pending player registrations.";
-            tbodies.rejectedPlayers.dataset.placeholder = "No players have been rejected.";
             tbodies.teams.dataset.placeholder = "No teams have been added yet.";
             tbodies.fixtures.dataset.placeholder = "No fixtures have been scheduled.";
 
             onSnapshot(collection(db, 'pending_players'), snap => {
-                 const rowsHtml = snap.docs.map(doc => {
+                const rowsHtml = snap.docs.map(doc => {
                     const p = doc.data();
-                     const mailtoLink = `mailto:${p.email}?subject=NYF%20Tournament%20Registration%20Approved&body=Congratulations%20${encodeURIComponent(p.fullName)},%0D%0A%0D%0AYour%20registration%20for%20the%20NYF%20Night%20Cricket%20Tournament%20has%20been%20approved!%0D%0A%0D%0AWe%20look%20forward%20to%20seeing%20you%20at%20the%20auction.%0D%0A%0D%0ARegards,%0D%0AThe%20NYF%20Organizing%20Committee.`;
-                    return `<tr><td>${p.fullName}</td><td>${p.phone}</td><td>${p.email}</td><td class="actions-cell">
-                        <button class="btn btn-proof" data-url="${p.photoUrl}">Photo</button>
-                        <button class="btn btn-proof" data-url="${p.proofUrl}">Proof</button>
-                        <a href="${mailtoLink}" class="btn-link btn-notify">Notify</a>
-                        <button class="btn btn-approve" data-id="${doc.id}">Approve</button>
-                        <button class="btn btn-reject" data-id="${doc.id}">Reject</button>
-                    </td></tr>`
+                    return `<tr><td>${p.fullName}</td><td>${p.phone}</td><td>${p.address}</td><td>${p.basePrice} Coins</td><td class="actions-cell"><button class="btn btn-proof" data-url="${p.photoUrl}">Photo</button><button class="btn btn-proof" data-url="${p.proofUrl}">Proof</button><button class="btn btn-approve" data-id="${doc.id}">Approve</button><button class="btn btn-reject" data-id="${doc.id}">Reject</button></td></tr>`;
                 }).join('');
-                 tbodies.pendingPlayers.innerHTML = snap.empty ? `<tr><td colspan="4" class="placeholder">${tbodies.pendingPlayers.dataset.placeholder}</td></tr>` : rowsHtml;
+                tbodies.pendingPlayers.innerHTML = snap.empty ? `<tr><td colspan="5" class="placeholder">${tbodies.pendingPlayers.dataset.placeholder}</td></tr>` : rowsHtml;
             });
             
             onSnapshot(collection(db, 'players'), snap => {
                 allApprovedPlayers = snap.docs.map(doc => ({id: doc.id, data: doc.data()}));
                 currentPage = 1;
                 renderApprovedPlayersTable();
-            });
-
-             onSnapshot(collection(db, 'rejected_players'), snap => {
-                const rowsHtml = snap.docs.map(doc => {
-                    const p = doc.data();
-                    return `<tr><td>${p.fullName}</td><td>${p.phone}</td><td class="actions-cell"><button class="btn btn-delete" data-collection="rejected_players" data-id="${doc.id}">Delete</button></td></tr>`;
-                }).join('');
-                tbodies.rejectedPlayers.innerHTML = snap.empty ? `<tr><td colspan="3" class="placeholder">${tbodies.rejectedPlayers.dataset.placeholder}</td></tr>` : rowsHtml;
             });
 
             onSnapshot(collection(db, 'approved_teams'), snap => {
@@ -426,22 +410,17 @@
         // --- Actions (Approve, Reject, Delete) ---
         document.addEventListener('click', async e => {
             const { classList, dataset } = e.target;
-            if (classList.contains('btn-approve') || classList.contains('btn-reject')) {
+            if (classList.contains('btn-approve')) {
                 const docRef = doc(db, 'pending_players', dataset.id);
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
-                    if (classList.contains('btn-approve')) {
-                        await setDoc(doc(db, 'players', dataset.id), docSnap.data());
-                        alert('Player approved!');
-                    } else { // Reject
-                        if(confirm('Are you sure you want to reject this player?')) {
-                            await setDoc(doc(db, 'rejected_players', dataset.id), docSnap.data());
-                            alert('Player rejected.');
-                        } else { return; }
-                    }
+                    await setDoc(doc(db, 'players', dataset.id), docSnap.data());
                     await deleteDoc(docRef);
+                    alert('Player approved!');
                 }
-            } else if (classList.contains('btn-delete') && confirm('Delete this item permanently?')) {
+            } else if (classList.contains('btn-reject') && confirm('Reject this player? This will permanently delete their application.')) {
+                await deleteDoc(doc(db, 'pending_players', dataset.id));
+            } else if (classList.contains('btn-delete') && confirm('Delete this item?')) {
                 await deleteDoc(doc(db, dataset.collection, dataset.id));
             } else if (classList.contains('btn-proof')) {
                 window.open(dataset.url, '_blank');
@@ -515,9 +494,9 @@
              let yPos = 25;
 
              for (const role in groupedPlayers) {
-                 if (!isFirstPage && yPos > 15) { // Check if we need a new page
+                 if (!isFirstPage && yPos > 15) {
                      const remainingSpace = docPdf.internal.pageSize.getHeight() - yPos;
-                     if (remainingSpace < 40) { // If less than 40mm space left, add a new page
+                     if (remainingSpace < 40) {
                          docPdf.addPage();
                          yPos = 15;
                      }
@@ -556,6 +535,43 @@
              docPdf.save('approved-players-by-role.pdf');
              pdfButton.disabled = false;
              pdfButton.textContent = 'Download PDF';
+        });
+
+         // --- CSV Backup ---
+        document.addEventListener('click', async (e) => {
+            if (e.target.matches('.backup-btn')) {
+                const button = e.target;
+                const collectionName = button.dataset.collection;
+                
+                button.textContent = 'Exporting...';
+                button.disabled = true;
+
+                try {
+                    const snapshot = await getDocs(query(collection(db, collectionName)));
+                    if (snapshot.empty) {
+                        alert(`No data found in ${collectionName} to export.`);
+                        return;
+                    }
+                    const data = snapshot.docs.map(doc => doc.data());
+                    const csv = Papa.unparse(data);
+
+                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement("a");
+                    const url = URL.createObjectURL(blob);
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", `${collectionName}_backup_${new Date().toISOString().split('T')[0]}.csv`);
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+
+                } catch (error) {
+                    console.error(`Failed to export ${collectionName}:`, error);
+                    alert(`An error occurred while exporting ${collectionName}.`);
+                } finally {
+                    button.textContent = `Download ${collectionName.replace('_', ' ')}`;
+                    button.disabled = false;
+                }
+            }
         });
 
     </script>
