@@ -320,7 +320,7 @@
                          <div class="form-group">
                             <label for="playerPhoto">Upload Player Photo</label>
                             <input type="file" id="playerPhoto" accept="image/*" required>
-                            <p class="file-note">Max file size: 2MB</p>
+                            <p class="file-note">Max file size: 3MB</p>
                         </div>
                          <div class="form-group">
                             <label for="paymentProof">Upload Payment Proof</label>
@@ -395,7 +395,7 @@
                 submitButton.textContent = 'Submit Registration';
             };
 
-            if (photoFile.size > 2 * 1024 * 1024) { alert('Player photo must be under 2MB.'); hideLoading(); return; }
+            if (photoFile.size > 3 * 1024 * 1024) { alert('Player photo must be under 3MB.'); hideLoading(); return; }
             if (proofFile.size > 1 * 1024 * 1024) { alert('Payment proof must be under 1MB.'); hideLoading(); return; }
             
             const selectedRole = document.querySelector('input[name="role"]:checked');
