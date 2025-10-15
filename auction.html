@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -79,7 +80,7 @@
         .tab-button.active { color: var(--accent-violet); border-bottom: 3px solid var(--accent-violet); }
         .tab-content { display: none; padding-top: 2rem; }
         .tab-content.active { display: block; }
-
+        
         .section-header { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
         .pdf-btn { background-color: var(--success-color); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 0.375rem; cursor: pointer; font-weight: 500; }
         .pdf-btn:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -220,6 +221,7 @@
                     <form id="announcement-form">
                         <input type="text" id="announcement-headline" placeholder="Headline" class="form-group" required>
                         <textarea id="announcement-text" placeholder="Description..." class="form-group" required></textarea>
+                        <input type="url" id="announcement-link" placeholder="Optional Link (e.g., https://...)" class="form-group">
                         <button type="submit" class="submit-btn">Post Announcement</button>
                     </form>
                 </div>
@@ -410,7 +412,17 @@
         });
 
         // --- Forms (Announcements, Add Team, Add Fixture) ---
-        document.getElementById('announcement-form').addEventListener('submit', async e => { e.preventDefault(); const f = e.target; await addDoc(collection(db, 'announcements'), { headline: f.elements['announcement-headline'].value, text: f.elements['announcement-text'].value, createdAt: serverTimestamp() }); f.reset(); });
+        document.getElementById('announcement-form').addEventListener('submit', async e => {
+             e.preventDefault();
+             const f = e.target;
+             await addDoc(collection(db, 'announcements'), {
+                 headline: f.elements['announcement-headline'].value,
+                 text: f.elements['announcement-text'].value,
+                 link: f.elements['announcement-link'].value || '', // Save link, or empty string
+                 createdAt: serverTimestamp()
+             });
+             f.reset();
+        });
         document.getElementById('add-team-form').addEventListener('submit', async e => { e.preventDefault(); const f = e.target; await addDoc(collection(db, 'approved_teams'), { teamName: f.elements['teamName'].value, city: f.elements['city'].value }); f.reset(); });
         document.getElementById('add-fixture-form').addEventListener('submit', async e => {
             e.preventDefault();
