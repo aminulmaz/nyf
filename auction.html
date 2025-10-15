@@ -51,7 +51,7 @@
         /* Login Page Styles */
         #login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
         .login-box { background-color: var(--bg-secondary); padding: 2.5rem; border-radius: 0.75rem; border: 1px solid var(--border-color); width: 100%; max-width: 400px; }
-        .login-box img { display: block; height: 60px; margin: 0 auto 1.5rem; }
+        .login-box img { display: block; height: 60px; width: auto; margin: 0 auto 1.5rem; }
         .login-box h1 { font-size: 2.5rem; text-align: center; margin-bottom: 2rem; }
         .form-group { margin-bottom: 1.5rem; }
         .form-group label { display: block; font-weight: 500; margin-bottom: 0.5rem; color: var(--text-muted); }
@@ -101,11 +101,17 @@
         .data-table th { font-weight: 600; color: var(--text-light); }
         .data-table tbody tr:last-child td { border-bottom: none; }
         .actions-cell { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-        .actions-cell .btn { border: none; padding: 0.5rem 1rem; border-radius: 0.375rem; cursor: pointer; font-weight: 600; }
+        .actions-cell .btn, .actions-cell .btn-link { 
+            border: none; padding: 0.5rem 1rem; border-radius: 0.375rem; 
+            cursor: pointer; font-weight: 600; text-decoration: none;
+            display: inline-block; font-size: 0.875rem;
+        }
         .btn-approve { background-color: var(--success-color); color: white; }
         .btn-reject { background-color: var(--danger-color); color: white; }
         .btn-proof { background: var(--primary-blue); color: white; }
+        .btn-notify { background-color: var(--accent-yellow); color: #1a202c; }
         .btn-delete { background-color: var(--danger-color); color: white; }
+
 
         .pagination-controls {
             display: flex;
@@ -135,14 +141,8 @@
         .card-actions { margin-top: 1rem; }
         .placeholder { color: var(--text-muted); text-align: center; padding: 2rem; }
         .footer { background-color: var(--bg-secondary); padding: 2rem 0; margin-top: 3rem; text-align: center; border-top: 1px solid var(--border-color); }
-        .developer-name {
-            font-weight: 700;
-            color: var(--accent-yellow);
-            text-decoration: none;
-        }
-        .developer-name:hover {
-            text-decoration: underline;
-        }
+        .developer-name { font-weight: 700; color: var(--accent-yellow); text-decoration: none; }
+        .developer-name:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -166,6 +166,7 @@
             <div class="tabs">
                 <button class="tab-button active" data-tab="pending-players">Pending Players</button>
                 <button class="tab-button" data-tab="approved-players">Approved Players</button>
+                <button class="tab-button" data-tab="rejected-players">Rejected Players</button>
                 <button class="tab-button" data-tab="manage-teams">Manage Teams</button>
                 <button class="tab-button" data-tab="manage-fixtures">Manage Fixtures</button>
                 <button class="tab-button" data-tab="announcements">Announcements</button>
@@ -173,7 +174,7 @@
 
             <div id="pending-players" class="tab-content active">
                 <div class="section-header"><h2>Pending Player Approvals</h2></div>
-                <div class="table-container"><table class="data-table"><thead><tr><th>Full Name</th><th>Phone</th><th>Address</th><th>Base Price</th><th>Actions</th></tr></thead><tbody id="pending-players-tbody"></tbody></table></div>
+                <div class="table-container"><table class="data-table"><thead><tr><th>Full Name</th><th>Phone</th><th>Email</th><th>Actions</th></tr></thead><tbody id="pending-players-tbody"></tbody></table></div>
             </div>
             
             <div id="approved-players" class="tab-content">
@@ -190,6 +191,11 @@
                     <button id="prev-page">Previous</button>
                     <button id="next-page">Next</button>
                 </div>
+            </div>
+            
+             <div id="rejected-players" class="tab-content">
+                <div class="section-header"><h2>Rejected Player List</h2></div>
+                <div class="table-container"><table class="data-table"><thead><tr><th>Full Name</th><th>Phone</th><th>Actions</th></tr></thead><tbody id="rejected-players-tbody"></tbody></table></div>
             </div>
 
             <div id="manage-teams" class="tab-content">
@@ -327,26 +333,44 @@
         function loadDashboardData() {
             const tbodies = {
                 pendingPlayers: document.getElementById('pending-players-tbody'),
+                approvedPlayers: document.getElementById('approved-players-tbody'),
+                rejectedPlayers: document.getElementById('rejected-players-tbody'),
                 teams: document.getElementById('teams-tbody'),
                 fixtures: document.getElementById('fixtures-tbody'),
             };
             document.getElementById('approved-players-tbody').dataset.placeholder = "No approved players yet.";
             tbodies.pendingPlayers.dataset.placeholder = "No pending player registrations.";
+            tbodies.rejectedPlayers.dataset.placeholder = "No players have been rejected.";
             tbodies.teams.dataset.placeholder = "No teams have been added yet.";
             tbodies.fixtures.dataset.placeholder = "No fixtures have been scheduled.";
 
             onSnapshot(collection(db, 'pending_players'), snap => {
-                const rowsHtml = snap.docs.map(doc => {
+                 const rowsHtml = snap.docs.map(doc => {
                     const p = doc.data();
-                    return `<tr><td>${p.fullName}</td><td>${p.phone}</td><td>${p.address}</td><td>${p.basePrice} Coins</td><td class="actions-cell"><button class="btn btn-proof" data-url="${p.photoUrl}">Photo</button><button class="btn btn-proof" data-url="${p.proofUrl}">Proof</button><button class="btn btn-approve" data-id="${doc.id}">Approve</button><button class="btn btn-reject" data-id="${doc.id}">Reject</button></td></tr>`;
+                     const mailtoLink = `mailto:${p.email}?subject=NYF%20Tournament%20Registration%20Approved&body=Congratulations%20${encodeURIComponent(p.fullName)},%0D%0A%0D%0AYour%20registration%20for%20the%20NYF%20Night%20Cricket%20Tournament%20has%20been%20approved!%0D%0A%0D%0AWe%20look%20forward%20to%20seeing%20you%20at%20the%20auction.%0D%0A%0D%0ARegards,%0D%0AThe%20NYF%20Organizing%20Committee.`;
+                    return `<tr><td>${p.fullName}</td><td>${p.phone}</td><td>${p.email}</td><td class="actions-cell">
+                        <button class="btn btn-proof" data-url="${p.photoUrl}">Photo</button>
+                        <button class="btn btn-proof" data-url="${p.proofUrl}">Proof</button>
+                        <a href="${mailtoLink}" class="btn-link btn-notify">Notify</a>
+                        <button class="btn btn-approve" data-id="${doc.id}">Approve</button>
+                        <button class="btn btn-reject" data-id="${doc.id}">Reject</button>
+                    </td></tr>`
                 }).join('');
-                tbodies.pendingPlayers.innerHTML = snap.empty ? `<tr><td colspan="5" class="placeholder">${tbodies.pendingPlayers.dataset.placeholder}</td></tr>` : rowsHtml;
+                 tbodies.pendingPlayers.innerHTML = snap.empty ? `<tr><td colspan="4" class="placeholder">${tbodies.pendingPlayers.dataset.placeholder}</td></tr>` : rowsHtml;
             });
             
             onSnapshot(collection(db, 'players'), snap => {
                 allApprovedPlayers = snap.docs.map(doc => ({id: doc.id, data: doc.data()}));
                 currentPage = 1;
                 renderApprovedPlayersTable();
+            });
+
+             onSnapshot(collection(db, 'rejected_players'), snap => {
+                const rowsHtml = snap.docs.map(doc => {
+                    const p = doc.data();
+                    return `<tr><td>${p.fullName}</td><td>${p.phone}</td><td class="actions-cell"><button class="btn btn-delete" data-collection="rejected_players" data-id="${doc.id}">Delete</button></td></tr>`;
+                }).join('');
+                tbodies.rejectedPlayers.innerHTML = snap.empty ? `<tr><td colspan="3" class="placeholder">${tbodies.rejectedPlayers.dataset.placeholder}</td></tr>` : rowsHtml;
             });
 
             onSnapshot(collection(db, 'approved_teams'), snap => {
@@ -402,17 +426,22 @@
         // --- Actions (Approve, Reject, Delete) ---
         document.addEventListener('click', async e => {
             const { classList, dataset } = e.target;
-            if (classList.contains('btn-approve')) {
+            if (classList.contains('btn-approve') || classList.contains('btn-reject')) {
                 const docRef = doc(db, 'pending_players', dataset.id);
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
-                    await setDoc(doc(db, 'players', dataset.id), docSnap.data());
+                    if (classList.contains('btn-approve')) {
+                        await setDoc(doc(db, 'players', dataset.id), docSnap.data());
+                        alert('Player approved!');
+                    } else { // Reject
+                        if(confirm('Are you sure you want to reject this player?')) {
+                            await setDoc(doc(db, 'rejected_players', dataset.id), docSnap.data());
+                            alert('Player rejected.');
+                        } else { return; }
+                    }
                     await deleteDoc(docRef);
-                    alert('Player approved!');
                 }
-            } else if (classList.contains('btn-reject') && confirm('Reject this player?')) {
-                await deleteDoc(doc(db, 'pending_players', dataset.id));
-            } else if (classList.contains('btn-delete') && confirm('Delete this item?')) {
+            } else if (classList.contains('btn-delete') && confirm('Delete this item permanently?')) {
                 await deleteDoc(doc(db, dataset.collection, dataset.id));
             } else if (classList.contains('btn-proof')) {
                 window.open(dataset.url, '_blank');
@@ -426,7 +455,7 @@
              await addDoc(collection(db, 'announcements'), {
                  headline: f.elements['announcement-headline'].value,
                  text: f.elements['announcement-text'].value,
-                 link: f.elements['announcement-link'].value || '', // Save link, or empty string
+                 link: f.elements['announcement-link'].value || '',
                  createdAt: serverTimestamp()
              });
              f.reset();
@@ -470,7 +499,6 @@
              }
              const playersDataForPdf = playersSnapshot.docs.map(doc => doc.data());
              
-             // Group players by role
              const groupedPlayers = playersDataForPdf.reduce((acc, player) => {
                 const role = player.role || 'Uncategorized';
                 if (!acc[role]) { acc[role] = []; }
@@ -487,9 +515,12 @@
              let yPos = 25;
 
              for (const role in groupedPlayers) {
-                 if (!isFirstPage) {
-                     docPdf.addPage();
-                     yPos = 15;
+                 if (!isFirstPage && yPos > 15) { // Check if we need a new page
+                     const remainingSpace = docPdf.internal.pageSize.getHeight() - yPos;
+                     if (remainingSpace < 40) { // If less than 40mm space left, add a new page
+                         docPdf.addPage();
+                         yPos = 15;
+                     }
                  }
                 
                  const tableData = groupedPlayers[role].map(p => [
