@@ -168,6 +168,7 @@
                 <button class="tab-button" data-tab="manage-teams">Manage Teams</button>
                 <button class="tab-button" data-tab="manage-fixtures">Manage Fixtures</button>
                 <button class="tab-button" data-tab="announcements">Announcements</button>
+                <button class="tab-button" data-tab="auction-cards">Auction Cards</button>
             </div>
 
             <div id="pending-players" class="tab-content active">
@@ -236,6 +237,14 @@
                 <div id="announcements-grid"></div>
             </div>
             
+            <div id="auction-cards" class="tab-content">
+                <div class="section-header"><h2>Auction Card Generator</h2></div>
+                <div class="form-container">
+                    <p>This tool will generate separate PDF files for each player category (Batsman, Bowler, etc.), containing professionally designed auction cards for all approved players. Each card will include a space for you to manually add a player's photo.</p>
+                    <button class="submit-btn" id="generate-auction-pdf">Generate & Download All PDFs</button>
+                    <p id="pdf-generation-status" style="text-align: center; margin-top: 1rem; color: var(--accent-violet);"></p>
+                </div>
+            </div>
         </main>
         <footer class="footer">Developed by <a href="https://github.com/your-profile" target="_blank" class="developer-name">Aminul Mazumder</a></footer>
     </div>
@@ -459,7 +468,7 @@
             }
         });
         
-        // --- PDF Generation (Grouped by Role with Photo Space) ---
+        // --- PDF Generation (Grouped by Role) ---
         const { jsPDF } = window.jspdf;
         
         document.getElementById('generate-players-pdf').addEventListener('click', async () => {
@@ -501,11 +510,7 @@
                  }
                 
                  const tableData = groupedPlayers[role].map(p => [
-                    '', // Empty cell for photo
-                    p.fullName, 
-                    p.phone, 
-                    p.address, 
-                    `${p.basePrice} Coins`
+                    p.fullName, p.phone, p.address, `${p.basePrice} Coins`
                  ]);
 
                  docPdf.autoTable({ 
@@ -523,12 +528,10 @@
                 });
 
                  docPdf.autoTable({ 
-                    head: [['Photo', 'Full Name', 'Phone', 'Address', 'Base Price']],
+                    head: [['Full Name', 'Phone', 'Address', 'Base Price']],
                     body: tableData, 
                     startY: docPdf.autoTable.previous.finalY, 
-                    theme: 'grid',
-                    bodyStyles: { minCellHeight: 25 }, // Make rows taller
-                    columnStyles: { 0: { minCellWidth: 25 } } // Make photo column wider
+                    theme: 'grid'
                 });
                 
                 yPos = docPdf.autoTable.previous.finalY + 15;
@@ -539,6 +542,97 @@
              docPdf.save('approved-players-by-role.pdf');
              pdfButton.disabled = false;
              pdfButton.textContent = 'Download PDF';
+        });
+
+        // --- Auction Card PDF Generation (No Images) ---
+        document.getElementById('generate-auction-pdf').addEventListener('click', async () => {
+            const playersSnapshot = await getDocs(query(collection(db, 'players')));
+            if (playersSnapshot.empty) {
+                alert('No approved players to generate auction cards for.');
+                return;
+            }
+            const auctionPlayersData = playersSnapshot.docs.map(doc => doc.data());
+
+            const button = document.getElementById('generate-auction-pdf');
+            const statusEl = document.getElementById('pdf-generation-status');
+            button.disabled = true;
+            button.textContent = 'Generating...';
+            statusEl.textContent = 'Grouping players and creating PDFs...';
+
+            try {
+                const groupedPlayers = auctionPlayersData.reduce((acc, player) => {
+                    const role = player.role || 'Uncategorized';
+                    if (!acc[role]) { acc[role] = []; }
+                    acc[role].push(player);
+                    return acc;
+                }, {});
+                
+                for (const role in groupedPlayers) {
+                    const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+                    const pageW = 210, pageH = 297;
+                    const cardW = 140, cardH = 200; 
+                    const x = (pageW - cardW) / 2;
+                    const y = (pageH - cardH) / 2;
+                    
+                    doc.setFontSize(30); doc.setTextColor('#4f46e5');
+                    doc.text('MLA Haji Suzam Uddin Laskar Night Cricket Tournament', pageW / 2, 20, { align: 'center' });
+                    doc.setFontSize(24); doc.setTextColor('#a855f7');
+                    doc.text(`Player Auction - ${role.toUpperCase()}`, pageW / 2, 35, { align: 'center' });
+                    
+                    const playersInRole = groupedPlayers[role];
+                    playersInRole.forEach((player, index) => {
+                        if (index > 0) { doc.addPage(); }
+                        drawCard(doc, x, y, cardW, cardH, player);
+                    });
+                    
+                    doc.save(`NYF-Auction-${role.replace(/\s/g, '_')}.pdf`);
+                }
+
+                function drawCard(doc, x, y, w, h, player) {
+                    doc.setDrawColor('#a855f7');
+                    doc.setLineWidth(1);
+                    doc.setFillColor('#2d3748');
+                    doc.roundedRect(x, y, w, h, 5, 5, 'FD');
+                    
+                    doc.setFillColor('#1a202c');
+                    doc.roundedRect(x, y, w, 20, 5, 5, 'F');
+                    doc.setFontSize(12); doc.setFont('helvetica', 'bold'); doc.setTextColor('#ffffff');
+                    doc.text('NYF Player Auction Card', x + w / 2, y + 12, { align: 'center' });
+
+                    const imgBoxX = x + 10, imgBoxY = y + 25, imgBoxW = w - 20, imgBoxH = 80;
+                    doc.setDrawColor('#4a5568');
+                    doc.setLineWidth(0.5);
+                    doc.rect(imgBoxX, imgBoxY, imgBoxW, imgBoxH);
+                    doc.setFontSize(10); doc.setTextColor('#a0aec0');
+                    doc.text('PASTE PLAYER PHOTO HERE', x + w/2, imgBoxY + imgBoxH / 2, {align: 'center'});
+
+                    doc.setFontSize(36); doc.setFont('Teko', 'bold'); doc.setTextColor('#ffffff');
+                    doc.text(player.fullName.toUpperCase(), x + w / 2, y + 125, { align: 'center', maxWidth: w - 10 });
+                    
+                    doc.setFontSize(16); doc.setFont('helvetica', 'normal'); doc.setTextColor('#a0aec0');
+                    const details = `${player.role}  •  ${player.address}`;
+                    doc.text(details, x + w / 2, y + 138, { align: 'center' });
+
+                    doc.setDrawColor('#4a5568');
+                    doc.setLineWidth(0.5);
+                    doc.line(x + 10, y + 148, x + w - 10, y + 148);
+                    
+                    doc.setFontSize(18); doc.setTextColor('#ffffff');
+                    doc.text('BASE PRICE', x + w / 2, y + 158, { align: 'center' });
+                    
+                    doc.setFontSize(40); doc.setFont('Teko', 'bold'); doc.setTextColor('#fbbf24');
+                    doc.text(`${player.basePrice} COINS`, x + w / 2, y + 173, { align: 'center' });
+                }
+
+            } catch (err) {
+                console.error("Failed to generate auction PDF:", err);
+                statusEl.textContent = 'An error occurred during PDF generation.';
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Generate & Download All PDFs';
+                statusEl.textContent = `Successfully generated all PDF files!`;
+                setTimeout(() => { statusEl.textContent = ''; }, 5000);
+            }
         });
 
     </script>
