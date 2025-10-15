@@ -576,25 +576,20 @@
                         { x: (pageW / 2) - cardW - 5, y: 30 + cardH }, { x: (pageW / 2) + 5, y: 30 + cardH },
                     ];
                     
-                    doc.setFontSize(20); doc.setTextColor('#a855f7');
-                    doc.text(`Player Auction - ${role.toUpperCase()}`, pageW / 2, 15, { align: 'center' });
-                    
                     const playersInRole = groupedPlayers[role];
                     playersInRole.forEach((player, index) => {
                         if (index > 0 && index % 4 === 0) { 
                             doc.addPage();
-                            doc.setFontSize(20); doc.setTextColor('#a855f7');
-                            doc.text(`Player Auction - ${role.toUpperCase()}`, pageW / 2, 15, { align: 'center' });
                         }
                         
                         const pos = positions[index % 4];
-                        drawCard(doc, pos.x, pos.y, cardW, cardH, player);
+                        drawCard(doc, pos.x, pos.y, cardW, cardH, player, role);
                     });
                     
                     doc.save(`NYF-Auction-${role.replace(/\s/g, '_')}.pdf`);
                 }
 
-                function drawCard(doc, x, y, w, h, player) {
+                function drawCard(doc, x, y, w, h, player, role) {
                     doc.setDrawColor('#a855f7');
                     doc.setLineWidth(0.5);
                     doc.setFillColor('#2d3748');
@@ -602,8 +597,8 @@
                     
                     doc.setFillColor('#1a202c');
                     doc.roundedRect(x, y, w, 15, 3, 3, 'F');
-                    doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.setTextColor('#ffffff');
-                    doc.text('NYF Player Auction Card', x + w / 2, y + 9, { align: 'center' });
+                    doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor('#ffffff');
+                    doc.text(role.toUpperCase(), x + w / 2, y + 9, { align: 'center' });
 
                     const imgBoxX = x + 5, imgBoxY = y + 20, imgBoxW = w - 10, imgBoxH = 50;
                     doc.setDrawColor('#4a5568');
@@ -613,20 +608,20 @@
                     doc.text('PASTE PLAYER PHOTO HERE', x + w/2, imgBoxY + imgBoxH / 2, {align: 'center'});
                     
                     let currentY = y + 83;
-                    doc.setFontSize(22); doc.setFont('Teko', 'bold'); doc.setTextColor('#ffffff');
-                    var splitName = doc.splitTextToSize(player.fullName.toUpperCase(), w - 10);
+                    doc.setFontSize(20); doc.setFont('Teko', 'bold'); doc.setTextColor('#ffffff');
+                    var splitName = doc.splitTextToSize(player.fullName.toUpperCase(), w - 15);
                     doc.text(splitName, x + w / 2, currentY, { align: 'center' });
-                    currentY += (splitName.length * 6); 
+                    currentY += (splitName.length * 7) + 2; 
 
-                    doc.setFontSize(11); doc.setFont('helvetica', 'normal'); doc.setTextColor('#a0aec0');
+                    doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.setTextColor('#ffffff');
                     const details = `${player.role}  •  ${player.address}`;
                     doc.text(details, x + w / 2, currentY, { align: 'center' });
-                    currentY += 8;
+                    currentY += 12;
 
                     doc.setDrawColor('#4a5568');
                     doc.setLineWidth(0.2);
                     doc.line(x + 10, currentY, x + w - 10, currentY);
-                    currentY += 7;
+                    currentY += 8;
                     
                     doc.setFontSize(12); doc.setTextColor('#ffffff');
                     doc.text('BASE PRICE', x + w / 2, currentY, { align: 'center' });
