@@ -80,6 +80,47 @@
         .tab-content { display: none; padding-top: 2rem; }
         .tab-content.active { display: block; }
         
+        /* Stat Cards */
+        .stats-grid {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+        .stat-card {
+            background-color: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            border-left: 5px solid var(--primary-blue);
+        }
+        .stat-card h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        .stat-card .stat-number {
+            font-family: 'Teko', sans-serif;
+            font-size: 3.5rem;
+            line-height: 1;
+        }
+        .stat-card .stat-note {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .status-dot.connected { background-color: var(--success-color); }
+        .status-dot.error { background-color: var(--danger-color); }
+
+
         .section-header { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
         .pdf-btn { background-color: var(--success-color); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 0.375rem; cursor: pointer; font-weight: 500; }
         .pdf-btn:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -155,14 +196,48 @@
         <header class="header"><h1>Admin Dashboard</h1><button id="logout-button">Logout</button></header>
         <main class="container">
             <div class="tabs">
-                <button class="tab-button active" data-tab="pending-players">Pending Players</button>
+                <button class="tab-button active" data-tab="dashboard">Dashboard</button>
+                <button class="tab-button" data-tab="pending-players">Pending Players</button>
                 <button class="tab-button" data-tab="approved-players">Approved Players</button>
                 <button class="tab-button" data-tab="manage-teams">Manage Teams</button>
                 <button class="tab-button" data-tab="manage-fixtures">Manage Fixtures</button>
                 <button class="tab-button" data-tab="announcements">Announcements</button>
             </div>
+            
+            <div id="dashboard" class="tab-content active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Approved Players</h3>
+                        <p class="stat-number" id="approved-players-count">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Pending Registrations</h3>
+                        <p class="stat-number" id="pending-players-count">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Teams</h3>
+                        <p class="stat-number" id="teams-count">0</p>
+                    </div>
+                     <div class="stat-card">
+                        <h3>Scheduled Fixtures</h3>
+                        <p class="stat-number" id="fixtures-count">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Estimated Storage</h3>
+                        <p class="stat-number" id="storage-estimate">0 MB</p>
+                        <p class="stat-note">Based on ~1.5MB per player registration.</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Firebase Status</h3>
+                        <div class="status-indicator">
+                            <div class="status-dot" id="db-status-dot"></div>
+                            <span id="db-status-text">Checking...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            <div id="pending-players" class="tab-content active">
+            <div id="pending-players" class="tab-content">
                 <div class="section-header"><h2>Pending Player Approvals</h2></div>
                 <div class="table-container"><table class="data-table"><thead><tr><th>Full Name</th><th>Phone</th><th>Address</th><th>Base Price</th><th>Actions</th></tr></thead><tbody id="pending-players-tbody"></tbody></table></div>
             </div>
@@ -235,7 +310,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, doc, getDoc, setDoc, deleteDoc, addDoc, serverTimestamp, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, doc, getDoc, setDoc, deleteDoc, addDoc, serverTimestamp, query, orderBy, getDocs, getCountFromServer } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -313,8 +388,41 @@
             nextButton.disabled = currentPage === totalPages || totalPages === 0;
         };
 
+        // --- Dashboard Stats ---
+        async function updateDashboardStats() {
+            try {
+                const approvedCountSnap = await getCountFromServer(collection(db, 'players'));
+                const pendingCountSnap = await getCountFromServer(collection(db, 'pending_players'));
+                const teamsCountSnap = await getCountFromServer(collection(db, 'approved_teams'));
+                const fixturesCountSnap = await getCountFromServer(collection(db, 'fixtures'));
+
+                const approvedCount = approvedCountSnap.data().count;
+                const pendingCount = pendingCountSnap.data().count;
+
+                document.getElementById('approved-players-count').textContent = approvedCount;
+                document.getElementById('pending-players-count').textContent = pendingCount;
+                document.getElementById('teams-count').textContent = teamsCountSnap.data().count;
+                document.getElementById('fixtures-count').textContent = fixturesCountSnap.data().count;
+
+                const totalRegistrations = approvedCount + pendingCount;
+                const storageEstimate = (totalRegistrations * 1.5).toFixed(2);
+                document.getElementById('storage-estimate').textContent = `${storageEstimate} MB`;
+
+                // Health check
+                document.getElementById('db-status-dot').className = 'status-dot connected';
+                document.getElementById('db-status-text').textContent = 'Connected';
+            } catch (error) {
+                console.error("Error fetching dashboard stats:", error);
+                 document.getElementById('db-status-dot').className = 'status-dot error';
+                document.getElementById('db-status-text').textContent = 'Connection Error';
+            }
+        }
+
+
         // --- Load Data ---
         function loadDashboardData() {
+            updateDashboardStats(); // Load dashboard stats
+
             const tbodies = {
                 pendingPlayers: document.getElementById('pending-players-tbody'),
                 teams: document.getElementById('teams-tbody'),
