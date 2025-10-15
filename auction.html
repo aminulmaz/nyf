@@ -572,18 +572,20 @@
                     const pageW = 210, pageH = 297;
                     const cardW = 90, cardH = 125; 
                     const positions = [
-                        { x: (pageW / 2) - cardW - 5, y: 40 }, { x: (pageW / 2) + 5, y: 40 },
-                        { x: (pageW / 2) - cardW - 5, y: 50 + cardH }, { x: (pageW / 2) + 5, y: 50 + cardH },
+                        { x: (pageW / 2) - cardW - 5, y: 20 }, { x: (pageW / 2) + 5, y: 20 },
+                        { x: (pageW / 2) - cardW - 5, y: 30 + cardH }, { x: (pageW / 2) + 5, y: 30 + cardH },
                     ];
                     
-                    doc.setFontSize(26); doc.setTextColor('#4f46e5');
-                    doc.text('MLA Haji Suzam Uddin Laskar Night Cricket Tournament', pageW / 2, 15, { align: 'center' });
                     doc.setFontSize(20); doc.setTextColor('#a855f7');
-                    doc.text(`Player Auction - ${role.toUpperCase()}`, pageW / 2, 25, { align: 'center' });
+                    doc.text(`Player Auction - ${role.toUpperCase()}`, pageW / 2, 15, { align: 'center' });
                     
                     const playersInRole = groupedPlayers[role];
                     playersInRole.forEach((player, index) => {
-                        if (index > 0 && index % 4 === 0) { doc.addPage(); }
+                        if (index > 0 && index % 4 === 0) { 
+                            doc.addPage();
+                            doc.setFontSize(20); doc.setTextColor('#a855f7');
+                            doc.text(`Player Auction - ${role.toUpperCase()}`, pageW / 2, 15, { align: 'center' });
+                        }
                         
                         const pos = positions[index % 4];
                         drawCard(doc, pos.x, pos.y, cardW, cardH, player);
@@ -610,25 +612,28 @@
                     doc.setFontSize(8); doc.setTextColor('#a0aec0');
                     doc.text('PASTE PLAYER PHOTO HERE', x + w/2, imgBoxY + imgBoxH / 2, {align: 'center'});
                     
-                    const nameY = y + 83;
+                    let currentY = y + 83;
                     doc.setFontSize(22); doc.setFont('Teko', 'bold'); doc.setTextColor('#ffffff');
                     var splitName = doc.splitTextToSize(player.fullName.toUpperCase(), w - 10);
-                    doc.text(splitName, x + w / 2, nameY, { align: 'center' });
+                    doc.text(splitName, x + w / 2, currentY, { align: 'center' });
+                    currentY += (splitName.length * 6); 
 
-                    const detailsY = nameY + (splitName.length * 8); // Adjust position based on name length
                     doc.setFontSize(11); doc.setFont('helvetica', 'normal'); doc.setTextColor('#a0aec0');
                     const details = `${player.role}  •  ${player.address}`;
-                    doc.text(details, x + w / 2, detailsY, { align: 'center' });
+                    doc.text(details, x + w / 2, currentY, { align: 'center' });
+                    currentY += 8;
 
                     doc.setDrawColor('#4a5568');
                     doc.setLineWidth(0.2);
-                    doc.line(x + 10, detailsY + 8, x + w - 10, detailsY + 8);
+                    doc.line(x + 10, currentY, x + w - 10, currentY);
+                    currentY += 7;
                     
                     doc.setFontSize(12); doc.setTextColor('#ffffff');
-                    doc.text('BASE PRICE', x + w / 2, detailsY + 15, { align: 'center' });
+                    doc.text('BASE PRICE', x + w / 2, currentY, { align: 'center' });
+                    currentY += 9;
                     
                     doc.setFontSize(26); doc.setFont('Teko', 'bold'); doc.setTextColor('#fbbf24');
-                    doc.text(`${player.basePrice} COINS`, x + w / 2, detailsY + 24, { align: 'center' });
+                    doc.text(`${player.basePrice} COINS`, x + w / 2, currentY, { align: 'center' });
                 }
 
             } catch (err) {
