@@ -205,11 +205,13 @@
             background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.4), transparent);
             animation: shimmer 4s infinite linear;
         }
-        .announcement-link { text-decoration: none; }
+        .announcement-link { text-decoration: none; color: inherit; }
         .announcement-item { padding: 1rem 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 1rem; }
         .announcement-item:last-child { border-bottom: none; padding-bottom: 0; }
         .announcement-item:first-child { padding-top: 0; }
         .announcement-icon { color: var(--primary-purple); min-width: 24px; }
+        .announcement-item p { margin: 0; color: var(--text-light); }
+        .announcement-item p strong { color: var(--text-dark); }
 
         /* Teams Section */
         .teams-grid { display: grid; gap: 1rem; }
@@ -284,11 +286,11 @@
         <nav class="container nav">
             <a href="index.html" class="nav-brand"><img src="media/logo.jpg" alt="NYF Logo"></a>
             <div class="nav-links">
-                <a href="index.html" class="active">Home</a>
+                <a href="index" class="active">Home</a>
                 <a href="about">About Tournament</a>
                 <a href="fixtures">Fixtures</a>
                 <a href="rules">Rules & Regulations</a>
-                <a href="player-reg.html">Player Registration</a>
+                <a href="player-reg">Player Registration</a>
                 <a href="contact">Contact</a>
             </div>
             <button id="mobile-menu-button">
@@ -333,7 +335,8 @@
             </div>
         </section>
         
-    
+        
+
         <div class="container">
             <section class="section">
                 <div id="announcements">
@@ -396,7 +399,7 @@
                     <a href="tel:+919999999999">+91 999 999 9999</a>
                 </div>
             </div>
-            <div class="copyright">Developed by <a href="https://www.facebook.com/Aminulmzr" target="_blank" class="developer-name">Aminul Mazumder</a></div>
+            <div class="copyright">Developed by <a href="https://facebook.com/Aminulmzr" target="_blank" class="developer-name">Aminul Mazumder</a></div>
         </div>
     </footer>
 
